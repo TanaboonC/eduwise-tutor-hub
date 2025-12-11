@@ -9,12 +9,23 @@ import {
   User, 
   CheckCircle, 
   XCircle,
-  ChevronRight,
   TrendingUp,
-  BarChart3
+  BarChart3,
+  Filter
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  AreaChart,
+  Area
+} from "recharts";
 
 const courses = [
   {
@@ -26,7 +37,18 @@ const courses = [
     attendance: 95,
     totalClasses: 24,
     attended: 23,
-    color: "bg-primary"
+    color: "bg-primary",
+    weeklyData: [
+      { name: "W1", attendance: 100 },
+      { name: "W2", attendance: 90 },
+      { name: "W3", attendance: 100 },
+      { name: "W4", attendance: 95 },
+    ],
+    monthlyData: [
+      { name: "Jan", attendance: 94 },
+      { name: "Feb", attendance: 95 },
+      { name: "Mar", attendance: 96 },
+    ]
   },
   {
     id: 2,
@@ -37,7 +59,18 @@ const courses = [
     attendance: 92,
     totalClasses: 16,
     attended: 15,
-    color: "bg-info"
+    color: "bg-info",
+    weeklyData: [
+      { name: "W1", attendance: 88 },
+      { name: "W2", attendance: 100 },
+      { name: "W3", attendance: 88 },
+      { name: "W4", attendance: 100 },
+    ],
+    monthlyData: [
+      { name: "Jan", attendance: 90 },
+      { name: "Feb", attendance: 92 },
+      { name: "Mar", attendance: 94 },
+    ]
   },
   {
     id: 3,
@@ -48,7 +81,18 @@ const courses = [
     attendance: 100,
     totalClasses: 12,
     attended: 12,
-    color: "bg-warning"
+    color: "bg-warning",
+    weeklyData: [
+      { name: "W1", attendance: 100 },
+      { name: "W2", attendance: 100 },
+      { name: "W3", attendance: 100 },
+      { name: "W4", attendance: 100 },
+    ],
+    monthlyData: [
+      { name: "Jan", attendance: 100 },
+      { name: "Feb", attendance: 100 },
+      { name: "Mar", attendance: 100 },
+    ]
   },
 ];
 
@@ -73,23 +117,30 @@ const weeklySchedule = [
 ];
 
 const attendanceRecords = [
-  { date: "2024-01-15", subject: "Mathematics", status: "present" },
-  { date: "2024-01-15", subject: "English", status: "present" },
-  { date: "2024-01-16", subject: "Science", status: "present" },
-  { date: "2024-01-17", subject: "Mathematics", status: "present" },
-  { date: "2024-01-17", subject: "English", status: "absent" },
-  { date: "2024-01-18", subject: "Science", status: "present" },
-  { date: "2024-01-19", subject: "Mathematics", status: "present" },
+  { date: "2024-01-15", subject: "Mathematics", status: "present", remarks: "" },
+  { date: "2024-01-15", subject: "English", status: "present", remarks: "" },
+  { date: "2024-01-16", subject: "Science", status: "present", remarks: "" },
+  { date: "2024-01-17", subject: "Mathematics", status: "present", remarks: "" },
+  { date: "2024-01-17", subject: "English", status: "absent", remarks: "Medical leave" },
+  { date: "2024-01-18", subject: "Science", status: "present", remarks: "" },
+  { date: "2024-01-19", subject: "Mathematics", status: "present", remarks: "" },
 ];
 
 function getStatusBadge(percentage: number) {
-  if (percentage >= 95) return { label: "Excellent", class: "status-excellent" };
-  if (percentage >= 80) return { label: "Good", class: "status-good" };
-  return { label: "Needs Improvement", class: "status-improve" };
+  if (percentage >= 95) return { label: "Excellent", class: "status-excellent", status: "excellent" };
+  if (percentage >= 80) return { label: "Good", class: "status-good", status: "good" };
+  return { label: "Needs Improvement", class: "status-improve", status: "needs_improvement" };
 }
 
 export default function CoursesAttendancePage() {
   const [selectedCourse, setSelectedCourse] = useState(courses[0]);
+  const [viewMode, setViewMode] = useState<"weekly" | "monthly">("weekly");
+  const [subjectFilter, setSubjectFilter] = useState<string>("all");
+
+  const attendanceData = viewMode === "weekly" ? selectedCourse.weeklyData : selectedCourse.monthlyData;
+  const filteredRecords = subjectFilter === "all" 
+    ? attendanceRecords 
+    : attendanceRecords.filter(r => r.subject === subjectFilter);
 
   return (
     <StudentLayout
@@ -118,7 +169,10 @@ export default function CoursesAttendancePage() {
             {courses.map((course) => (
               <div
                 key={course.id}
-                className="bg-card rounded-2xl shadow-soft border border-border overflow-hidden card-hover cursor-pointer"
+                className={cn(
+                  "bg-card rounded-2xl shadow-soft border-2 overflow-hidden card-hover cursor-pointer transition-all",
+                  selectedCourse.id === course.id ? "border-primary" : "border-border"
+                )}
                 onClick={() => setSelectedCourse(course)}
               >
                 <div className={`h-2 ${course.color}`} />
@@ -151,6 +205,82 @@ export default function CoursesAttendancePage() {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Course Attendance Graph */}
+          <div className="bg-card rounded-2xl shadow-soft border border-border overflow-hidden">
+            <div className="p-5 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="font-bold text-foreground flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  {selectedCourse.name} - Attendance Trend
+                </h3>
+                <p className="text-sm text-muted-foreground mt-1">Click on a course card above to see its trend</p>
+              </div>
+              <div className="flex bg-muted rounded-lg p-1">
+                <Button
+                  variant={viewMode === "weekly" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("weekly")}
+                  className="rounded-md"
+                >
+                  Weekly
+                </Button>
+                <Button
+                  variant={viewMode === "monthly" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("monthly")}
+                  className="rounded-md"
+                >
+                  Monthly
+                </Button>
+              </div>
+            </div>
+            <div className="p-5">
+              <ResponsiveContainer width="100%" height={250}>
+                <AreaChart data={attendanceData}>
+                  <defs>
+                    <linearGradient id="courseGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                  />
+                  <YAxis 
+                    domain={[70, 100]} 
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: "hsl(var(--card))", 
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "8px"
+                    }}
+                    formatter={(value: number) => [`${value}%`, "Attendance"]}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="attendance"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={3}
+                    fill="url(#courseGradient)"
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="attendance" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth={3}
+                    dot={{ fill: "hsl(var(--primary))", strokeWidth: 2, r: 5 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </TabsContent>
 
@@ -215,12 +345,27 @@ export default function CoursesAttendancePage() {
             </div>
           </div>
 
+          {/* Filter */}
+          <div className="flex items-center gap-3">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            <select
+              value={subjectFilter}
+              onChange={(e) => setSubjectFilter(e.target.value)}
+              className="px-3 py-2 rounded-lg border border-border bg-card text-foreground text-sm"
+            >
+              <option value="all">All Subjects</option>
+              <option value="Mathematics">Mathematics</option>
+              <option value="Science">Science</option>
+              <option value="English">English</option>
+            </select>
+          </div>
+
           {/* Attendance Records */}
           <div className="bg-card rounded-2xl shadow-soft border border-border overflow-hidden">
             <div className="p-4 border-b border-border bg-muted/30">
               <h3 className="font-bold text-foreground flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-primary" />
-                Recent Attendance Records
+                Attendance Records
               </h3>
             </div>
             <div className="overflow-x-auto">
@@ -230,10 +375,11 @@ export default function CoursesAttendancePage() {
                     <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Date</th>
                     <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Subject</th>
                     <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Status</th>
+                    <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Remarks</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {attendanceRecords.map((record, index) => (
+                  {filteredRecords.map((record, index) => (
                     <tr key={index} className="hover:bg-muted/30 transition-colors">
                       <td className="p-4 text-sm text-foreground">
                         {new Date(record.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
@@ -251,6 +397,9 @@ export default function CoursesAttendancePage() {
                             Absent
                           </span>
                         )}
+                      </td>
+                      <td className="p-4 text-sm text-muted-foreground">
+                        {record.remarks || "-"}
                       </td>
                     </tr>
                   ))}
