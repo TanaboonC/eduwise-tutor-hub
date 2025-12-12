@@ -24,7 +24,7 @@ const subjectExams = [
   {
     id: 1,
     name: "Mathematics Advanced",
-    nameTH: "คณิตศาสตร์",
+    nameTH: "",
     totalSets: 10,
     completedSets: 6,
     passedSets: 5,
@@ -34,7 +34,7 @@ const subjectExams = [
   {
     id: 2,
     name: "Science Integration",
-    nameTH: "วิทยาศาสตร์",
+    nameTH: "",
     totalSets: 8,
     completedSets: 4,
     passedSets: 3,
@@ -44,7 +44,7 @@ const subjectExams = [
   {
     id: 3,
     name: "English Proficiency",
-    nameTH: "ภาษาอังกฤษ",
+    nameTH: "",
     totalSets: 6,
     completedSets: 6,
     passedSets: 6,
