@@ -131,7 +131,7 @@ export default function ExamCenterPage() {
   return (
     <StudentLayout
       title="Exam Center"
-      description="ศูนย์สอบ - Schedule, practice sets, and results"
+      description="Schedule, practice sets, and results"
     >
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="bg-card border border-border p-1 rounded-xl">
@@ -157,7 +157,7 @@ export default function ExamCenterPage() {
               <div className="p-5 border-b border-border bg-muted/30">
                 <h3 className="font-bold text-foreground flex items-center gap-2">
                   <FileText className="h-5 w-5 text-primary" />
-                  รายวิชา - Exam Progress by Subject
+                  Exam Progress by Subject
                 </h3>
               </div>
               <div className="divide-y divide-border">
@@ -180,7 +180,7 @@ export default function ExamCenterPage() {
                           </div>
                         </div>
                         <Button variant="ghost" size="sm" className="gap-2">
-                          ดูคะแนนและสถิติ
+                          View Scores & Stats
                           <ArrowRight className="h-4 w-4" />
                         </Button>
                       </div>
@@ -189,8 +189,8 @@ export default function ExamCenterPage() {
                         {/* Completed sets */}
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">ชุดที่ทำแล้ว</span>
-                            <span className="font-medium text-foreground">{subject.completedSets} ชุด</span>
+                            <span className="text-muted-foreground">Completed Sets</span>
+                            <span className="font-medium text-foreground">{subject.completedSets} sets</span>
                           </div>
                           <div className="relative h-3 bg-muted rounded-full overflow-hidden">
                             <div 
@@ -198,14 +198,14 @@ export default function ExamCenterPage() {
                               style={{ width: `${progressPercent}%` }}
                             />
                           </div>
-                          <p className="text-xs text-muted-foreground">จากทั้งหมด {subject.totalSets} ชุด</p>
+                          <p className="text-xs text-muted-foreground">Out of {subject.totalSets} sets</p>
                         </div>
 
                         {/* Passed sets */}
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">ผ่าน {subject.passThreshold}%</span>
-                            <span className="font-medium text-success">{subject.passedSets} ชุด</span>
+                            <span className="text-muted-foreground">Passed {subject.passThreshold}%</span>
+                            <span className="font-medium text-success">{subject.passedSets} sets</span>
                           </div>
                           <div className="relative h-3 bg-muted rounded-full overflow-hidden">
                             <div 
@@ -213,7 +213,7 @@ export default function ExamCenterPage() {
                               style={{ width: `${passedPercent}%` }}
                             />
                           </div>
-                          <p className="text-xs text-muted-foreground">เกณฑ์ผ่าน {subject.passThreshold}%</p>
+                          <p className="text-xs text-muted-foreground">Pass threshold {subject.passThreshold}%</p>
                         </div>
                       </div>
                     </div>
@@ -230,7 +230,7 @@ export default function ExamCenterPage() {
                 className="gap-2"
               >
                 <ChevronRight className="h-4 w-4 rotate-180" />
-                กลับไปรายการวิชา
+                Back to Subject List
               </Button>
               
               <div className="bg-card rounded-2xl shadow-soft border border-border overflow-hidden">
@@ -239,7 +239,7 @@ export default function ExamCenterPage() {
                     {subjectExams.find(s => s.id === selectedSubject)?.name} - CLO Detail
                   </h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    ผลการสอบตาม Course Learning Outcomes
+                    Exam results by Course Learning Outcomes
                   </p>
                 </div>
                 
@@ -248,7 +248,7 @@ export default function ExamCenterPage() {
                     <thead>
                       <tr className="border-b border-border bg-muted/50">
                         <th className="text-left p-4 text-sm font-semibold text-muted-foreground">CLO</th>
-                        <th className="text-left p-4 text-sm font-semibold text-muted-foreground">สถานะ / Status</th>
+                        <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Status</th>
                         <th className="text-center p-4 text-sm font-semibold text-muted-foreground">Score</th>
                         <th className="text-center p-4 text-sm font-semibold text-muted-foreground">Max</th>
                         <th className="text-center p-4 text-sm font-semibold text-muted-foreground">Mean</th>
@@ -271,7 +271,7 @@ export default function ExamCenterPage() {
                                 statusConfig.class
                               )}>
                                 <StatusIcon className="h-4 w-4" />
-                                {statusConfig.label}
+                                {statusConfig.labelEN}
                               </span>
                             </td>
                             <td className="p-4 text-center">
