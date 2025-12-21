@@ -187,6 +187,14 @@ export default function TeacherStudentsPage() {
                     <SelectItem value="คอร์สติวเข้มเนื้อหา ม.5">คอร์สติวเข้มเนื้อหา ม.5</SelectItem>
                   </SelectContent>
                 </Select>
+                <Select value={subjectFilter} onValueChange={setSubjectFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="เลือกวิชา" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="คณิตศาสตร์">คณิตศาสตร์</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>
