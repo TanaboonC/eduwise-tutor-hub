@@ -10,7 +10,10 @@ import CoursesAttendancePage from "./pages/student/CoursesAttendancePage";
 import ExamCenterPage from "./pages/student/ExamCenterPage";
 import RegistrationPage from "./pages/student/RegistrationPage";
 import RewardsPage from "./pages/student/RewardsPage";
-import TeacherModulePage from "./pages/TeacherModulePage";
+import TeacherProfilePage from "./pages/teacher/TeacherProfilePage";
+import TeacherCoursesPage from "./pages/teacher/TeacherCoursesPage";
+import TeacherStudentsPage from "./pages/teacher/TeacherStudentsPage";
+import TeacherPerformancePage from "./pages/teacher/TeacherPerformancePage";
 import MentorModulePage from "./pages/MentorModulePage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
@@ -34,8 +37,13 @@ const App = () => (
           <Route path="/student/exams" element={<ExamCenterPage />} />
           <Route path="/student/registration" element={<RegistrationPage />} />
           <Route path="/student/rewards" element={<RewardsPage />} />
+          {/* Teacher Module Routes */}
+          <Route path="/teacher" element={<Navigate to="/teacher/profile" replace />} />
+          <Route path="/teacher/profile" element={<TeacherProfilePage />} />
+          <Route path="/teacher/courses" element={<TeacherCoursesPage />} />
+          <Route path="/teacher/students" element={<TeacherStudentsPage />} />
+          <Route path="/teacher/performance" element={<TeacherPerformancePage />} />
           {/* Other Module Routes */}
-          <Route path="/teacher" element={<TeacherModulePage />} />
           <Route path="/mentor" element={<MentorModulePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
