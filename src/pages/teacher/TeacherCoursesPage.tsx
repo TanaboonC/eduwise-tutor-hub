@@ -9,18 +9,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { 
-  BookOpen, 
-  ChevronRight, 
-  Calendar, 
-  Clock, 
-  Upload, 
+import {
+  BookOpen,
+  ChevronRight,
+  Calendar,
+  Clock,
+  Upload,
   Video,
   FileText,
   CheckCircle,
   AlertCircle,
   XCircle,
-  ArrowLeft
+  ArrowLeft,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -28,21 +28,21 @@ const courses = [
   {
     id: 1,
     name: "คอร์สติวเข้มเนื้อหา ม.4",
-    subjects: ["คณิตศาสตร์", "ฟิสิกส์", "เคมี", "ชีววิทยา"],
+    subjects: ["คณิตศาสตร์"],
     students: 32,
     status: "active",
   },
   {
     id: 2,
     name: "คอร์สติวเข้มเนื้อหา ม.5",
-    subjects: ["คณิตศาสตร์", "ฟิสิกส์", "เคมี"],
+    subjects: ["คณิตศาสตร์"],
     students: 28,
     status: "active",
   },
   {
     id: 3,
     name: "คอร์สติวเข้มเนื้อหา ม.6",
-    subjects: ["คณิตศาสตร์", "ฟิสิกส์"],
+    subjects: ["คณิตศาสตร์"],
     students: 45,
     status: "active",
   },
@@ -150,21 +150,14 @@ const getAttendanceStatusBadge = (status: string) => {
 };
 
 export default function TeacherCoursesPage() {
-  const [selectedCourse, setSelectedCourse] = useState<typeof courses[0] | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<(typeof courses)[0] | null>(null);
   const [viewMode, setViewMode] = useState<"daily" | "weekly" | "course">("weekly");
 
   if (selectedCourse) {
     return (
-      <TeacherLayout 
-        title={selectedCourse.name}
-        description="จัดการแผนการสอนและติดตามการประเมิน"
-      >
+      <TeacherLayout title={selectedCourse.name} description="จัดการแผนการสอนและติดตามการประเมิน">
         <div className="space-y-6">
-          <Button 
-            variant="ghost" 
-            onClick={() => setSelectedCourse(null)}
-            className="mb-2"
-          >
+          <Button variant="ghost" onClick={() => setSelectedCourse(null)} className="mb-2">
             <ArrowLeft className="h-4 w-4 mr-2" />
             กลับไปรายการหลักสูตร
           </Button>
@@ -192,19 +185,25 @@ export default function TeacherCoursesPage() {
                             <p className="text-sm text-muted-foreground">{ep.description}</p>
                           </div>
                         </div>
-                        
+
                         <div className="grid gap-2 text-sm">
                           <div className="flex items-center gap-2 text-muted-foreground">
                             <FileText className="h-4 w-4" />
-                            <span><strong>เนื้อหา:</strong> {ep.content}</span>
+                            <span>
+                              <strong>เนื้อหา:</strong> {ep.content}
+                            </span>
                           </div>
                           <div className="flex items-center gap-2 text-muted-foreground">
                             <Calendar className="h-4 w-4" />
-                            <span><strong>วันที่สอน:</strong> {ep.date}</span>
+                            <span>
+                              <strong>วันที่สอน:</strong> {ep.date}
+                            </span>
                           </div>
                           <div className="flex items-center gap-2 text-muted-foreground">
                             <Clock className="h-4 w-4" />
-                            <span><strong>เวลา:</strong> {ep.time}</span>
+                            <span>
+                              <strong>เวลา:</strong> {ep.time}
+                            </span>
                           </div>
                         </div>
 
@@ -254,7 +253,9 @@ export default function TeacherCoursesPage() {
                             </div>
                           </DialogContent>
                         </Dialog>
-                        <Button variant="outline" size="sm">แก้ไขข้อมูล</Button>
+                        <Button variant="outline" size="sm">
+                          แก้ไขข้อมูล
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
@@ -304,22 +305,22 @@ export default function TeacherCoursesPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <CardTitle className="text-lg">สรุปเวลาเข้าสอน</CardTitle>
                     <div className="flex gap-2">
-                      <Button 
-                        variant={viewMode === "daily" ? "default" : "outline"} 
+                      <Button
+                        variant={viewMode === "daily" ? "default" : "outline"}
                         size="sm"
                         onClick={() => setViewMode("daily")}
                       >
                         รายวัน
                       </Button>
-                      <Button 
-                        variant={viewMode === "weekly" ? "default" : "outline"} 
+                      <Button
+                        variant={viewMode === "weekly" ? "default" : "outline"}
                         size="sm"
                         onClick={() => setViewMode("weekly")}
                       >
                         รายสัปดาห์
                       </Button>
-                      <Button 
-                        variant={viewMode === "course" ? "default" : "outline"} 
+                      <Button
+                        variant={viewMode === "course" ? "default" : "outline"}
                         size="sm"
                         onClick={() => setViewMode("course")}
                       >
@@ -354,9 +355,9 @@ export default function TeacherCoursesPage() {
                             <TableCell>{row.actualDateTime}</TableCell>
                             <TableCell>{getAttendanceStatusBadge(row.status)}</TableCell>
                             <TableCell>
-                              <Input 
-                                defaultValue={row.note} 
-                                placeholder="เพิ่มหมายเหตุ" 
+                              <Input
+                                defaultValue={row.note}
+                                placeholder="เพิ่มหมายเหตุ"
                                 className="h-8 text-sm min-w-[120px]"
                               />
                             </TableCell>
@@ -375,14 +376,11 @@ export default function TeacherCoursesPage() {
   }
 
   return (
-    <TeacherLayout 
-      title="หลักสูตรการสอน" 
-      description="จัดการคอร์สและแผนการสอน"
-    >
+    <TeacherLayout title="หลักสูตรการสอน" description="จัดการคอร์สและแผนการสอน">
       <div className="space-y-4">
         {courses.map((course) => (
-          <Card 
-            key={course.id} 
+          <Card
+            key={course.id}
             className="border-border shadow-soft hover:shadow-md transition-shadow cursor-pointer"
             onClick={() => setSelectedCourse(course)}
           >
@@ -401,9 +399,7 @@ export default function TeacherCoursesPage() {
                         </Badge>
                       ))}
                     </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      นักเรียน {course.students} คน
-                    </p>
+                    <p className="text-sm text-muted-foreground mt-2">นักเรียน {course.students} คน</p>
                   </div>
                 </div>
                 <ChevronRight className="h-6 w-6 text-muted-foreground" />
