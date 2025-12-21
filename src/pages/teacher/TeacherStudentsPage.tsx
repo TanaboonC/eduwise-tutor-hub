@@ -542,6 +542,10 @@ export default function TeacherStudentsPage() {
 
 // Exam Analytics Component
 function ExamAnalyticsDashboard() {
+  const [examSetFilter, setExamSetFilter] = useState("CL1");
+  
+  const examSets = ["CL1", "CL2", "CL3", "CL4", "CL5"];
+
   const questionStats = [
     { question: "ข้อ 1", correctRate: 85 },
     { question: "ข้อ 2", correctRate: 72 },
@@ -553,19 +557,92 @@ function ExamAnalyticsDashboard() {
     { question: "ข้อ 8", correctRate: 55 },
   ];
 
-  const studentScores = [
+  const studentScoresByExam: Record<string, typeof studentScoresCL1> = {
+    "CL1": [
+      { name: "ณัฐพล", score: 95, rank: 1 },
+      { name: "พิมพ์ใจ", score: 88, rank: 2 },
+      { name: "สมหญิง", score: 75, rank: 3 },
+      { name: "วิชัย", score: 62, rank: 4 },
+    ],
+    "CL2": [
+      { name: "พิมพ์ใจ", score: 92, rank: 1 },
+      { name: "ณัฐพล", score: 85, rank: 2 },
+      { name: "วิชัย", score: 78, rank: 3 },
+      { name: "สมหญิง", score: 70, rank: 4 },
+    ],
+    "CL3": [
+      { name: "สมหญิง", score: 90, rank: 1 },
+      { name: "ณัฐพล", score: 82, rank: 2 },
+      { name: "พิมพ์ใจ", score: 76, rank: 3 },
+      { name: "วิชัย", score: 65, rank: 4 },
+    ],
+    "CL4": [
+      { name: "วิชัย", score: 88, rank: 1 },
+      { name: "ณัฐพล", score: 84, rank: 2 },
+      { name: "สมหญิง", score: 79, rank: 3 },
+      { name: "พิมพ์ใจ", score: 72, rank: 4 },
+    ],
+    "CL5": [
+      { name: "ณัฐพล", score: 98, rank: 1 },
+      { name: "สมหญิง", score: 91, rank: 2 },
+      { name: "พิมพ์ใจ", score: 85, rank: 3 },
+      { name: "วิชัย", score: 68, rank: 4 },
+    ],
+  };
+
+  const studentScoresCL1 = [
     { name: "ณัฐพล", score: 95, rank: 1 },
     { name: "พิมพ์ใจ", score: 88, rank: 2 },
     { name: "สมหญิง", score: 75, rank: 3 },
     { name: "วิชัย", score: 62, rank: 4 },
   ];
 
-  const statusDistribution = [
+  const statusDistributionByExam: Record<string, typeof statusDistributionCL1> = {
+    "CL1": [
+      { status: "Green", color: "#22c55e", totalStudents: 15, tookExam: 15, percentage: 100, max: 95, mean: 88, min: 80 },
+      { status: "Yellow", color: "#eab308", totalStudents: 8, tookExam: 7, percentage: 87.5, max: 79, mean: 72, min: 65 },
+      { status: "Orange", color: "#f97316", totalStudents: 4, tookExam: 4, percentage: 100, max: 64, mean: 58, min: 50 },
+      { status: "Red", color: "#ef4444", totalStudents: 3, tookExam: 2, percentage: 66.7, max: 49, mean: 42, min: 35 },
+    ],
+    "CL2": [
+      { status: "Green", color: "#22c55e", totalStudents: 12, tookExam: 12, percentage: 100, max: 92, mean: 85, min: 78 },
+      { status: "Yellow", color: "#eab308", totalStudents: 10, tookExam: 9, percentage: 90, max: 77, mean: 70, min: 62 },
+      { status: "Orange", color: "#f97316", totalStudents: 5, tookExam: 5, percentage: 100, max: 61, mean: 55, min: 48 },
+      { status: "Red", color: "#ef4444", totalStudents: 3, tookExam: 2, percentage: 66.7, max: 47, mean: 40, min: 32 },
+    ],
+    "CL3": [
+      { status: "Green", color: "#22c55e", totalStudents: 14, tookExam: 13, percentage: 92.9, max: 90, mean: 84, min: 76 },
+      { status: "Yellow", color: "#eab308", totalStudents: 9, tookExam: 8, percentage: 88.9, max: 75, mean: 68, min: 60 },
+      { status: "Orange", color: "#f97316", totalStudents: 4, tookExam: 4, percentage: 100, max: 59, mean: 52, min: 45 },
+      { status: "Red", color: "#ef4444", totalStudents: 3, tookExam: 3, percentage: 100, max: 44, mean: 38, min: 30 },
+    ],
+    "CL4": [
+      { status: "Green", color: "#22c55e", totalStudents: 16, tookExam: 16, percentage: 100, max: 88, mean: 82, min: 75 },
+      { status: "Yellow", color: "#eab308", totalStudents: 7, tookExam: 6, percentage: 85.7, max: 74, mean: 67, min: 58 },
+      { status: "Orange", color: "#f97316", totalStudents: 5, tookExam: 4, percentage: 80, max: 57, mean: 50, min: 42 },
+      { status: "Red", color: "#ef4444", totalStudents: 2, tookExam: 2, percentage: 100, max: 41, mean: 36, min: 28 },
+    ],
+    "CL5": [
+      { status: "Green", color: "#22c55e", totalStudents: 18, tookExam: 18, percentage: 100, max: 98, mean: 92, min: 85 },
+      { status: "Yellow", color: "#eab308", totalStudents: 6, tookExam: 5, percentage: 83.3, max: 84, mean: 78, min: 70 },
+      { status: "Orange", color: "#f97316", totalStudents: 4, tookExam: 3, percentage: 75, max: 69, mean: 62, min: 55 },
+      { status: "Red", color: "#ef4444", totalStudents: 2, tookExam: 1, percentage: 50, max: 54, mean: 48, min: 40 },
+    ],
+  };
+
+  const statusDistributionCL1 = [
     { status: "Green", color: "#22c55e", totalStudents: 15, tookExam: 15, percentage: 100, max: 95, mean: 88, min: 80 },
     { status: "Yellow", color: "#eab308", totalStudents: 8, tookExam: 7, percentage: 87.5, max: 79, mean: 72, min: 65 },
     { status: "Orange", color: "#f97316", totalStudents: 4, tookExam: 4, percentage: 100, max: 64, mean: 58, min: 50 },
     { status: "Red", color: "#ef4444", totalStudents: 3, tookExam: 2, percentage: 66.7, max: 49, mean: 42, min: 35 },
   ];
+
+  const currentStudentScores = studentScoresByExam[examSetFilter] || studentScoresCL1;
+  const currentStatusDistribution = statusDistributionByExam[examSetFilter] || statusDistributionCL1;
+  
+  const maxScore = Math.max(...currentStudentScores.map(s => s.score));
+  const minScore = Math.min(...currentStudentScores.map(s => s.score));
+  const meanScore = Math.round(currentStudentScores.reduce((sum, s) => sum + s.score, 0) / currentStudentScores.length);
 
   return (
     <div className="space-y-6">
@@ -592,9 +669,21 @@ function ExamAnalyticsDashboard() {
       {/* Dashboard 2 & 4: Score Ranking */}
       <Card className="border-border shadow-soft">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <CardTitle className="text-lg">คะแนนเรียงจากมากไปน้อย</CardTitle>
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center flex-wrap">
+              <Select value={examSetFilter} onValueChange={setExamSetFilter}>
+                <SelectTrigger className="w-[120px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {examSets.map((set) => (
+                    <SelectItem key={set} value={set}>
+                      {set}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Button variant="outline" size="sm">
                 Export Excel
               </Button>
@@ -614,7 +703,7 @@ function ExamAnalyticsDashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {studentScores.map((student) => (
+              {currentStudentScores.map((student) => (
                 <TableRow key={student.rank}>
                   <TableCell>
                     <Badge variant={student.rank === 1 ? "default" : "secondary"}>#{student.rank}</Badge>
@@ -626,9 +715,9 @@ function ExamAnalyticsDashboard() {
             </TableBody>
           </Table>
           <div className="flex justify-between mt-4 pt-4 border-t text-sm text-muted-foreground">
-            <span>Max: 95</span>
-            <span>Mean: 80</span>
-            <span>Min: 62</span>
+            <span>Max: {maxScore}</span>
+            <span>Mean: {meanScore}</span>
+            <span>Min: {minScore}</span>
           </div>
         </CardContent>
       </Card>
@@ -636,7 +725,21 @@ function ExamAnalyticsDashboard() {
       {/* Dashboard 3: Status Distribution */}
       <Card className="border-border shadow-soft">
         <CardHeader>
-          <CardTitle className="text-lg">คะแนนตามสถานะสี</CardTitle>
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <CardTitle className="text-lg">คะแนนตามสถานะสี</CardTitle>
+            <Select value={examSetFilter} onValueChange={setExamSetFilter}>
+              <SelectTrigger className="w-[120px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {examSets.map((set) => (
+                  <SelectItem key={set} value={set}>
+                    {set}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -652,7 +755,7 @@ function ExamAnalyticsDashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {statusDistribution.map((item) => (
+              {currentStatusDistribution.map((item) => (
                 <TableRow key={item.status}>
                   <TableCell>
                     <div className="flex items-center gap-2">
