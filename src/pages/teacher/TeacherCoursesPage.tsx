@@ -155,12 +155,22 @@ export default function TeacherCoursesPage() {
 
   if (selectedCourse) {
     return (
-      <TeacherLayout title={selectedCourse.name} description="จัดการแผนการสอนและติดตามการประเมิน">
+      <TeacherLayout title="หลักสูตรการสอน" description="จัดการแผนการสอนและติดตามการประเมิน">
         <div className="space-y-6">
-          <Button variant="ghost" onClick={() => setSelectedCourse(null)} className="mb-2">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            กลับไปรายการหลักสูตร
-          </Button>
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 text-sm">
+            <Button
+              variant="link"
+              className="p-0 h-auto text-muted-foreground hover:text-foreground"
+              onClick={() => setSelectedCourse(null)}
+            >
+              หลักสูตรการสอน
+            </Button>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            <span className="font-medium text-foreground">{selectedCourse.name}</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            <span className="text-primary font-medium">{selectedCourse.subjects[0]}</span>
+          </div>
 
           <Tabs defaultValue="episodes" className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-6">
