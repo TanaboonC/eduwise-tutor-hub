@@ -561,10 +561,10 @@ function ExamAnalyticsDashboard() {
   ];
 
   const statusDistribution = [
-    { status: "Green", count: 15, color: "#22c55e" },
-    { status: "Yellow", count: 8, color: "#eab308" },
-    { status: "Orange", count: 4, color: "#f97316" },
-    { status: "Red", count: 3, color: "#ef4444" },
+    { status: "Green", color: "#22c55e", totalStudents: 15, tookExam: 15, percentage: 100, max: 95, mean: 88, min: 80 },
+    { status: "Yellow", color: "#eab308", totalStudents: 8, tookExam: 7, percentage: 87.5, max: 79, mean: 72, min: 65 },
+    { status: "Orange", color: "#f97316", totalStudents: 4, tookExam: 4, percentage: 100, max: 64, mean: 58, min: 50 },
+    { status: "Red", color: "#ef4444", totalStudents: 3, tookExam: 2, percentage: 66.7, max: 49, mean: 42, min: 35 },
   ];
 
   return (
@@ -639,38 +639,40 @@ function ExamAnalyticsDashboard() {
           <CardTitle className="text-lg">คะแนนตามสถานะสี</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            {statusDistribution.map((item) => (
-              <div
-                key={item.status}
-                className="text-center p-4 rounded-xl"
-                style={{ backgroundColor: `${item.color}20` }}
-              >
-                <div className="text-3xl font-bold" style={{ color: item.color }}>
-                  {item.count}
-                </div>
-                <div className="text-sm text-muted-foreground">{item.status}</div>
-              </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t text-center text-sm">
-            <div>
-              <div className="text-lg font-bold">30</div>
-              <div className="text-muted-foreground">จำนวนนักเรียน</div>
-            </div>
-            <div>
-              <div className="text-lg font-bold">28</div>
-              <div className="text-muted-foreground">ทำข้อสอบแล้ว</div>
-            </div>
-            <div>
-              <div className="text-lg font-bold">93.3%</div>
-              <div className="text-muted-foreground">% ผู้ทำ</div>
-            </div>
-            <div>
-              <div className="text-lg font-bold">95 / 80 / 62</div>
-              <div className="text-muted-foreground">Max / Mean / Min</div>
-            </div>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>สถานะ</TableHead>
+                <TableHead className="text-center">จำนวนนักเรียนทั้งหมด</TableHead>
+                <TableHead className="text-center">จำนวนคนที่ทำข้อสอบ</TableHead>
+                <TableHead className="text-center">% คนที่ทำข้อสอบ</TableHead>
+                <TableHead className="text-center">Max</TableHead>
+                <TableHead className="text-center">Mean</TableHead>
+                <TableHead className="text-center">Min</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {statusDistribution.map((item) => (
+                <TableRow key={item.status}>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-4 h-4 rounded-full" 
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span className="font-medium" style={{ color: item.color }}>{item.status}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center">{item.totalStudents}</TableCell>
+                  <TableCell className="text-center">{item.tookExam}</TableCell>
+                  <TableCell className="text-center">{item.percentage}%</TableCell>
+                  <TableCell className="text-center font-bold">{item.max}</TableCell>
+                  <TableCell className="text-center">{item.mean}</TableCell>
+                  <TableCell className="text-center">{item.min}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>
