@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, MessageSquare, Users, Calendar, CheckCircle, BarChart3, BookOpen, ArrowLeft } from "lucide-react";
+import { Search, MessageSquare, Users, Calendar, CheckCircle, BarChart3, BookOpen, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import {
   AreaChart,
@@ -160,7 +160,6 @@ const getStatusLabel = (status: string) => {
 export default function TeacherStudentsPage() {
   const [selectedCourse, setSelectedCourse] = useState<typeof courses[0] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [subjectFilter, setSubjectFilter] = useState("all");
   const [attendanceFilter, setAttendanceFilter] = useState("weekly");
 
   const filteredStudents = students.filter((student) => {
@@ -170,8 +169,7 @@ export default function TeacherStudentsPage() {
       student.nickname.includes(searchTerm) ||
       student.id.includes(searchTerm);
     const matchesCourse = selectedCourse ? student.course === selectedCourse.name : true;
-    const matchesSubject = subjectFilter === "all" || student.subject === subjectFilter;
-    return matchesSearch && matchesCourse && matchesSubject;
+    return matchesSearch && matchesCourse;
   });
 
   const attendanceChartData = attendanceFilter === "weekly" ? attendanceWeeklyData : attendanceMonthlyData;
@@ -224,15 +222,20 @@ export default function TeacherStudentsPage() {
   return (
     <TeacherLayout title="ข้อมูลนักเรียน" description={`คอร์ส: ${selectedCourse.name}`}>
       <div className="space-y-6">
-        {/* Back Button */}
-        <Button
-          variant="ghost"
-          className="gap-2"
-          onClick={() => setSelectedCourse(null)}
-        >
-          <ArrowLeft className="h-4 w-4" />
-          กลับไปเลือกคอร์ส
-        </Button>
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-sm">
+          <Button
+            variant="link"
+            className="p-0 h-auto text-muted-foreground hover:text-foreground"
+            onClick={() => setSelectedCourse(null)}
+          >
+            ข้อมูลนักเรียน
+          </Button>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          <span className="font-medium text-foreground">{selectedCourse.name}</span>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          <span className="text-primary font-medium">{selectedCourse.subjects[0]}</span>
+        </div>
 
         <Tabs defaultValue="students" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
@@ -255,29 +258,14 @@ export default function TeacherStudentsPage() {
             {/* Filters */}
             <Card className="border-border shadow-soft">
               <CardContent className="pt-6">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="ค้นหานักเรียน..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                  <Select value={subjectFilter} onValueChange={setSubjectFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="เลือกวิชา" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">ทุกวิชา</SelectItem>
-                      {selectedCourse.subjects.map((subject) => (
-                        <SelectItem key={subject} value={subject}>
-                          {subject}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="relative max-w-md">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="ค้นหานักเรียน..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
                 </div>
               </CardContent>
             </Card>
