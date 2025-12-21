@@ -16,7 +16,9 @@ import {
   Users,
   Calendar,
   CheckCircle,
-  BarChart3
+  BarChart3,
+  ChevronRight,
+  ArrowLeft
 } from "lucide-react";
 import { useState } from "react";
 import { 
@@ -31,6 +33,30 @@ import {
   Bar,
   Legend
 } from "recharts";
+
+const courses = [
+  {
+    id: 1,
+    name: "คอร์สติวเข้มเนื้อหา ม.4",
+    subjects: ["คณิตศาสตร์", "ฟิสิกส์", "เคมี", "ชีววิทยา"],
+    students: 32,
+    status: "active",
+  },
+  {
+    id: 2,
+    name: "คอร์สติวเข้มเนื้อหา ม.5",
+    subjects: ["คณิตศาสตร์", "ฟิสิกส์"],
+    students: 28,
+    status: "active",
+  },
+  {
+    id: 3,
+    name: "คอร์สติวเข้มเนื้อหา ม.6",
+    subjects: ["คณิตศาสตร์", "ฟิสิกส์", "เคมี"],
+    students: 45,
+    status: "active",
+  },
+];
 
 const students = [
   {
@@ -109,6 +135,24 @@ const attendanceChartData = [
   { week: "สัปดาห์ 4", byCourse: 90, bySubject: 87 },
 ];
 
+const examScoresByQuestion = [
+  { question: "ข้อ 1", correct: 85 },
+  { question: "ข้อ 2", correct: 72 },
+  { question: "ข้อ 3", correct: 91 },
+  { question: "ข้อ 4", correct: 68 },
+  { question: "ข้อ 5", correct: 79 },
+  { question: "ข้อ 6", correct: 55 },
+  { question: "ข้อ 7", correct: 88 },
+  { question: "ข้อ 8", correct: 76 },
+];
+
+const examScoresByStudent = [
+  { name: "ณัฐพล", score: 95, rank: 1, status: "green" },
+  { name: "พิมพ์ใจ", score: 88, rank: 2, status: "green" },
+  { name: "สมหญิง", score: 75, rank: 3, status: "yellow" },
+  { name: "วิชัย", score: 62, rank: 4, status: "red" },
+];
+
 const getStatusColor = (status: string) => {
   switch (status) {
     case "green":
@@ -136,8 +180,8 @@ const getStatusLabel = (status: string) => {
 };
 
 export default function TeacherStudentsPage() {
+  const [selectedCourse, setSelectedCourse] = useState<(typeof courses)[0] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [courseFilter, setCourseFilter] = useState("all");
   const [subjectFilter, setSubjectFilter] = useState("all");
 
   const filteredStudents = students.filter((student) => {
@@ -146,403 +190,406 @@ export default function TeacherStudentsPage() {
       student.lastName.includes(searchTerm) ||
       student.nickname.includes(searchTerm) ||
       student.id.includes(searchTerm);
-    const matchesCourse = courseFilter === "all" || student.course === courseFilter;
+    const matchesCourse = selectedCourse ? student.course === selectedCourse.name : true;
     const matchesSubject = subjectFilter === "all" || student.subject === subjectFilter;
     return matchesSearch && matchesCourse && matchesSubject;
   });
 
-  return (
-    <TeacherLayout 
-      title="ข้อมูลนักเรียน" 
-      description="จัดการข้อมูลนักเรียนแยกตามหลักสูตรและรายวิชา"
-    >
-      <Tabs defaultValue="students" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="students">
-            <Users className="h-4 w-4 mr-2" />
-            รายชื่อนักเรียน
-          </TabsTrigger>
-          <TabsTrigger value="attendance">
-            <Calendar className="h-4 w-4 mr-2" />
-            สรุปการเข้าเรียน
-          </TabsTrigger>
-          <TabsTrigger value="exams">
-            <BarChart3 className="h-4 w-4 mr-2" />
-            สรุปคะแนนสอบ
-          </TabsTrigger>
-        </TabsList>
+  // Course detail view with students
+  if (selectedCourse) {
+    return (
+      <TeacherLayout 
+        title={selectedCourse.name} 
+        description="จัดการข้อมูลนักเรียนในหลักสูตรนี้"
+      >
+        <div className="space-y-6">
+          <Button variant="ghost" onClick={() => setSelectedCourse(null)} className="mb-2">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            กลับไปรายการหลักสูตร
+          </Button>
 
-        {/* Students List Tab */}
-        <TabsContent value="students" className="space-y-6">
-          {/* Filters */}
-          <Card className="border-border shadow-soft">
-            <CardContent className="pt-6">
-              <div className="grid gap-4 sm:grid-cols-3">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="ค้นหานักเรียน..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <Select value={courseFilter} onValueChange={setCourseFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="เลือกคอร์ส" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">ทุกคอร์ส</SelectItem>
-                    <SelectItem value="คอร์สติวเข้มเนื้อหา ม.4">คอร์สติวเข้มเนื้อหา ม.4</SelectItem>
-                    <SelectItem value="คอร์สติวเข้มเนื้อหา ม.5">คอร์สติวเข้มเนื้อหา ม.5</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={subjectFilter} onValueChange={setSubjectFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="เลือกวิชา" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">ทุกวิชา</SelectItem>
-                    <SelectItem value="คณิตศาสตร์">คณิตศาสตร์</SelectItem>
-                    <SelectItem value="ฟิสิกส์">ฟิสิกส์</SelectItem>
-                    <SelectItem value="เคมี">เคมี</SelectItem>
-                    <SelectItem value="ชีววิทยา">ชีววิทยา</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
+          <Tabs defaultValue="students" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="students">
+                <Users className="h-4 w-4 mr-2" />
+                รายชื่อนักเรียน
+              </TabsTrigger>
+              <TabsTrigger value="attendance">
+                <Calendar className="h-4 w-4 mr-2" />
+                สรุปการเข้าเรียน
+              </TabsTrigger>
+              <TabsTrigger value="exams">
+                <BarChart3 className="h-4 w-4 mr-2" />
+                สรุปคะแนนสอบ
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Student List */}
-          <Card className="border-border shadow-soft">
-            <CardContent className="pt-6">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>รหัส</TableHead>
-                      <TableHead>ชื่อ-นามสกุล</TableHead>
-                      <TableHead>ชื่อเล่น</TableHead>
-                      <TableHead>ชั้น</TableHead>
-                      <TableHead>โรงเรียน</TableHead>
-                      <TableHead>เบอร์นักเรียน</TableHead>
-                      <TableHead>เบอร์ผู้ปกครอง</TableHead>
-                      <TableHead>สถานะ</TableHead>
-                      <TableHead>Feedback</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredStudents.map((student) => (
-                      <TableRow key={student.id}>
-                        <TableCell className="font-medium">{student.id}</TableCell>
-                        <TableCell>{student.firstName} {student.lastName}</TableCell>
-                        <TableCell>{student.nickname}</TableCell>
-                        <TableCell>{student.grade}</TableCell>
-                        <TableCell className="text-xs">{student.school}</TableCell>
-                        <TableCell>{student.phone}</TableCell>
-                        <TableCell>{student.parentPhone}</TableCell>
-                        <TableCell>
-                          <Badge className={getStatusColor(student.status)}>
-                            {getStatusLabel(student.status)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MessageSquare className="h-4 w-4" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-lg">
-                              <DialogHeader>
-                                <DialogTitle>Feedback - {student.firstName} {student.lastName}</DialogTitle>
-                              </DialogHeader>
-                              <div className="space-y-4 pt-4">
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                  <div>
-                                    <Label className="text-muted-foreground">ชื่อ</Label>
-                                    <p className="font-medium">{student.firstName}</p>
+            {/* Students List Tab */}
+            <TabsContent value="students" className="space-y-6">
+              {/* Filters */}
+              <Card className="border-border shadow-soft">
+                <CardContent className="pt-6">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="ค้นหานักเรียน..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                    <Select value={subjectFilter} onValueChange={setSubjectFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="เลือกวิชา" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">ทุกวิชา</SelectItem>
+                        {selectedCourse?.subjects.map((subject) => (
+                          <SelectItem key={subject} value={subject}>{subject}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Student List */}
+              <Card className="border-border shadow-soft">
+                <CardContent className="pt-6">
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>รหัส</TableHead>
+                          <TableHead>ชื่อ-นามสกุล</TableHead>
+                          <TableHead>ชื่อเล่น</TableHead>
+                          <TableHead>ชั้น</TableHead>
+                          <TableHead>โรงเรียน</TableHead>
+                          <TableHead>เบอร์นักเรียน</TableHead>
+                          <TableHead>เบอร์ผู้ปกครอง</TableHead>
+                          <TableHead>สถานะ</TableHead>
+                          <TableHead>Feedback</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredStudents.map((student) => (
+                          <TableRow key={student.id}>
+                            <TableCell className="font-medium">{student.id}</TableCell>
+                            <TableCell>{student.firstName} {student.lastName}</TableCell>
+                            <TableCell>{student.nickname}</TableCell>
+                            <TableCell>{student.grade}</TableCell>
+                            <TableCell className="text-xs">{student.school}</TableCell>
+                            <TableCell>{student.phone}</TableCell>
+                            <TableCell>{student.parentPhone}</TableCell>
+                            <TableCell>
+                              <Badge className={getStatusColor(student.status)}>
+                                {getStatusLabel(student.status)}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button variant="ghost" size="sm">
+                                    <MessageSquare className="h-4 w-4" />
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-lg">
+                                  <DialogHeader>
+                                    <DialogTitle>Feedback - {student.firstName} {student.lastName}</DialogTitle>
+                                  </DialogHeader>
+                                  <div className="space-y-4 pt-4">
+                                    <div className="grid grid-cols-2 gap-4 text-sm">
+                                      <div>
+                                        <Label className="text-muted-foreground">ชื่อ</Label>
+                                        <p className="font-medium">{student.firstName}</p>
+                                      </div>
+                                      <div>
+                                        <Label className="text-muted-foreground">นามสกุล</Label>
+                                        <p className="font-medium">{student.lastName}</p>
+                                      </div>
+                                      <div>
+                                        <Label className="text-muted-foreground">ชื่อเล่น</Label>
+                                        <p className="font-medium">{student.nickname}</p>
+                                      </div>
+                                      <div>
+                                        <Label className="text-muted-foreground">คอร์ส</Label>
+                                        <p className="font-medium text-xs">{student.course}</p>
+                                      </div>
+                                      <div>
+                                        <Label className="text-muted-foreground">รายวิชา</Label>
+                                        <p className="font-medium">{student.subject}</p>
+                                      </div>
+                                      <div>
+                                        <Label className="text-muted-foreground">วันที่</Label>
+                                        <p className="font-medium">{new Date().toLocaleDateString("th-TH")}</p>
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <Label className="text-muted-foreground">โรงเรียนที่ต้องการศึกษาต่อ</Label>
+                                      <p className="font-medium">{student.targetSchool}</p>
+                                    </div>
+                                    <div>
+                                      <Label className="text-muted-foreground">รายละเอียดการสัมภาษณ์</Label>
+                                      <p className="font-medium text-sm">{student.interviewNotes}</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                      <Label>รายละเอียด Feedback</Label>
+                                      <Textarea placeholder="เพิ่ม Feedback สำหรับนักเรียน..." rows={4} />
+                                    </div>
+                                    <Button className="w-full">บันทึก Feedback</Button>
                                   </div>
-                                  <div>
-                                    <Label className="text-muted-foreground">นามสกุล</Label>
-                                    <p className="font-medium">{student.lastName}</p>
-                                  </div>
-                                  <div>
-                                    <Label className="text-muted-foreground">ชื่อเล่น</Label>
-                                    <p className="font-medium">{student.nickname}</p>
-                                  </div>
-                                  <div>
-                                    <Label className="text-muted-foreground">คอร์ส</Label>
-                                    <p className="font-medium text-xs">{student.course}</p>
-                                  </div>
-                                  <div>
-                                    <Label className="text-muted-foreground">รายวิชา</Label>
-                                    <p className="font-medium">{student.subject}</p>
-                                  </div>
-                                  <div>
-                                    <Label className="text-muted-foreground">วันที่</Label>
-                                    <p className="font-medium">{new Date().toLocaleDateString("th-TH")}</p>
-                                  </div>
-                                </div>
-                                <div>
-                                  <Label className="text-muted-foreground">โรงเรียนที่ต้องการศึกษาต่อ</Label>
-                                  <p className="font-medium">{student.targetSchool}</p>
-                                </div>
-                                <div>
-                                  <Label className="text-muted-foreground">รายละเอียดการสัมภาษณ์</Label>
-                                  <p className="font-medium text-sm">{student.interviewNotes}</p>
-                                </div>
-                                <div className="space-y-2">
-                                  <Label>รายละเอียด Feedback</Label>
-                                  <Textarea placeholder="เพิ่ม Feedback สำหรับนักเรียน..." rows={4} />
-                                </div>
-                                <Button className="w-full">บันทึก Feedback</Button>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                        </TableCell>
+                                </DialogContent>
+                              </Dialog>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Attendance Analytics Tab */}
+            <TabsContent value="attendance" className="space-y-6">
+              {/* Attendance Chart */}
+              <Card className="border-border shadow-soft">
+                <CardHeader>
+                  <CardTitle className="text-lg">สรุปการเข้าเรียน</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={attendanceChartData}>
+                        <defs>
+                          <linearGradient id="colorCourse" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#bcc97e" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#bcc97e" stopOpacity={0.1}/>
+                          </linearGradient>
+                          <linearGradient id="colorSubject" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#3f3029" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#3f3029" stopOpacity={0.1}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="week" />
+                        <YAxis domain={[0, 100]} />
+                        <Tooltip />
+                        <Legend />
+                        <Area 
+                          type="monotone" 
+                          dataKey="byCourse" 
+                          name="รายคอร์ส" 
+                          stroke="#bcc97e" 
+                          fillOpacity={1} 
+                          fill="url(#colorCourse)" 
+                        />
+                        <Area 
+                          type="monotone" 
+                          dataKey="bySubject" 
+                          name="รายวิชา" 
+                          stroke="#3f3029" 
+                          fillOpacity={1} 
+                          fill="url(#colorSubject)" 
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Attendance Table by Student */}
+              <Card className="border-border shadow-soft">
+                <CardHeader>
+                  <CardTitle className="text-lg">การเข้าเรียนรายบุคคล</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>ชื่อนักเรียน</TableHead>
+                        <TableHead className="text-center">คณิตศาสตร์</TableHead>
+                        <TableHead className="text-center">ฟิสิกส์</TableHead>
+                        <TableHead className="text-center">เคมี</TableHead>
+                        <TableHead className="text-center">ชีววิทยา</TableHead>
+                        <TableHead className="text-center">ค่าเฉลี่ย (%)</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                    </TableHeader>
+                    <TableBody>
+                      {attendanceByStudent.map((student, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">{student.name}</TableCell>
+                          <TableCell className="text-center">
+                            {student.math ? (
+                              <CheckCircle className="h-5 w-5 text-green-600 mx-auto" />
+                            ) : (
+                              <span className="text-red-500">✗</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {student.physics ? (
+                              <CheckCircle className="h-5 w-5 text-green-600 mx-auto" />
+                            ) : (
+                              <span className="text-red-500">✗</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {student.chemistry ? (
+                              <CheckCircle className="h-5 w-5 text-green-600 mx-auto" />
+                            ) : (
+                              <span className="text-red-500">✗</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {student.biology ? (
+                              <CheckCircle className="h-5 w-5 text-green-600 mx-auto" />
+                            ) : (
+                              <span className="text-red-500">✗</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="flex items-center gap-2">
+                              <Progress value={student.average} className="h-2 flex-1" />
+                              <span className="text-sm font-medium w-10">{student.average}%</span>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-        {/* Attendance Analytics Tab */}
-        <TabsContent value="attendance" className="space-y-6">
-          {/* Attendance Chart */}
-          <Card className="border-border shadow-soft">
-            <CardHeader>
-              <CardTitle className="text-lg">สรุปการเข้าเรียน</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={attendanceChartData}>
-                    <defs>
-                      <linearGradient id="colorCourse" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#bcc97e" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#bcc97e" stopOpacity={0.1}/>
-                      </linearGradient>
-                      <linearGradient id="colorSubject" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3f3029" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#3f3029" stopOpacity={0.1}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="week" />
-                    <YAxis domain={[0, 100]} />
-                    <Tooltip />
-                    <Legend />
-                    <Area 
-                      type="monotone" 
-                      dataKey="byCourse" 
-                      name="รายคอร์ส" 
-                      stroke="#bcc97e" 
-                      fillOpacity={1} 
-                      fill="url(#colorCourse)" 
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="bySubject" 
-                      name="รายวิชา" 
-                      stroke="#3f3029" 
-                      fillOpacity={1} 
-                      fill="url(#colorSubject)" 
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
+            {/* Exams Analytics Tab */}
+            <TabsContent value="exams" className="space-y-6">
+              {/* Dashboard 1: % correct per question */}
+              <Card className="border-border shadow-soft">
+                <CardHeader>
+                  <CardTitle className="text-lg">% คนตอบถูกในแต่ละข้อ</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={examScoresByQuestion}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="question" />
+                        <YAxis domain={[0, 100]} />
+                        <Tooltip />
+                        <Bar dataKey="correct" name="% ตอบถูก" fill="#bcc97e" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
 
-          {/* Attendance Table by Student */}
-          <Card className="border-border shadow-soft">
-            <CardHeader>
-              <CardTitle className="text-lg">การเข้าเรียนรายบุคคล</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ชื่อนักเรียน</TableHead>
-                    <TableHead className="text-center">คณิตศาสตร์</TableHead>
-                    <TableHead className="text-center">ฟิสิกส์</TableHead>
-                    <TableHead className="text-center">เคมี</TableHead>
-                    <TableHead className="text-center">ชีววิทยา</TableHead>
-                    <TableHead className="text-center">ค่าเฉลี่ย (%)</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {attendanceByStudent.map((student, index) => (
-                    <TableRow key={index}>
-                      <TableCell className="font-medium">{student.name}</TableCell>
-                      <TableCell className="text-center">
-                        {student.math ? <CheckCircle className="h-5 w-5 text-green-600 mx-auto" /> : <span className="text-red-500">✗</span>}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {student.physics ? <CheckCircle className="h-5 w-5 text-green-600 mx-auto" /> : <span className="text-red-500">✗</span>}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {student.chemistry ? <CheckCircle className="h-5 w-5 text-green-600 mx-auto" /> : <span className="text-red-500">✗</span>}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {student.biology ? <CheckCircle className="h-5 w-5 text-green-600 mx-auto" /> : <span className="text-red-500">✗</span>}
-                      </TableCell>
-                      <TableCell className="text-center font-bold">{student.average}%</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
+              {/* Dashboard 2 & 3: Score ranking with status */}
+              <Card className="border-border shadow-soft">
+                <CardHeader>
+                  <CardTitle className="text-lg">คะแนนเรียงจากมากไปน้อย (ตามสถานะสี)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>อันดับ</TableHead>
+                        <TableHead>ชื่อนักเรียน</TableHead>
+                        <TableHead>คะแนน</TableHead>
+                        <TableHead>สถานะ</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {examScoresByStudent.map((student) => (
+                        <TableRow key={student.rank}>
+                          <TableCell className="font-bold">{student.rank}</TableCell>
+                          <TableCell>{student.name}</TableCell>
+                          <TableCell>{student.score}</TableCell>
+                          <TableCell>
+                            <Badge className={getStatusColor(student.status)}>
+                              {getStatusLabel(student.status)}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
 
-        {/* Exam Analytics Tab - Will be created in TeacherPerformancePage for detailed analytics */}
-        <TabsContent value="exams" className="space-y-6">
-          <ExamAnalyticsDashboard />
-        </TabsContent>
-      </Tabs>
-    </TeacherLayout>
-  );
-}
+              {/* Dashboard 4: Summary stats */}
+              <Card className="border-border shadow-soft">
+                <CardHeader>
+                  <CardTitle className="text-lg">สรุปภาพรวมการทำข้อสอบ</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex gap-4 mb-4">
+                    <Button variant="outline" size="sm">Export Excel</Button>
+                    <Button variant="outline" size="sm">Export PDF</Button>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t text-center text-sm">
+                    <div>
+                      <div className="text-lg font-bold">30</div>
+                      <div className="text-muted-foreground">จำนวนนักเรียน</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold">28</div>
+                      <div className="text-muted-foreground">ทำข้อสอบแล้ว</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold">93.3%</div>
+                      <div className="text-muted-foreground">% ผู้ทำ</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold">95 / 80 / 62</div>
+                      <div className="text-muted-foreground">Max / Mean / Min</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </TeacherLayout>
+    );
+  }
 
-// Exam Analytics Component
-function ExamAnalyticsDashboard() {
-  const questionStats = [
-    { question: "ข้อ 1", correctRate: 85 },
-    { question: "ข้อ 2", correctRate: 72 },
-    { question: "ข้อ 3", correctRate: 68 },
-    { question: "ข้อ 4", correctRate: 91 },
-    { question: "ข้อ 5", correctRate: 45 },
-    { question: "ข้อ 6", correctRate: 78 },
-    { question: "ข้อ 7", correctRate: 82 },
-    { question: "ข้อ 8", correctRate: 55 },
-  ];
-
-  const studentScores = [
-    { name: "ณัฐพล", score: 95, rank: 1 },
-    { name: "พิมพ์ใจ", score: 88, rank: 2 },
-    { name: "สมหญิง", score: 75, rank: 3 },
-    { name: "วิชัย", score: 62, rank: 4 },
-  ];
-
-  const statusDistribution = [
-    { status: "Green", count: 15, color: "#22c55e" },
-    { status: "Yellow", count: 8, color: "#eab308" },
-    { status: "Orange", count: 4, color: "#f97316" },
-    { status: "Red", count: 3, color: "#ef4444" },
-  ];
-
+  // Course selection page
   return (
-    <div className="space-y-6">
-      {/* Dashboard 1: Correct Rate per Question */}
-      <Card className="border-border shadow-soft">
-        <CardHeader>
-          <CardTitle className="text-lg">% คนตอบถูกในแต่ละข้อ</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[250px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={questionStats}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="question" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Bar dataKey="correctRate" name="% ถูก" fill="#bcc97e" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Dashboard 2 & 4: Score Ranking */}
-      <Card className="border-border shadow-soft">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">คะแนนเรียงจากมากไปน้อย</CardTitle>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm">Export Excel</Button>
-              <Button variant="outline" size="sm">Export PDF</Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>อันดับ</TableHead>
-                <TableHead>ชื่อนักเรียน</TableHead>
-                <TableHead className="text-right">คะแนนที่ได้</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {studentScores.map((student) => (
-                <TableRow key={student.rank}>
-                  <TableCell>
-                    <Badge variant={student.rank === 1 ? "default" : "secondary"}>
-                      #{student.rank}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="font-medium">{student.name}</TableCell>
-                  <TableCell className="text-right font-bold">{student.score}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <div className="flex justify-between mt-4 pt-4 border-t text-sm text-muted-foreground">
-            <span>Max: 95</span>
-            <span>Mean: 80</span>
-            <span>Min: 62</span>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Dashboard 3: Status Distribution */}
-      <Card className="border-border shadow-soft">
-        <CardHeader>
-          <CardTitle className="text-lg">คะแนนตามสถานะสี</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            {statusDistribution.map((item) => (
-              <div 
-                key={item.status} 
-                className="text-center p-4 rounded-xl"
-                style={{ backgroundColor: `${item.color}20` }}
-              >
-                <div 
-                  className="text-3xl font-bold"
-                  style={{ color: item.color }}
-                >
-                  {item.count}
+    <TeacherLayout title="ข้อมูลนักเรียน" description="เลือกหลักสูตรเพื่อดูข้อมูลนักเรียน">
+      <div className="space-y-4">
+        {courses.map((course) => (
+          <Card
+            key={course.id}
+            className="border-border shadow-soft hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => setSelectedCourse(course)}
+          >
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Users className="h-7 w-7 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-foreground">{course.name}</h3>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {course.subjects.map((subject) => (
+                        <Badge key={subject} variant="secondary" className="text-xs">
+                          {subject}
+                        </Badge>
+                      ))}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {course.students} นักเรียน
+                    </p>
+                  </div>
                 </div>
-                <div className="text-sm text-muted-foreground">{item.status}</div>
+                <ChevronRight className="h-6 w-6 text-muted-foreground" />
               </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t text-center text-sm">
-            <div>
-              <div className="text-lg font-bold">30</div>
-              <div className="text-muted-foreground">จำนวนนักเรียน</div>
-            </div>
-            <div>
-              <div className="text-lg font-bold">28</div>
-              <div className="text-muted-foreground">ทำข้อสอบแล้ว</div>
-            </div>
-            <div>
-              <div className="text-lg font-bold">93.3%</div>
-              <div className="text-muted-foreground">% ผู้ทำ</div>
-            </div>
-            <div>
-              <div className="text-lg font-bold">95 / 80 / 62</div>
-              <div className="text-muted-foreground">Max / Mean / Min</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </TeacherLayout>
   );
 }
