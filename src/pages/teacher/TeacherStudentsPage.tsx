@@ -108,12 +108,41 @@ const students = [
   },
 ];
 
-const attendanceByStudent = [
+const attendanceByStudentByWeek: Record<string, typeof attendanceByStudentWeek1> = {
+  "1": [
+    { name: "ณัฐพล", math: true, physics: true, chemistry: true, biology: true, average: 100 },
+    { name: "สมหญิง", math: true, physics: true, chemistry: false, biology: true, average: 75 },
+    { name: "วิชัย", math: false, physics: true, chemistry: true, biology: false, average: 50 },
+    { name: "พิมพ์ใจ", math: true, physics: true, chemistry: true, biology: true, average: 100 },
+  ],
+  "2": [
+    { name: "ณัฐพล", math: true, physics: true, chemistry: true, biology: false, average: 75 },
+    { name: "สมหญิง", math: true, physics: false, chemistry: true, biology: true, average: 75 },
+    { name: "วิชัย", math: true, physics: true, chemistry: true, biology: true, average: 100 },
+    { name: "พิมพ์ใจ", math: true, physics: true, chemistry: false, biology: true, average: 75 },
+  ],
+  "3": [
+    { name: "ณัฐพล", math: true, physics: false, chemistry: true, biology: true, average: 75 },
+    { name: "สมหญิง", math: true, physics: true, chemistry: true, biology: true, average: 100 },
+    { name: "วิชัย", math: false, physics: false, chemistry: true, biology: true, average: 50 },
+    { name: "พิมพ์ใจ", math: true, physics: true, chemistry: true, biology: true, average: 100 },
+  ],
+  "4": [
+    { name: "ณัฐพล", math: true, physics: true, chemistry: true, biology: true, average: 100 },
+    { name: "สมหญิง", math: false, physics: true, chemistry: true, biology: true, average: 75 },
+    { name: "วิชัย", math: true, physics: true, chemistry: false, biology: false, average: 50 },
+    { name: "พิมพ์ใจ", math: true, physics: true, chemistry: true, biology: false, average: 75 },
+  ],
+};
+
+const attendanceByStudentWeek1 = [
   { name: "ณัฐพล", math: true, physics: true, chemistry: true, biology: true, average: 100 },
   { name: "สมหญิง", math: true, physics: true, chemistry: false, biology: true, average: 75 },
   { name: "วิชัย", math: false, physics: true, chemistry: true, biology: false, average: 50 },
   { name: "พิมพ์ใจ", math: true, physics: true, chemistry: true, biology: true, average: 100 },
 ];
+
+const weekOptions = ["1", "2", "3", "4"];
 
 const attendanceWeeklyData = [
   { period: "สัปดาห์ 1", byCourse: 92, bySubject: 88 },
@@ -161,6 +190,7 @@ export default function TeacherStudentsPage() {
   const [selectedCourse, setSelectedCourse] = useState<typeof courses[0] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [attendanceFilter, setAttendanceFilter] = useState("weekly");
+  const [individualWeekFilter, setIndividualWeekFilter] = useState("1");
 
   const filteredStudents = students.filter((student) => {
     const matchesSearch =
@@ -431,7 +461,21 @@ export default function TeacherStudentsPage() {
             {/* Attendance Table by Student */}
             <Card className="border-border shadow-soft">
               <CardHeader>
-                <CardTitle className="text-lg">การเข้าเรียนรายบุคคล</CardTitle>
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <CardTitle className="text-lg">การเข้าเรียนรายบุคคล</CardTitle>
+                  <Select value={individualWeekFilter} onValueChange={setIndividualWeekFilter}>
+                    <SelectTrigger className="w-[150px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {weekOptions.map((week) => (
+                        <SelectItem key={week} value={week}>
+                          สัปดาห์ {week}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -446,7 +490,7 @@ export default function TeacherStudentsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {attendanceByStudent.map((student, index) => (
+                    {(attendanceByStudentByWeek[individualWeekFilter] || attendanceByStudentWeek1).map((student, index) => (
                       <TableRow key={index}>
                         <TableCell className="font-medium">{student.name}</TableCell>
                         <TableCell className="text-center">
