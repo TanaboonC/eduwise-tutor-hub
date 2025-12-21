@@ -104,11 +104,11 @@ const attendanceData = [
   },
   {
     course: "คอร์สติวเข้มเนื้อหา ม.4",
-    subject: "ฟิสิกส์",
-    ep: "EP.1",
-    scheduledDate: "16 ม.ค. 2567",
-    scheduledTime: "13:00",
-    actualDateTime: "16 ม.ค. 2567 13:15",
+    subject: "คณิตศาสตร์",
+    ep: "EP.3",
+    scheduledDate: "29 ม.ค. 2567",
+    scheduledTime: "09:00",
+    actualDateTime: "29 ม.ค. 2567 09:15",
     status: "late",
     note: "รถติด",
   },
@@ -253,9 +253,9 @@ export default function TeacherCoursesPage() {
                             </div>
                           </DialogContent>
                         </Dialog>
-                        <Button variant="outline" size="sm">
+                        {/*<Button variant="outline" size="sm">
                           แก้ไขข้อมูล
-                        </Button>
+                        </Button>*/}
                       </div>
                     </div>
                   </CardContent>
