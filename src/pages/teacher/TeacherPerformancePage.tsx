@@ -12,11 +12,17 @@ const idpItems = [
 
 const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย."];
 
-// IDP data by month - true = needs improvement, false = passed
+// IDP data by month - scores 1-5
 const idpMonthlyData = {
-  "IDP1": { "ม.ค.": true, "ก.พ.": true, "มี.ค.": false, "เม.ย.": false, "พ.ค.": false, "มิ.ย.": false },
-  "IDP2": { "ม.ค.": false, "ก.พ.": false, "มี.ค.": true, "เม.ย.": true, "พ.ค.": false, "มิ.ย.": false },
-  "IDP3": { "ม.ค.": true, "ก.พ.": false, "มี.ค.": false, "เม.ย.": false, "พ.ค.": true, "มิ.ย.": false },
+  "IDP1": { "ม.ค.": 3, "ก.พ.": 3, "มี.ค.": 4, "เม.ย.": 4, "พ.ค.": 5, "มิ.ย.": 5 },
+  "IDP2": { "ม.ค.": 4, "ก.พ.": 4, "มี.ค.": 3, "เม.ย.": 3, "พ.ค.": 4, "มิ.ย.": 5 },
+  "IDP3": { "ม.ค.": 2, "ก.พ.": 3, "มี.ค.": 4, "เม.ย.": 4, "พ.ค.": 3, "มิ.ย.": 4 },
+};
+
+const getScoreColor = (score: number) => {
+  if (score >= 4) return "bg-green-100 text-green-700";
+  if (score >= 3) return "bg-yellow-100 text-yellow-700";
+  return "bg-red-100 text-red-700";
 };
 
 const monthlyScores = [
@@ -88,15 +94,14 @@ export default function TeacherPerformancePage() {
                 {idpItems.map((idp) => (
                   <TableRow key={idp.id}>
                     <TableCell className="font-medium">{idp.id}: {idp.name}</TableCell>
-                    {months.map((month) => (
-                      <TableCell key={month} className="text-center">
-                        {idpMonthlyData[idp.id as keyof typeof idpMonthlyData][month as keyof typeof idpMonthlyData["IDP1"]] ? (
-                          <Badge className="bg-red-100 text-red-700">ต้องพัฒนา</Badge>
-                        ) : (
-                          <Badge className="bg-green-100 text-green-700">ผ่าน</Badge>
-                        )}
-                      </TableCell>
-                    ))}
+                    {months.map((month) => {
+                      const score = idpMonthlyData[idp.id as keyof typeof idpMonthlyData][month as keyof typeof idpMonthlyData["IDP1"]];
+                      return (
+                        <TableCell key={month} className="text-center">
+                          <Badge className={getScoreColor(score)}>{score}/5</Badge>
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 ))}
               </TableBody>
