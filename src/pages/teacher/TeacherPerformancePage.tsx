@@ -25,6 +25,20 @@ const getScoreColor = (score: number) => {
   return "bg-red-100 text-red-700";
 };
 
+// Calculate total score for each month
+const getMonthlyTotal = (month: string) => {
+  return idpItems.reduce((sum, idp) => {
+    return sum + idpMonthlyData[idp.id as keyof typeof idpMonthlyData][month as keyof typeof idpMonthlyData["IDP1"]];
+  }, 0);
+};
+
+// Get IDPs that need development (score < 4) for each month
+const getIdpsToImprove = (month: string) => {
+  return idpItems
+    .filter((idp) => idpMonthlyData[idp.id as keyof typeof idpMonthlyData][month as keyof typeof idpMonthlyData["IDP1"]] < 4)
+    .map((idp) => idp.id);
+};
+
 const monthlyScores = [
   { month: "ม.ค.", score: 4.2 },
   { month: "ก.พ.", score: 4.5 },
@@ -104,6 +118,34 @@ export default function TeacherPerformancePage() {
                     })}
                   </TableRow>
                 ))}
+                {/* Total Score Row */}
+                <TableRow className="bg-muted/50 font-semibold">
+                  <TableCell className="font-bold">รวมคะแนน</TableCell>
+                  {months.map((month) => {
+                    const total = getMonthlyTotal(month);
+                    return (
+                      <TableCell key={month} className="text-center font-bold">
+                        {total}/15
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+                {/* IDPs to Improve Row */}
+                <TableRow className="bg-orange-50">
+                  <TableCell className="font-bold text-orange-700">ต้องพัฒนา</TableCell>
+                  {months.map((month) => {
+                    const idpsToImprove = getIdpsToImprove(month);
+                    return (
+                      <TableCell key={month} className="text-center">
+                        {idpsToImprove.length > 0 ? (
+                          <span className="text-orange-700 font-medium">{idpsToImprove.join(", ")}</span>
+                        ) : (
+                          <Badge className="bg-green-100 text-green-700">ผ่านทุกข้อ</Badge>
+                        )}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
               </TableBody>
             </Table>
           </CardContent>
