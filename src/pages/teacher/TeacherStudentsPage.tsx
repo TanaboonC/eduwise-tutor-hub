@@ -383,9 +383,25 @@ export default function TeacherStudentsPage() {
                                   </div>
                                   <div className="space-y-2">
                                     <Label>รายละเอียด Feedback</Label>
-                                    <Textarea placeholder="เพิ่ม Feedback สำหรับนักเรียน..." rows={4} />
+                                    <div className="bg-muted/50 rounded-lg p-3 space-y-2 text-sm max-h-[200px] overflow-y-auto">
+                                      <div className="border-b border-border pb-2">
+                                        <span className="text-muted-foreground">10/11/2024</span>
+                                        <p className="font-medium">น้องแจ้งว่าไม่มาเพราะไปธุระ</p>
+                                      </div>
+                                      <div className="border-b border-border pb-2">
+                                        <span className="text-muted-foreground">05/11/2024</span>
+                                        <p className="font-medium">น้องมีความก้าวหน้าในวิชาคณิตศาสตร์ดีมาก</p>
+                                      </div>
+                                      <div className="border-b border-border pb-2">
+                                        <span className="text-muted-foreground">28/10/2024</span>
+                                        <p className="font-medium">ผู้ปกครองโทรมาสอบถามเรื่องการบ้าน</p>
+                                      </div>
+                                      <div>
+                                        <span className="text-muted-foreground">15/10/2024</span>
+                                        <p className="font-medium">เริ่มเรียนวันแรก มีความตั้งใจดี</p>
+                                      </div>
+                                    </div>
                                   </div>
-                                  <Button className="w-full">บันทึก Feedback</Button>
                                 </div>
                               </DialogContent>
                             </Dialog>
