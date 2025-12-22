@@ -108,41 +108,12 @@ const students = [
   },
 ];
 
-const attendanceByStudentByWeek: Record<string, typeof attendanceByStudentWeek1> = {
-  "1": [
-    { name: "ณัฐพล", math: true, physics: true, chemistry: true, biology: true, average: 100 },
-    { name: "สมหญิง", math: true, physics: true, chemistry: false, biology: true, average: 75 },
-    { name: "วิชัย", math: false, physics: true, chemistry: true, biology: false, average: 50 },
-    { name: "พิมพ์ใจ", math: true, physics: true, chemistry: true, biology: true, average: 100 },
-  ],
-  "2": [
-    { name: "ณัฐพล", math: true, physics: true, chemistry: true, biology: false, average: 75 },
-    { name: "สมหญิง", math: true, physics: false, chemistry: true, biology: true, average: 75 },
-    { name: "วิชัย", math: true, physics: true, chemistry: true, biology: true, average: 100 },
-    { name: "พิมพ์ใจ", math: true, physics: true, chemistry: false, biology: true, average: 75 },
-  ],
-  "3": [
-    { name: "ณัฐพล", math: true, physics: false, chemistry: true, biology: true, average: 75 },
-    { name: "สมหญิง", math: true, physics: true, chemistry: true, biology: true, average: 100 },
-    { name: "วิชัย", math: false, physics: false, chemistry: true, biology: true, average: 50 },
-    { name: "พิมพ์ใจ", math: true, physics: true, chemistry: true, biology: true, average: 100 },
-  ],
-  "4": [
-    { name: "ณัฐพล", math: true, physics: true, chemistry: true, biology: true, average: 100 },
-    { name: "สมหญิง", math: false, physics: true, chemistry: true, biology: true, average: 75 },
-    { name: "วิชัย", math: true, physics: true, chemistry: false, biology: false, average: 50 },
-    { name: "พิมพ์ใจ", math: true, physics: true, chemistry: true, biology: false, average: 75 },
-  ],
-};
-
-const attendanceByStudentWeek1 = [
-  { name: "ณัฐพล", math: true, physics: true, chemistry: true, biology: true, average: 100 },
-  { name: "สมหญิง", math: true, physics: true, chemistry: false, biology: true, average: 75 },
-  { name: "วิชัย", math: false, physics: true, chemistry: true, biology: false, average: 50 },
-  { name: "พิมพ์ใจ", math: true, physics: true, chemistry: true, biology: true, average: 100 },
+const mathAttendanceByStudent = [
+  { name: "ณัฐพล", ep1: true, ep2: true, ep3: true, ep4: true, ep5: true, ep6: false, ep7: true, ep8: true, average: 87.5 },
+  { name: "สมหญิง", ep1: true, ep2: true, ep3: false, ep4: true, ep5: true, ep6: true, ep7: true, ep8: false, average: 75 },
+  { name: "วิชัย", ep1: false, ep2: true, ep3: true, ep4: false, ep5: true, ep6: true, ep7: false, ep8: true, average: 62.5 },
+  { name: "พิมพ์ใจ", ep1: true, ep2: true, ep3: true, ep4: true, ep5: true, ep6: true, ep7: true, ep8: true, average: 100 },
 ];
-
-const weekOptions = ["1", "2", "3", "4"];
 
 const attendanceWeeklyData = [
   { period: "สัปดาห์ 1", byCourse: 92, bySubject: 88 },
@@ -190,7 +161,7 @@ export default function TeacherStudentsPage() {
   const [selectedCourse, setSelectedCourse] = useState<typeof courses[0] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [attendanceFilter, setAttendanceFilter] = useState("weekly");
-  const [individualWeekFilter, setIndividualWeekFilter] = useState("1");
+  
 
   const filteredStudents = students.filter((student) => {
     const matchesSearch =
@@ -477,61 +448,79 @@ export default function TeacherStudentsPage() {
             {/* Attendance Table by Student */}
             <Card className="border-border shadow-soft">
               <CardHeader>
-                <div className="flex items-center justify-between flex-wrap gap-4">
-                  <CardTitle className="text-lg">การเข้าเรียนรายบุคคล</CardTitle>
-                  <Select value={individualWeekFilter} onValueChange={setIndividualWeekFilter}>
-                    <SelectTrigger className="w-[150px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {weekOptions.map((week) => (
-                        <SelectItem key={week} value={week}>
-                          สัปดาห์ {week}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <CardTitle className="text-lg">การเข้าเรียนรายบุคคล - วิชาคณิตศาสตร์</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>ชื่อนักเรียน</TableHead>
-                      <TableHead className="text-center">คณิตศาสตร์</TableHead>
-                      <TableHead className="text-center">ฟิสิกส์</TableHead>
-                      <TableHead className="text-center">เคมี</TableHead>
-                      <TableHead className="text-center">ชีววิทยา</TableHead>
+                      <TableHead className="text-center">EP1</TableHead>
+                      <TableHead className="text-center">EP2</TableHead>
+                      <TableHead className="text-center">EP3</TableHead>
+                      <TableHead className="text-center">EP4</TableHead>
+                      <TableHead className="text-center">EP5</TableHead>
+                      <TableHead className="text-center">EP6</TableHead>
+                      <TableHead className="text-center">EP7</TableHead>
+                      <TableHead className="text-center">EP8</TableHead>
                       <TableHead className="text-center">ค่าเฉลี่ย (%)</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {(attendanceByStudentByWeek[individualWeekFilter] || attendanceByStudentWeek1).map((student, index) => (
+                    {mathAttendanceByStudent.map((student, index) => (
                       <TableRow key={index}>
                         <TableCell className="font-medium">{student.name}</TableCell>
                         <TableCell className="text-center">
-                          {student.math ? (
+                          {student.ep1 ? (
                             <CheckCircle className="h-5 w-5 text-green-600 mx-auto" />
                           ) : (
                             <span className="text-red-500">✗</span>
                           )}
                         </TableCell>
                         <TableCell className="text-center">
-                          {student.physics ? (
+                          {student.ep2 ? (
                             <CheckCircle className="h-5 w-5 text-green-600 mx-auto" />
                           ) : (
                             <span className="text-red-500">✗</span>
                           )}
                         </TableCell>
                         <TableCell className="text-center">
-                          {student.chemistry ? (
+                          {student.ep3 ? (
                             <CheckCircle className="h-5 w-5 text-green-600 mx-auto" />
                           ) : (
                             <span className="text-red-500">✗</span>
                           )}
                         </TableCell>
                         <TableCell className="text-center">
-                          {student.biology ? (
+                          {student.ep4 ? (
+                            <CheckCircle className="h-5 w-5 text-green-600 mx-auto" />
+                          ) : (
+                            <span className="text-red-500">✗</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {student.ep5 ? (
+                            <CheckCircle className="h-5 w-5 text-green-600 mx-auto" />
+                          ) : (
+                            <span className="text-red-500">✗</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {student.ep6 ? (
+                            <CheckCircle className="h-5 w-5 text-green-600 mx-auto" />
+                          ) : (
+                            <span className="text-red-500">✗</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {student.ep7 ? (
+                            <CheckCircle className="h-5 w-5 text-green-600 mx-auto" />
+                          ) : (
+                            <span className="text-red-500">✗</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {student.ep8 ? (
                             <CheckCircle className="h-5 w-5 text-green-600 mx-auto" />
                           ) : (
                             <span className="text-red-500">✗</span>
