@@ -4,6 +4,21 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
+const idpItems = [
+  { id: "IDP1", name: "การพูดให้ชัดเจน" },
+  { id: "IDP2", name: "สอนให้สนุก" },
+  { id: "IDP3", name: "เตรียมการสอนมากขึ้น" },
+];
+
+const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย."];
+
+// IDP data by month - true = needs improvement, false = passed
+const idpMonthlyData = {
+  "IDP1": { "ม.ค.": true, "ก.พ.": true, "มี.ค.": false, "เม.ย.": false, "พ.ค.": false, "มิ.ย.": false },
+  "IDP2": { "ม.ค.": false, "ก.พ.": false, "มี.ค.": true, "เม.ย.": true, "พ.ค.": false, "มิ.ย.": false },
+  "IDP3": { "ม.ค.": true, "ก.พ.": false, "มี.ค.": false, "เม.ย.": false, "พ.ค.": true, "มิ.ย.": false },
+};
+
 const monthlyScores = [
   { month: "ม.ค.", score: 4.2 },
   { month: "ก.พ.", score: 4.5 },
@@ -11,14 +26,6 @@ const monthlyScores = [
   { month: "เม.ย.", score: 4.6 },
   { month: "พ.ค.", score: 4.8 },
   { month: "มิ.ย.", score: 4.7 },
-];
-
-const evaluationHistory = [
-  { period: "มกราคม 2567", score: 4.2, comment: "การสอนดี นักเรียนเข้าใจง่าย" },
-  { period: "กุมภาพันธ์ 2567", score: 4.5, comment: "พัฒนาสื่อการสอนได้ดีมาก" },
-  { period: "มีนาคม 2567", score: 4.3, comment: "ควรเพิ่มกิจกรรมในห้องเรียน" },
-  { period: "เมษายน 2567", score: 4.6, comment: "นักเรียนมีพัฒนาการดี" },
-  { period: "พฤษภาคม 2567", score: 4.8, comment: "ผลสอบนักเรียนดีเยี่ยม" },
 ];
 
 export default function TeacherPerformancePage() {
@@ -64,23 +71,32 @@ export default function TeacherPerformancePage() {
           </CardContent>
         </Card>
 
+        {/* IDP Development Table */}
         <Card className="border-border shadow-soft">
-          <CardHeader><CardTitle>ประวัติการประเมิน</CardTitle></CardHeader>
+          <CardHeader><CardTitle>สรุปส่วนที่ต้องพัฒนา (IDP) รายเดือน</CardTitle></CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ช่วงเวลา</TableHead>
-                  <TableHead>คะแนน</TableHead>
-                  <TableHead>คอมเมนต์จากหัวหน้า</TableHead>
+                  <TableHead className="w-[200px]">หัวข้อ IDP</TableHead>
+                  {months.map((month) => (
+                    <TableHead key={month} className="text-center">{month}</TableHead>
+                  ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {evaluationHistory.map((row, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="font-medium">{row.period}</TableCell>
-                    <TableCell><Badge variant="secondary">{row.score}/5</Badge></TableCell>
-                    <TableCell>{row.comment}</TableCell>
+                {idpItems.map((idp) => (
+                  <TableRow key={idp.id}>
+                    <TableCell className="font-medium">{idp.id}: {idp.name}</TableCell>
+                    {months.map((month) => (
+                      <TableCell key={month} className="text-center">
+                        {idpMonthlyData[idp.id as keyof typeof idpMonthlyData][month as keyof typeof idpMonthlyData["IDP1"]] ? (
+                          <Badge className="bg-red-100 text-red-700">ต้องพัฒนา</Badge>
+                        ) : (
+                          <Badge className="bg-green-100 text-green-700">ผ่าน</Badge>
+                        )}
+                      </TableCell>
+                    ))}
                   </TableRow>
                 ))}
               </TableBody>
