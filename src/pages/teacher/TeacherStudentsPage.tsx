@@ -651,6 +651,27 @@ function ExamAnalyticsDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Global Filter */}
+      <Card className="border-border shadow-soft">
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-4">
+            <Label className="font-medium">ชุดข้อสอบ:</Label>
+            <Select value={examSetFilter} onValueChange={setExamSetFilter}>
+              <SelectTrigger className="w-[120px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {examSets.map((set) => (
+                  <SelectItem key={set} value={set}>
+                    {set}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Dashboard 1: Correct Rate per Question */}
       <Card className="border-border shadow-soft">
         <CardHeader>
@@ -677,18 +698,6 @@ function ExamAnalyticsDashboard() {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <CardTitle className="text-lg">คะแนนเรียงจากมากไปน้อย</CardTitle>
             <div className="flex gap-2 items-center flex-wrap">
-              <Select value={examSetFilter} onValueChange={setExamSetFilter}>
-                <SelectTrigger className="w-[120px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {examSets.map((set) => (
-                    <SelectItem key={set} value={set}>
-                      {set}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
               <Button variant="outline" size="sm">
                 Export Excel
               </Button>
@@ -730,21 +739,7 @@ function ExamAnalyticsDashboard() {
       {/* Dashboard 3: Status Distribution */}
       <Card className="border-border shadow-soft">
         <CardHeader>
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <CardTitle className="text-lg">คะแนนตามสถานะสี</CardTitle>
-            <Select value={examSetFilter} onValueChange={setExamSetFilter}>
-              <SelectTrigger className="w-[120px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {examSets.map((set) => (
-                  <SelectItem key={set} value={set}>
-                    {set}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <CardTitle className="text-lg">คะแนนตามสถานะสี</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
