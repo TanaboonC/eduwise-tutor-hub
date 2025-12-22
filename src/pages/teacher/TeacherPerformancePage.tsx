@@ -39,14 +39,20 @@ const getIdpsToImprove = (month: string) => {
     .map((idp) => idp.id);
 };
 
-const monthlyScores = [
-  { month: "ม.ค.", score: 4.2 },
-  { month: "ก.พ.", score: 4.5 },
-  { month: "มี.ค.", score: 4.3 },
-  { month: "เม.ย.", score: 4.6 },
-  { month: "พ.ค.", score: 4.8 },
-  { month: "มิ.ย.", score: 4.7 },
-];
+// Generate monthly scores from IDP data
+const monthlyScores = months.map((month) => ({
+  month,
+  score: getMonthlyTotal(month),
+}));
+
+// Calculate average and max scores
+const totalScores = months.map((month) => getMonthlyTotal(month));
+const averageScore = (totalScores.reduce((a, b) => a + b, 0) / totalScores.length).toFixed(1);
+const maxScore = Math.max(...totalScores);
+
+// Get current status (latest month)
+const latestMonth = months[months.length - 1];
+const currentIdpsToImprove = getIdpsToImprove(latestMonth);
 
 export default function TeacherPerformancePage() {
   return (
@@ -55,20 +61,24 @@ export default function TeacherPerformancePage() {
         <div className="grid gap-4 md:grid-cols-3">
           <Card className="border-border shadow-soft">
             <CardContent className="pt-6 text-center">
-              <div className="text-4xl font-bold text-primary">4.7</div>
+              <div className="text-4xl font-bold text-primary">{averageScore}/15</div>
               <p className="text-muted-foreground">คะแนนเฉลี่ยปี 2567</p>
             </CardContent>
           </Card>
           <Card className="border-border shadow-soft">
             <CardContent className="pt-6 text-center">
-              <div className="text-4xl font-bold text-green-600">4.8</div>
+              <div className="text-4xl font-bold text-green-600">{maxScore}/15</div>
               <p className="text-muted-foreground">คะแนนสูงสุด</p>
             </CardContent>
           </Card>
           <Card className="border-border shadow-soft">
             <CardContent className="pt-6 text-center">
-              <Badge className="bg-green-100 text-green-700 text-lg px-4 py-1">ดีเยี่ยม</Badge>
-              <p className="text-muted-foreground mt-2">สถานะ</p>
+              {currentIdpsToImprove.length === 0 ? (
+                <Badge className="bg-green-100 text-green-700 text-lg px-4 py-1">ผ่านทุกข้อ</Badge>
+              ) : (
+                <Badge className="bg-orange-100 text-orange-700 text-lg px-4 py-1">ต้องพัฒนา {currentIdpsToImprove.join(", ")}</Badge>
+              )}
+              <p className="text-muted-foreground mt-2">สถานะปัจจุบัน</p>
             </CardContent>
           </Card>
         </div>
@@ -81,10 +91,10 @@ export default function TeacherPerformancePage() {
                 <LineChart data={monthlyScores}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
-                  <YAxis domain={[0, 5]} />
+                  <YAxis domain={[0, 15]} />
                   <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="score" name="คะแนน" stroke="#bcc97e" strokeWidth={3} dot={{ fill: "#bcc97e", r: 5 }} />
+                  <Line type="monotone" dataKey="score" name="คะแนนรวม" stroke="#bcc97e" strokeWidth={3} dot={{ fill: "#bcc97e", r: 5 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
