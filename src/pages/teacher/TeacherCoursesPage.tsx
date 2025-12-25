@@ -9,12 +9,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   BookOpen,
   ChevronRight,
   Calendar,
   Clock,
-  Upload,
+  Download,
   Video,
   FileText,
   CheckCircle,
@@ -53,7 +54,11 @@ const episodes = [
     id: 1,
     name: "EP.1 พื้นฐานพีชคณิต",
     description: "เรียนรู้หลักการพื้นฐานของพีชคณิตและการแก้สมการ",
-    content: "สมการเชิงเส้น, การแยกตัวประกอบ, การแก้สมการกำลังสอง",
+    contentItems: [
+      { id: "1-1", label: "สมการเชิงเส้น", checked: true },
+      { id: "1-2", label: "การแยกตัวประกอบ", checked: true },
+      { id: "1-3", label: "การแก้สมการกำลังสอง", checked: false },
+    ],
     date: "2024-01-15",
     time: "09:00 - 12:00",
     hasFile: true,
@@ -63,7 +68,11 @@ const episodes = [
     id: 2,
     name: "EP.2 เรขาคณิตวิเคราะห์",
     description: "ศึกษาเส้นตรง วงกลม และพาราโบลา",
-    content: "สมการเส้นตรง, ระยะห่างระหว่างจุด, สมการวงกลม",
+    contentItems: [
+      { id: "2-1", label: "สมการเส้นตรง", checked: true },
+      { id: "2-2", label: "ระยะห่างระหว่างจุด", checked: true },
+      { id: "2-3", label: "สมการวงกลม", checked: true },
+    ],
     date: "2024-01-22",
     time: "09:00 - 12:00",
     hasFile: true,
@@ -73,7 +82,10 @@ const episodes = [
     id: 3,
     name: "EP.3 ตรีโกณมิติ",
     description: "อัตราส่วนตรีโกณมิติและการประยุกต์ใช้",
-    content: "ฟังก์ชันตรีโกณมิติ, เอกลักษณ์ตรีโกณมิติ",
+    contentItems: [
+      { id: "3-1", label: "ฟังก์ชันตรีโกณมิติ", checked: false },
+      { id: "3-2", label: "เอกลักษณ์ตรีโกณมิติ", checked: false },
+    ],
     date: "2024-01-29",
     time: "09:00 - 12:00",
     hasFile: false,
@@ -197,11 +209,27 @@ export default function TeacherCoursesPage() {
                         </div>
 
                         <div className="grid gap-2 text-sm">
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <FileText className="h-4 w-4" />
-                            <span>
-                              <strong>เนื้อหา:</strong> {ep.content}
-                            </span>
+                          <div className="text-muted-foreground">
+                            <div className="flex items-center gap-2 mb-2">
+                              <FileText className="h-4 w-4" />
+                              <strong>เนื้อหา:</strong>
+                            </div>
+                            <div className="ml-6 space-y-2">
+                              {ep.contentItems.map((item) => (
+                                <div key={item.id} className="flex items-center gap-2">
+                                  <Checkbox 
+                                    id={item.id} 
+                                    defaultChecked={item.checked}
+                                  />
+                                  <label 
+                                    htmlFor={item.id} 
+                                    className="text-sm cursor-pointer"
+                                  >
+                                    {item.label}
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                           <div className="flex items-center gap-2 text-muted-foreground">
                             <Calendar className="h-4 w-4" />
@@ -239,33 +267,18 @@ export default function TeacherCoursesPage() {
                       </div>
 
                       <div className="flex flex-col gap-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              <Upload className="h-4 w-4 mr-2" />
-                              อัปโหลดไฟล์
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>อัปโหลดสื่อการสอน - {ep.name}</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4 pt-4">
-                              <div className="space-y-2">
-                                <Label>ไฟล์สื่อการสอน</Label>
-                                <Input type="file" />
-                              </div>
-                              <div className="space-y-2">
-                                <Label>VDO เพิ่มเติม (optional)</Label>
-                                <Input type="file" accept="video/*" />
-                              </div>
-                              <Button className="w-full">อัปโหลด</Button>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                        {/*<Button variant="outline" size="sm">
-                          แก้ไขข้อมูล
-                        </Button>*/}
+                        {ep.hasFile && (
+                          <Button variant="outline" size="sm">
+                            <Download className="h-4 w-4 mr-2" />
+                            ดาวน์โหลดไฟล์
+                          </Button>
+                        )}
+                        {ep.hasVideo && (
+                          <Button variant="outline" size="sm">
+                            <Video className="h-4 w-4 mr-2" />
+                            ดาวน์โหลด VDO
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </CardContent>
