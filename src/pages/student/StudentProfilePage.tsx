@@ -7,15 +7,20 @@ import {
   User, 
   Mail, 
   Phone, 
-  MapPin, 
   Camera, 
   Save, 
   Edit2,
   CheckCircle,
   Calendar,
-  GraduationCap
+  GraduationCap,
+  School,
+  Users,
+  MessageSquare,
+  Target,
+  ClipboardList
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const mockStudent = {
   firstName: "Somchai",
@@ -26,9 +31,58 @@ const mockStudent = {
   dateOfBirth: "2008-05-15",
   enrollmentDate: "2023-08-01",
   studentId: "STU-2023-001",
-  grade: "Grade 10",
+  grade: "มัธยมศึกษาปีที่ 4",
+  school: "โรงเรียนสาธิตแห่งมหาวิทยาลัยกรุงเทพ",
+  parentPhone: "+66 81-234-5678",
+  targetSchool: "คณะวิศวกรรมศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย",
   avatar: null
 };
+
+const mockInterviewDetails = [
+  {
+    id: 1,
+    date: "2024-01-15",
+    interviewer: "อ.สมศักดิ์ มณีรัตน์",
+    topic: "สัมภาษณ์ประเมินความพร้อม",
+    result: "ผ่าน",
+    notes: "นักเรียนมีความมุ่งมั่น ตั้งใจเรียน มีเป้าหมายชัดเจน"
+  },
+  {
+    id: 2,
+    date: "2024-02-20",
+    interviewer: "อ.วิภา สุขใจ",
+    topic: "สัมภาษณ์ติดตามผลการเรียน",
+    result: "ผ่าน",
+    notes: "ผลการเรียนดีขึ้น ควรเน้นวิชาคณิตศาสตร์เพิ่มเติม"
+  }
+];
+
+const mockFeedback = [
+  {
+    id: 1,
+    date: "2024-01-20",
+    from: "Mentor: อ.สมศักดิ์",
+    type: "ข้อเสนอแนะทั่วไป",
+    content: "นักเรียนมีพัฒนาการที่ดี ควรฝึกทำข้อสอบเพิ่มเติม",
+    status: "อ่านแล้ว"
+  },
+  {
+    id: 2,
+    date: "2024-02-15",
+    from: "ครู: อ.วิภา",
+    type: "ผลการเรียน",
+    content: "คะแนนสอบวิชาคณิตศาสตร์ดีขึ้นจากครั้งก่อน 15%",
+    status: "อ่านแล้ว"
+  },
+  {
+    id: 3,
+    date: "2024-03-01",
+    from: "Mentor: อ.สมศักดิ์",
+    type: "แนะนำการเรียน",
+    content: "ควรเตรียมตัวสอบ GAT/PAT ล่วงหน้า 3 เดือน",
+    status: "ยังไม่อ่าน"
+  }
+];
 
 export default function StudentProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -37,15 +91,15 @@ export default function StudentProfilePage() {
   const handleSave = () => {
     setIsEditing(false);
     toast({
-      title: "Profile Updated!",
-      description: "Your changes have been saved successfully.",
+      title: "บันทึกข้อมูลสำเร็จ!",
+      description: "ข้อมูลของคุณได้รับการอัปเดตเรียบร้อยแล้ว",
     });
   };
 
   return (
     <StudentLayout
-      title="Student Profile"
-      description="Manage your personal information"
+      title="ข้อมูลส่วนตัว"
+      description="จัดการข้อมูลส่วนตัวของนักเรียน"
     >
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Profile Card */}
@@ -78,6 +132,10 @@ export default function StudentProfilePage() {
 
               <div className="mt-6 space-y-3">
                 <div className="flex items-center gap-3 text-sm">
+                  <School className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-foreground truncate">{formData.school}</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
                   <Mail className="h-4 w-4 text-muted-foreground" />
                   <span className="text-foreground truncate">{formData.email}</span>
                 </div>
@@ -86,131 +144,264 @@ export default function StudentProfilePage() {
                   <span className="text-foreground">{formData.phone}</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-foreground">Enrolled: {new Date(formData.enrollmentDate).toLocaleDateString()}</span>
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-foreground">ผู้ปกครอง: {formData.parentPhone}</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <Target className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-foreground truncate">{formData.targetSchool}</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Edit Form */}
+        {/* Main Content with Tabs */}
         <div className="lg:col-span-2">
-          <div className="bg-card rounded-2xl shadow-soft border border-border p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-foreground">Personal Information</h3>
-              <Button
-                variant={isEditing ? "outline" : "default"}
-                size="sm"
-                onClick={() => setIsEditing(!isEditing)}
-              >
-                <Edit2 className="h-4 w-4 mr-2" />
-                {isEditing ? "Cancel" : "Edit Profile"}
-              </Button>
-            </div>
+          <Tabs defaultValue="personal" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsTrigger value="personal">ข้อมูลส่วนตัว</TabsTrigger>
+              <TabsTrigger value="interview">รายละเอียดการสัมภาษณ์</TabsTrigger>
+              <TabsTrigger value="feedback">Feedback</TabsTrigger>
+            </TabsList>
 
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  value={formData.firstName}
-                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                  disabled={!isEditing}
-                  className="bg-background"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  value={formData.lastName}
-                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  disabled={!isEditing}
-                  className="bg-background"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  disabled={!isEditing}
-                  className="bg-background"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  disabled={!isEditing}
-                  className="bg-background"
-                />
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="address">Address</Label>
-                <Input
-                  id="address"
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  disabled={!isEditing}
-                  className="bg-background"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="dob">Date of Birth</Label>
-                <Input
-                  id="dob"
-                  type="date"
-                  value={formData.dateOfBirth}
-                  onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                  disabled={!isEditing}
-                  className="bg-background"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="studentId">Student ID</Label>
-                <Input
-                  id="studentId"
-                  value={formData.studentId}
-                  disabled
-                  className="bg-muted"
-                />
-              </div>
-            </div>
+            {/* Personal Information Tab */}
+            <TabsContent value="personal">
+              <div className="bg-card rounded-2xl shadow-soft border border-border p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-bold text-foreground">ข้อมูลส่วนตัว</h3>
+                  <Button
+                    variant={isEditing ? "outline" : "default"}
+                    size="sm"
+                    onClick={() => setIsEditing(!isEditing)}
+                  >
+                    <Edit2 className="h-4 w-4 mr-2" />
+                    {isEditing ? "ยกเลิก" : "แก้ไขข้อมูล"}
+                  </Button>
+                </div>
 
-            {isEditing && (
-              <div className="mt-6 flex justify-end gap-3">
-                <Button variant="outline" onClick={() => setIsEditing(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={handleSave}>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Changes
-                </Button>
-              </div>
-            )}
-          </div>
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">ชื่อ</Label>
+                    <Input
+                      id="firstName"
+                      value={formData.firstName}
+                      onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                      disabled={!isEditing}
+                      className="bg-background"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">นามสกุล</Label>
+                    <Input
+                      id="lastName"
+                      value={formData.lastName}
+                      onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                      disabled={!isEditing}
+                      className="bg-background"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="grade">ระดับชั้น</Label>
+                    <Input
+                      id="grade"
+                      value={formData.grade}
+                      onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
+                      disabled={!isEditing}
+                      className="bg-background"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="school">โรงเรียน</Label>
+                    <Input
+                      id="school"
+                      value={formData.school}
+                      onChange={(e) => setFormData({ ...formData, school: e.target.value })}
+                      disabled={!isEditing}
+                      className="bg-background"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">อีเมล</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      disabled={!isEditing}
+                      className="bg-background"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">เบอร์โทรศัพท์</Label>
+                    <Input
+                      id="phone"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      disabled={!isEditing}
+                      className="bg-background"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="parentPhone">เบอร์ผู้ปกครอง</Label>
+                    <Input
+                      id="parentPhone"
+                      value={formData.parentPhone}
+                      onChange={(e) => setFormData({ ...formData, parentPhone: e.target.value })}
+                      disabled={!isEditing}
+                      className="bg-background"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="dob">วันเกิด</Label>
+                    <Input
+                      id="dob"
+                      type="date"
+                      value={formData.dateOfBirth}
+                      onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                      disabled={!isEditing}
+                      className="bg-background"
+                    />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="address">ที่อยู่</Label>
+                    <Input
+                      id="address"
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      disabled={!isEditing}
+                      className="bg-background"
+                    />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="targetSchool">โรงเรียน/มหาวิทยาลัยที่ต้องการศึกษาต่อ</Label>
+                    <Input
+                      id="targetSchool"
+                      value={formData.targetSchool}
+                      onChange={(e) => setFormData({ ...formData, targetSchool: e.target.value })}
+                      disabled={!isEditing}
+                      className="bg-background"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="studentId">รหัสนักเรียน</Label>
+                    <Input
+                      id="studentId"
+                      value={formData.studentId}
+                      disabled
+                      className="bg-muted"
+                    />
+                  </div>
+                </div>
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-            {[
-              { label: "Courses", value: "3", icon: GraduationCap },
-              { label: "Attendance", value: "95%", icon: CheckCircle },
-              { label: "Exams Taken", value: "12", icon: Calendar },
-              { label: "Avg Score", value: "87%", icon: CheckCircle },
-            ].map((stat, i) => (
-              <div key={i} className="bg-card rounded-xl p-4 shadow-soft border border-border text-center">
-                <stat.icon className="h-6 w-6 text-primary mx-auto mb-2" />
-                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                <p className="text-xs text-muted-foreground">{stat.label}</p>
+                {isEditing && (
+                  <div className="mt-6 flex justify-end gap-3">
+                    <Button variant="outline" onClick={() => setIsEditing(false)}>
+                      ยกเลิก
+                    </Button>
+                    <Button onClick={handleSave}>
+                      <Save className="h-4 w-4 mr-2" />
+                      บันทึกข้อมูล
+                    </Button>
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
+
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                {[
+                  { label: "หลักสูตร", value: "3", icon: GraduationCap },
+                  { label: "เข้าเรียน", value: "95%", icon: CheckCircle },
+                  { label: "สอบแล้ว", value: "12", icon: Calendar },
+                  { label: "คะแนนเฉลี่ย", value: "87%", icon: CheckCircle },
+                ].map((stat, i) => (
+                  <div key={i} className="bg-card rounded-xl p-4 shadow-soft border border-border text-center">
+                    <stat.icon className="h-6 w-6 text-primary mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                    <p className="text-xs text-muted-foreground">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+
+            {/* Interview Details Tab */}
+            <TabsContent value="interview">
+              <div className="bg-card rounded-2xl shadow-soft border border-border p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <ClipboardList className="h-5 w-5 text-primary" />
+                  <h3 className="text-lg font-bold text-foreground">รายละเอียดการสัมภาษณ์</h3>
+                </div>
+
+                <div className="space-y-4">
+                  {mockInterviewDetails.map((interview) => (
+                    <div key={interview.id} className="bg-background rounded-xl p-4 border border-border">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h4 className="font-semibold text-foreground">{interview.topic}</h4>
+                          <p className="text-sm text-muted-foreground">{interview.interviewer}</p>
+                        </div>
+                        <div className="text-right">
+                          <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                            interview.result === "ผ่าน" 
+                              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" 
+                              : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                          }`}>
+                            {interview.result}
+                          </span>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {new Date(interview.date).toLocaleDateString('th-TH')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="bg-muted/50 rounded-lg p-3">
+                        <p className="text-sm text-foreground">{interview.notes}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Feedback Tab */}
+            <TabsContent value="feedback">
+              <div className="bg-card rounded-2xl shadow-soft border border-border p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <MessageSquare className="h-5 w-5 text-primary" />
+                  <h3 className="text-lg font-bold text-foreground">รายละเอียด Feedback</h3>
+                </div>
+
+                <div className="space-y-4">
+                  {mockFeedback.map((feedback) => (
+                    <div key={feedback.id} className="bg-background rounded-xl p-4 border border-border">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-semibold text-foreground">{feedback.from}</h4>
+                            <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full">
+                              {feedback.type}
+                            </span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {new Date(feedback.date).toLocaleDateString('th-TH')}
+                          </p>
+                        </div>
+                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                          feedback.status === "อ่านแล้ว" 
+                            ? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400" 
+                            : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                        }`}>
+                          {feedback.status}
+                        </span>
+                      </div>
+                      <div className="bg-muted/50 rounded-lg p-3">
+                        <p className="text-sm text-foreground">{feedback.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </StudentLayout>
