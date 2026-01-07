@@ -11,7 +11,9 @@ import {
   CheckCircle,
   Star,
   ShoppingCart,
-  BookOpen
+  BookOpen,
+  CreditCard,
+  Wallet
 } from "lucide-react";
 import {
   Dialog,
@@ -22,6 +24,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 const availableCourses = [
   {
@@ -80,23 +84,37 @@ const registrationHistory = [
   { id: 3, course: "English Proficiency", date: "2023-08-20", status: "Active", amount: 8000 },
 ];
 
+type PaymentOption = "full" | "installment3" | "installment6";
+
 export default function RegistrationPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCourse, setSelectedCourse] = useState<typeof availableCourses[0] | null>(null);
-  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [paymentOption, setPaymentOption] = useState<PaymentOption>("full");
 
   const filteredCourses = availableCourses.filter(course =>
     course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     course.teacher.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleRegister = () => {
-    setShowConfirmation(false);
+  const getInstallmentAmount = (price: number, installments: number) => {
+    return Math.ceil(price / installments);
+  };
+
+  const handlePayment = () => {
+    setShowPaymentDialog(false);
+    const paymentType = paymentOption === "full" 
+      ? "ชำระเต็มจำนวน" 
+      : paymentOption === "installment3" 
+        ? "ผ่อนชำระ 3 งวด" 
+        : "ผ่อนชำระ 6 งวด";
+    
     toast({
-      title: "Registration Successful!",
-      description: `You have successfully registered for ${selectedCourse?.name}`,
+      title: "ลงทะเบียนสำเร็จ!",
+      description: `คุณได้ลงทะเบียนคอร์ส ${selectedCourse?.name} แบบ${paymentType}`,
     });
     setSelectedCourse(null);
+    setPaymentOption("full");
   };
 
   return (
@@ -165,11 +183,11 @@ export default function RegistrationPage() {
                 <Button 
                   onClick={() => {
                     setSelectedCourse(course);
-                    setShowConfirmation(true);
+                    setShowPaymentDialog(true);
                   }}
                 >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Register Now
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  ชำระเงิน
                 </Button>
               </div>
             </div>
@@ -216,45 +234,125 @@ export default function RegistrationPage() {
         </div>
       </div>
 
-      {/* Registration Confirmation Dialog */}
-      <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
-        <DialogContent className="bg-card">
+      {/* Payment Options Dialog */}
+      <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
+        <DialogContent className="bg-card max-w-md">
           <DialogHeader>
-            <DialogTitle>Confirm Registration</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Wallet className="h-5 w-5 text-primary" />
+              เลือกวิธีชำระเงิน
+            </DialogTitle>
             <DialogDescription>
-              You are about to register for the following course:
+              กรุณาเลือกรูปแบบการชำระเงินสำหรับคอร์ส
             </DialogDescription>
           </DialogHeader>
           
           {selectedCourse && (
-            <div className="bg-muted/50 rounded-xl p-4 space-y-3">
-              <h4 className="font-bold text-foreground">{selectedCourse.name}</h4>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <User className="h-4 w-4" />
-                {selectedCourse.teacher}
+            <div className="space-y-4">
+              {/* Course Info */}
+              <div className="bg-muted/50 rounded-xl p-4 space-y-2">
+                <h4 className="font-bold text-foreground">{selectedCourse.name}</h4>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <User className="h-4 w-4" />
+                  {selectedCourse.teacher}
+                </div>
+                <div className="text-lg font-bold text-primary">
+                  ฿{selectedCourse.price.toLocaleString()}
+                </div>
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock className="h-4 w-4" />
-                {selectedCourse.duration}
-              </div>
-              <div className="pt-3 border-t border-border">
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Total Amount:</span>
-                  <span className="text-2xl font-bold text-foreground">
-                    ฿{selectedCourse.price.toLocaleString()}
+
+              {/* Payment Options */}
+              <RadioGroup value={paymentOption} onValueChange={(value) => setPaymentOption(value as PaymentOption)}>
+                {/* Full Payment */}
+                <div className={`relative flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                  paymentOption === "full" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                }`}>
+                  <RadioGroupItem value="full" id="full" className="mt-1" />
+                  <Label htmlFor="full" className="flex-1 cursor-pointer">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-foreground">ชำระเต็มจำนวน</p>
+                        <p className="text-sm text-muted-foreground">ชำระครั้งเดียว</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xl font-bold text-foreground">฿{selectedCourse.price.toLocaleString()}</p>
+                      </div>
+                    </div>
+                  </Label>
+                </div>
+
+                {/* 3 Installments */}
+                <div className={`relative flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                  paymentOption === "installment3" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                }`}>
+                  <RadioGroupItem value="installment3" id="installment3" className="mt-1" />
+                  <Label htmlFor="installment3" className="flex-1 cursor-pointer">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-foreground">ผ่อนชำระ 3 งวด</p>
+                        <p className="text-sm text-muted-foreground">แบ่งจ่าย 3 เดือน</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xl font-bold text-foreground">฿{getInstallmentAmount(selectedCourse.price, 3).toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground">/งวด</p>
+                      </div>
+                    </div>
+                  </Label>
+                </div>
+
+                {/* 6 Installments */}
+                <div className={`relative flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                  paymentOption === "installment6" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                }`}>
+                  <RadioGroupItem value="installment6" id="installment6" className="mt-1" />
+                  <Label htmlFor="installment6" className="flex-1 cursor-pointer">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-foreground">ผ่อนชำระ 6 งวด</p>
+                        <p className="text-sm text-muted-foreground">แบ่งจ่าย 6 เดือน</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xl font-bold text-foreground">฿{getInstallmentAmount(selectedCourse.price, 6).toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground">/งวด</p>
+                      </div>
+                    </div>
+                  </Label>
+                </div>
+              </RadioGroup>
+
+              {/* Payment Summary */}
+              <div className="bg-muted/30 rounded-xl p-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">ราคาคอร์ส</span>
+                  <span className="text-foreground">฿{selectedCourse.price.toLocaleString()}</span>
+                </div>
+                {paymentOption !== "full" && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">จำนวนงวด</span>
+                    <span className="text-foreground">{paymentOption === "installment3" ? "3" : "6"} งวด</span>
+                  </div>
+                )}
+                <div className="flex justify-between pt-2 border-t border-border">
+                  <span className="font-semibold text-foreground">
+                    {paymentOption === "full" ? "ยอดชำระ" : "ชำระงวดแรก"}
+                  </span>
+                  <span className="text-xl font-bold text-primary">
+                    ฿{paymentOption === "full" 
+                      ? selectedCourse.price.toLocaleString() 
+                      : getInstallmentAmount(selectedCourse.price, paymentOption === "installment3" ? 3 : 6).toLocaleString()}
                   </span>
                 </div>
               </div>
             </div>
           )}
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowConfirmation(false)}>
-              Cancel
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setShowPaymentDialog(false)}>
+              ยกเลิก
             </Button>
-            <Button onClick={handleRegister}>
+            <Button onClick={handlePayment}>
               <CheckCircle className="h-4 w-4 mr-2" />
-              Confirm & Pay
+              ยืนยันชำระเงิน
             </Button>
           </DialogFooter>
         </DialogContent>
