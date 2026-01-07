@@ -2,6 +2,8 @@ import { useState } from "react";
 import { StudentLayout } from "@/components/student/StudentLayout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { 
   BookOpen, 
   Calendar, 
@@ -11,7 +13,9 @@ import {
   XCircle,
   TrendingUp,
   BarChart3,
-  Filter
+  Filter,
+  ChevronRight,
+  Users
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -27,7 +31,28 @@ import {
   Area
 } from "recharts";
 
-const courses = [
+const availableCourses = [
+  {
+    id: 1,
+    name: "คอร์สติวเข้มเนื้อหา ม.4",
+    students: 32,
+    status: "active",
+  },
+  {
+    id: 2,
+    name: "คอร์สติวเข้มเนื้อหา ม.5",
+    students: 28,
+    status: "active",
+  },
+  {
+    id: 3,
+    name: "คอร์สติวเข้มเนื้อหา ม.6",
+    students: 45,
+    status: "active",
+  },
+];
+
+const subjects = [
   {
     id: 1,
     name: "Mathematics Advanced",
@@ -39,10 +64,10 @@ const courses = [
     attended: 23,
     color: "bg-primary",
     weeklyData: [
-      { name: "W1", attendance: 100 },
-      { name: "W2", attendance: 90 },
-      { name: "W3", attendance: 100 },
-      { name: "W4", attendance: 95 },
+      { name: "EP1", attendance: 100 },
+      { name: "EP2", attendance: 90 },
+      { name: "EP3", attendance: 100 },
+      { name: "EP4", attendance: 95 },
     ],
     monthlyData: [
       { name: "Jan", attendance: 94 },
@@ -61,10 +86,10 @@ const courses = [
     attended: 15,
     color: "bg-info",
     weeklyData: [
-      { name: "W1", attendance: 88 },
-      { name: "W2", attendance: 100 },
-      { name: "W3", attendance: 88 },
-      { name: "W4", attendance: 100 },
+      { name: "EP1", attendance: 88 },
+      { name: "EP2", attendance: 100 },
+      { name: "EP3", attendance: 88 },
+      { name: "EP4", attendance: 100 },
     ],
     monthlyData: [
       { name: "Jan", attendance: 90 },
@@ -83,10 +108,10 @@ const courses = [
     attended: 12,
     color: "bg-warning",
     weeklyData: [
-      { name: "W1", attendance: 100 },
-      { name: "W2", attendance: 100 },
-      { name: "W3", attendance: 100 },
-      { name: "W4", attendance: 100 },
+      { name: "EP1", attendance: 100 },
+      { name: "EP2", attendance: 100 },
+      { name: "EP3", attendance: 100 },
+      { name: "EP4", attendance: 100 },
     ],
     monthlyData: [
       { name: "Jan", attendance: 100 },
@@ -117,13 +142,13 @@ const weeklySchedule = [
 ];
 
 const attendanceRecords = [
-  { date: "2024-01-15", subject: "Mathematics", status: "present", remarks: "" },
-  { date: "2024-01-15", subject: "English", status: "present", remarks: "" },
-  { date: "2024-01-16", subject: "Science", status: "present", remarks: "" },
-  { date: "2024-01-17", subject: "Mathematics", status: "present", remarks: "" },
-  { date: "2024-01-17", subject: "English", status: "absent", remarks: "Medical leave" },
-  { date: "2024-01-18", subject: "Science", status: "present", remarks: "" },
-  { date: "2024-01-19", subject: "Mathematics", status: "present", remarks: "" },
+  { date: "2024-01-15", subject: "Mathematics", ep: "EP1", status: "present", remarks: "" },
+  { date: "2024-01-15", subject: "English", ep: "EP1", status: "present", remarks: "" },
+  { date: "2024-01-16", subject: "Science", ep: "EP1", status: "present", remarks: "" },
+  { date: "2024-01-17", subject: "Mathematics", ep: "EP2", status: "present", remarks: "" },
+  { date: "2024-01-17", subject: "English", ep: "EP2", status: "absent", remarks: "Medical leave" },
+  { date: "2024-01-18", subject: "Science", ep: "EP2", status: "present", remarks: "" },
+  { date: "2024-01-19", subject: "Mathematics", ep: "EP3", status: "present", remarks: "" },
 ];
 
 function getStatusBadge(percentage: number) {
@@ -133,20 +158,79 @@ function getStatusBadge(percentage: number) {
 }
 
 export default function CoursesAttendancePage() {
-  const [selectedCourse, setSelectedCourse] = useState(courses[0]);
+  const [selectedCourse, setSelectedCourse] = useState<(typeof availableCourses)[0] | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState(subjects[0]);
   const [viewMode, setViewMode] = useState<"weekly" | "monthly">("weekly");
   const [subjectFilter, setSubjectFilter] = useState<string>("all");
 
-  const attendanceData = viewMode === "weekly" ? selectedCourse.weeklyData : selectedCourse.monthlyData;
+  const attendanceData = viewMode === "weekly" ? selectedSubject.weeklyData : selectedSubject.monthlyData;
   const filteredRecords = subjectFilter === "all" 
     ? attendanceRecords 
     : attendanceRecords.filter(r => r.subject === subjectFilter);
+
+  // Course selection screen
+  if (!selectedCourse) {
+    return (
+      <StudentLayout
+        title="Courses & Attendance"
+        description="เลือกคอร์สเรียนเพื่อดูข้อมูลวิชาและ Attendance"
+      >
+        <div className="space-y-4">
+          {availableCourses.map((course) => (
+            <Card
+              key={course.id}
+              className="cursor-pointer transition-all hover:shadow-lg hover:border-primary border-2 border-border"
+              onClick={() => setSelectedCourse(course)}
+            >
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <BookOpen className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg text-foreground">{course.name}</h3>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
+                        <span className="flex items-center gap-1">
+                          <Users className="h-4 w-4" />
+                          {course.students} นักเรียน
+                        </span>
+                        <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">
+                          {course.status === "active" ? "กำลังเรียน" : "ยังไม่เริ่ม"}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                  <ChevronRight className="h-6 w-6 text-muted-foreground" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </StudentLayout>
+    );
+  }
 
   return (
     <StudentLayout
       title="Courses & Attendance"
       description="View your registered courses and attendance records"
     >
+      {/* Navigator Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm mb-6">
+        <Button
+          variant="link"
+          className="p-0 h-auto text-muted-foreground hover:text-foreground"
+          onClick={() => setSelectedCourse(null)}
+        >
+          คอร์สเรียน
+        </Button>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        <span className="font-medium text-foreground">{selectedCourse.name}</span>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        <span className="text-primary font-medium">{selectedSubject.name}</span>
+      </div>
+
       <Tabs defaultValue="courses" className="space-y-6">
         <TabsList className="bg-card border border-border p-1 rounded-xl">
           <TabsTrigger value="courses" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
@@ -163,42 +247,42 @@ export default function CoursesAttendancePage() {
           </TabsTrigger>
         </TabsList>
 
-        {/* Courses Tab */}
+        {/* Courses Tab - Now shows subjects */}
         <TabsContent value="courses" className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {courses.map((course) => (
+            {subjects.map((subject) => (
               <div
-                key={course.id}
+                key={subject.id}
                 className={cn(
                   "bg-card rounded-2xl shadow-soft border-2 overflow-hidden card-hover cursor-pointer transition-all",
-                  selectedCourse.id === course.id ? "border-primary" : "border-border"
+                  selectedSubject.id === subject.id ? "border-primary" : "border-border"
                 )}
-                onClick={() => setSelectedCourse(course)}
+                onClick={() => setSelectedSubject(subject)}
               >
-                <div className={`h-2 ${course.color}`} />
+                <div className={`h-2 ${subject.color}`} />
                 <div className="p-6">
-                  <h3 className="font-bold text-lg text-foreground mb-2">{course.name}</h3>
+                  <h3 className="font-bold text-lg text-foreground mb-2">{subject.name}</h3>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
                     <User className="h-4 w-4" />
-                    {course.teacher}
+                    {subject.teacher}
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
                     <Clock className="h-4 w-4" />
-                    {course.schedule}
+                    {subject.schedule}
                   </div>
                   <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                    {course.description}
+                    {subject.description}
                   </p>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Attendance</span>
-                      <span className="font-semibold text-foreground">{course.attendance}%</span>
+                      <span className="font-semibold text-foreground">{subject.attendance}%</span>
                     </div>
-                    <Progress value={course.attendance} className="h-2" />
+                    <Progress value={subject.attendance} className="h-2" />
                     <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>{course.attended} of {course.totalClasses} classes</span>
-                      <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium", getStatusBadge(course.attendance).class)}>
-                        {getStatusBadge(course.attendance).label}
+                      <span>{subject.attended} of {subject.totalClasses} classes</span>
+                      <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium", getStatusBadge(subject.attendance).class)}>
+                        {getStatusBadge(subject.attendance).label}
                       </span>
                     </div>
                   </div>
@@ -207,15 +291,15 @@ export default function CoursesAttendancePage() {
             ))}
           </div>
 
-          {/* Course Attendance Graph */}
+          {/* Subject Attendance Graph */}
           <div className="bg-card rounded-2xl shadow-soft border border-border overflow-hidden">
             <div className="p-5 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="font-bold text-foreground flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-primary" />
-                  {selectedCourse.name} - Attendance Trend
+                  {selectedSubject.name} - Attendance Trend
                 </h3>
-                <p className="text-sm text-muted-foreground mt-1">Click on a course card above to see its trend</p>
+                <p className="text-sm text-muted-foreground mt-1">Click on a subject card above to see its trend</p>
               </div>
               <div className="flex bg-muted rounded-lg p-1">
                 <Button
@@ -224,7 +308,7 @@ export default function CoursesAttendancePage() {
                   onClick={() => setViewMode("weekly")}
                   className="rounded-md"
                 >
-                  Weekly
+                  EP
                 </Button>
                 <Button
                   variant={viewMode === "monthly" ? "default" : "ghost"}
@@ -325,13 +409,13 @@ export default function CoursesAttendancePage() {
         <TabsContent value="attendance" className="space-y-6">
           {/* Summary Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {courses.map((course) => (
-              <div key={course.id} className="bg-card rounded-xl p-4 shadow-soft border border-border">
-                <div className={`h-1 w-12 ${course.color} rounded-full mb-3`} />
-                <p className="text-sm text-muted-foreground mb-1">{course.name}</p>
-                <p className="text-2xl font-bold text-foreground">{course.attendance}%</p>
-                <span className={cn("inline-block mt-2 px-2 py-0.5 rounded-full text-xs font-medium", getStatusBadge(course.attendance).class)}>
-                  {getStatusBadge(course.attendance).label}
+            {subjects.map((subject) => (
+              <div key={subject.id} className="bg-card rounded-xl p-4 shadow-soft border border-border">
+                <div className={`h-1 w-12 ${subject.color} rounded-full mb-3`} />
+                <p className="text-sm text-muted-foreground mb-1">{subject.name}</p>
+                <p className="text-2xl font-bold text-foreground">{subject.attendance}%</p>
+                <span className={cn("inline-block mt-2 px-2 py-0.5 rounded-full text-xs font-medium", getStatusBadge(subject.attendance).class)}>
+                  {getStatusBadge(subject.attendance).label}
                 </span>
               </div>
             ))}
@@ -374,6 +458,7 @@ export default function CoursesAttendancePage() {
                   <tr className="border-b border-border">
                     <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Date</th>
                     <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Subject</th>
+                    <th className="text-left p-4 text-sm font-semibold text-muted-foreground">EP</th>
                     <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Status</th>
                     <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Remarks</th>
                   </tr>
@@ -385,6 +470,7 @@ export default function CoursesAttendancePage() {
                         {new Date(record.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                       </td>
                       <td className="p-4 text-sm text-foreground">{record.subject}</td>
+                      <td className="p-4 text-sm text-foreground font-medium">{record.ep}</td>
                       <td className="p-4">
                         {record.status === "present" ? (
                           <span className="inline-flex items-center gap-1 text-sm text-success">
