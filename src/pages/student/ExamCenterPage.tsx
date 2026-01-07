@@ -409,6 +409,7 @@ export default function ExamCenterPage() {
                         <th className="text-center p-4 text-sm font-semibold text-muted-foreground">Max</th>
                         <th className="text-center p-4 text-sm font-semibold text-muted-foreground">Mean</th>
                         <th className="text-center p-4 text-sm font-semibold text-muted-foreground">Min</th>
+                        <th className="text-center p-4 text-sm font-semibold text-muted-foreground">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
@@ -446,6 +447,21 @@ export default function ExamCenterPage() {
                             </td>
                             <td className="p-4 text-center text-muted-foreground">
                               {item.min !== null ? item.min : "-"}
+                            </td>
+                            <td className="p-4 text-center">
+                              {item.status === "not_done" ? (
+                                <Button size="sm" className="gap-2">
+                                  <Play className="h-4 w-4" />
+                                  Start
+                                </Button>
+                              ) : item.status === "failed" ? (
+                                <Button variant="outline" size="sm" className="gap-2">
+                                  <Play className="h-4 w-4" />
+                                  Retry
+                                </Button>
+                              ) : (
+                                <span className="text-muted-foreground text-sm">-</span>
+                              )}
                             </td>
                           </tr>
                         );
