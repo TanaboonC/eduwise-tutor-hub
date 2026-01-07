@@ -15,9 +15,47 @@ import {
   CheckCircle,
   AlertCircle,
   XCircle,
-  ArrowRight
+  ArrowRight,
+  BookOpen,
+  GraduationCap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+
+// Course data for selection
+const courses = [
+  { 
+    id: 1, 
+    name: "Intensive Program 2024", 
+    code: "IP-2024",
+    subjects: 3,
+    totalExams: 24,
+    description: "คอร์สเตรียมสอบเข้ามหาวิทยาลัย"
+  },
+  { 
+    id: 2, 
+    name: "Summer Camp 2024", 
+    code: "SC-2024",
+    subjects: 2,
+    totalExams: 14,
+    description: "คอร์สเรียนช่วงซัมเมอร์"
+  },
+  { 
+    id: 3, 
+    name: "Weekend Tutorial", 
+    code: "WT-2024",
+    subjects: 4,
+    totalExams: 32,
+    description: "คอร์สเรียนเสริมวันหยุด"
+  },
+];
 
 // Subject exam overview data (Thai-style as requested)
 const subjectExams = [
@@ -126,13 +164,131 @@ function getStatusBadge(status: string) {
 }
 
 export default function ExamCenterPage() {
+  const [selectedCourse, setSelectedCourse] = useState<number | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<number | null>(null);
+
+  const currentCourse = courses.find(c => c.id === selectedCourse);
+  const currentSubject = subjectExams.find(s => s.id === selectedSubject);
+
+  // Course selection view
+  if (!selectedCourse) {
+    return (
+      <StudentLayout
+        title="Exam Center"
+        description="Schedule, practice sets, and results"
+      >
+        <div className="space-y-6">
+          <div className="bg-card rounded-2xl shadow-soft border border-border overflow-hidden">
+            <div className="p-5 border-b border-border bg-muted/30">
+              <h3 className="font-bold text-foreground flex items-center gap-2">
+                <GraduationCap className="h-5 w-5 text-primary" />
+                เลือกคอร์สเรียน
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">กรุณาเลือกคอร์สเพื่อดูข้อมูลการสอบ</p>
+            </div>
+            <div className="grid gap-4 p-5 md:grid-cols-2 lg:grid-cols-3">
+              {courses.map((course) => (
+                <div 
+                  key={course.id}
+                  className="bg-muted/30 rounded-xl p-5 border border-border hover:border-primary hover:shadow-md transition-all cursor-pointer group"
+                  onClick={() => setSelectedCourse(course.id)}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="p-3 bg-primary/10 rounded-xl">
+                      <BookOpen className="h-6 w-6 text-primary" />
+                    </div>
+                    <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded-full">
+                      {course.code}
+                    </span>
+                  </div>
+                  <h4 className="font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
+                    {course.name}
+                  </h4>
+                  <p className="text-sm text-muted-foreground mb-3">{course.description}</p>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">{course.subjects} วิชา</span>
+                    <span className="text-muted-foreground">{course.totalExams} ข้อสอบ</span>
+                  </div>
+                  <Button variant="ghost" size="sm" className="w-full mt-3 gap-2 group-hover:bg-primary group-hover:text-primary-foreground">
+                    เลือกคอร์สนี้
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </StudentLayout>
+    );
+  }
 
   return (
     <StudentLayout
       title="Exam Center"
       description="Schedule, practice sets, and results"
     >
+      {/* Navigator Breadcrumb */}
+      <div className="mb-6">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink 
+                className="cursor-pointer hover:text-primary"
+                onClick={() => {
+                  setSelectedCourse(null);
+                  setSelectedSubject(null);
+                }}
+              >
+                Exam Center
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              {selectedSubject ? (
+                <BreadcrumbLink 
+                  className="cursor-pointer hover:text-primary"
+                  onClick={() => setSelectedSubject(null)}
+                >
+                  {currentCourse?.name}
+                </BreadcrumbLink>
+              ) : (
+                <BreadcrumbPage>{currentCourse?.name}</BreadcrumbPage>
+              )}
+            </BreadcrumbItem>
+            {selectedSubject && currentSubject && (
+              <>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{currentSubject.name}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </>
+            )}
+          </BreadcrumbList>
+        </Breadcrumb>
+        
+        {/* Course Info Card */}
+        <div className="mt-4 p-4 bg-muted/30 rounded-xl border border-border flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <BookOpen className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="font-medium text-foreground">{currentCourse?.name}</p>
+              <p className="text-sm text-muted-foreground">{currentCourse?.code} • {currentCourse?.subjects} วิชา • {currentCourse?.totalExams} ข้อสอบ</p>
+            </div>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => {
+              setSelectedCourse(null);
+              setSelectedSubject(null);
+            }}
+          >
+            เปลี่ยนคอร์ส
+          </Button>
+        </div>
+      </div>
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="bg-card border border-border p-1 rounded-xl">
           <TabsTrigger value="overview" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
