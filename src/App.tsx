@@ -14,7 +14,10 @@ import TeacherProfilePage from "./pages/teacher/TeacherProfilePage";
 import TeacherCoursesPage from "./pages/teacher/TeacherCoursesPage";
 import TeacherStudentsPage from "./pages/teacher/TeacherStudentsPage";
 import TeacherPerformancePage from "./pages/teacher/TeacherPerformancePage";
-import MentorModulePage from "./pages/MentorModulePage";
+import MentorProfilePage from "./pages/mentor/MentorProfilePage";
+import AccountManagementPage from "./pages/mentor/AccountManagementPage";
+import CourseManagementPage from "./pages/mentor/CourseManagementPage";
+import AttendanceManagementPage from "./pages/mentor/AttendanceManagementPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
@@ -43,8 +46,13 @@ const App = () => (
           <Route path="/teacher/courses" element={<TeacherCoursesPage />} />
           <Route path="/teacher/students" element={<TeacherStudentsPage />} />
           <Route path="/teacher/performance" element={<TeacherPerformancePage />} />
-          {/* Other Module Routes */}
-          <Route path="/mentor" element={<MentorModulePage />} />
+          {/* Mentor Module Routes */}
+          <Route path="/mentor" element={<Navigate to="/mentor/profile" replace />} />
+          <Route path="/mentor/profile" element={<MentorProfilePage />} />
+          <Route path="/mentor/accounts" element={<AccountManagementPage />} />
+          <Route path="/mentor/courses" element={<CourseManagementPage />} />
+          <Route path="/mentor/attendance" element={<AttendanceManagementPage />} />
+          {/* Other Routes */}
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           {/* Catch-all */}
