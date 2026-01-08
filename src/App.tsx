@@ -18,6 +18,8 @@ import MentorProfilePage from "./pages/mentor/MentorProfilePage";
 import AccountManagementPage from "./pages/mentor/AccountManagementPage";
 import CourseManagementPage from "./pages/mentor/CourseManagementPage";
 import AttendanceManagementPage from "./pages/mentor/AttendanceManagementPage";
+import TeacherEvaluationPage from "./pages/mentor/TeacherEvaluationPage";
+import TeacherRatingPage from "./pages/mentor/TeacherRatingPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
@@ -52,6 +54,8 @@ const App = () => (
           <Route path="/mentor/accounts" element={<AccountManagementPage />} />
           <Route path="/mentor/courses" element={<CourseManagementPage />} />
           <Route path="/mentor/attendance" element={<AttendanceManagementPage />} />
+          <Route path="/mentor/evaluation" element={<TeacherEvaluationPage />} />
+          <Route path="/mentor/teacher-rating" element={<TeacherRatingPage />} />
           {/* Other Routes */}
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
