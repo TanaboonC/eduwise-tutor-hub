@@ -149,10 +149,42 @@ const getAverageScore = (teacher: TeacherRating) => {
 };
 
 export default function TeacherRatingPage() {
-  const [teachers] = useState<TeacherRating[]>(mockTeachers);
+  const [teachers, setTeachers] = useState<TeacherRating[]>(mockTeachers);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedTeacher, setExpandedTeacher] = useState<string | null>(null);
   const [selectedSession, setSelectedSession] = useState<{ teacher: TeacherRating; session: Session } | null>(null);
+  const [mentorFeedbackInput, setMentorFeedbackInput] = useState("");
+  const [isAddingFeedback, setIsAddingFeedback] = useState(false);
+
+  const handleSaveMentorFeedback = () => {
+    if (!selectedSession) return;
+    
+    setTeachers((prev) =>
+      prev.map((t) => {
+        if (t.id === selectedSession.teacher.id) {
+          return {
+            ...t,
+            feedbackData: {
+              ...t.feedbackData,
+              [selectedSession.session.id]: {
+                ...t.feedbackData[selectedSession.session.id],
+                mentorFeedback: mentorFeedbackInput,
+              },
+            },
+          };
+        }
+        return t;
+      })
+    );
+    setIsAddingFeedback(false);
+  };
+
+  const openFeedbackDialog = (teacher: TeacherRating, session: Session) => {
+    setSelectedSession({ teacher, session });
+    const existingFeedback = teacher.feedbackData[session.id]?.mentorFeedback || "";
+    setMentorFeedbackInput(existingFeedback);
+    setIsAddingFeedback(false);
+  };
 
   const filteredTeachers = teachers.filter((t) =>
     t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -339,10 +371,10 @@ export default function TeacherRatingPage() {
                                         variant="ghost" 
                                         size="sm" 
                                         className="gap-1"
-                                        onClick={() => setSelectedSession({ teacher, session })}
+                                        onClick={() => openFeedbackDialog(teacher, session)}
                                       >
                                         <MessageSquare className="h-4 w-4" />
-                                        <span className="text-xs">ดู</span>
+                                        <span className="text-xs">ดู/เพิ่ม</span>
                                       </Button>
                                     </DialogTrigger>
                                     <DialogContent className="sm:max-w-[500px]">
@@ -378,12 +410,50 @@ export default function TeacherRatingPage() {
                                           </div>
                                         </div>
                                         
-                                        {/* Mentor Feedback */}
+                                        {/* Mentor Feedback - Editable */}
                                         <div className="space-y-2">
-                                          <label className="text-sm font-medium">Feedback จาก Mentor:</label>
-                                          <div className="p-3 bg-blue-100 rounded-lg text-sm min-h-[60px]">
-                                            {feedback?.mentorFeedback || <span className="text-muted-foreground italic">ยังไม่มี Feedback จาก Mentor</span>}
+                                          <div className="flex items-center justify-between">
+                                            <label className="text-sm font-medium">Feedback จาก Mentor:</label>
+                                            {!isAddingFeedback && (
+                                              <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => setIsAddingFeedback(true)}
+                                              >
+                                                {feedback?.mentorFeedback ? "แก้ไข" : "เพิ่ม Feedback"}
+                                              </Button>
+                                            )}
                                           </div>
+                                          {isAddingFeedback ? (
+                                            <div className="space-y-2">
+                                              <Textarea
+                                                value={mentorFeedbackInput}
+                                                onChange={(e) => setMentorFeedbackInput(e.target.value)}
+                                                placeholder="เขียน Feedback ให้คุณครู..."
+                                                rows={3}
+                                              />
+                                              <div className="flex gap-2 justify-end">
+                                                <Button
+                                                  variant="outline"
+                                                  size="sm"
+                                                  onClick={() => setIsAddingFeedback(false)}
+                                                >
+                                                  ยกเลิก
+                                                </Button>
+                                                <Button
+                                                  size="sm"
+                                                  onClick={handleSaveMentorFeedback}
+                                                >
+                                                  บันทึก
+                                                </Button>
+                                              </div>
+                                            </div>
+                                          ) : (
+                                            <div className="p-3 bg-blue-100 rounded-lg text-sm min-h-[60px]">
+                                              {teachers.find(t => t.id === teacher.id)?.feedbackData[session.id]?.mentorFeedback || 
+                                                <span className="text-muted-foreground italic">ยังไม่มี Feedback จาก Mentor</span>}
+                                            </div>
+                                          )}
                                         </div>
                                       </div>
                                       <DialogFooter>
