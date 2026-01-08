@@ -4,10 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Search, Star, Eye, TrendingUp, TrendingDown, Minus, MessageSquare, ChevronDown, ChevronUp } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, Star, Eye, TrendingUp, TrendingDown, Minus, MessageSquare, ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 // Session structure
@@ -155,6 +157,13 @@ export default function TeacherRatingPage() {
   const [selectedSession, setSelectedSession] = useState<{ teacher: TeacherRating; session: Session } | null>(null);
   const [mentorFeedbackInput, setMentorFeedbackInput] = useState("");
   const [isAddingFeedback, setIsAddingFeedback] = useState(false);
+  
+  // New evaluation dialog state
+  const [isEvalDialogOpen, setIsEvalDialogOpen] = useState(false);
+  const [selectedTeacherId, setSelectedTeacherId] = useState("");
+  const [evalDate, setEvalDate] = useState("");
+  const [evalScores, setEvalScores] = useState<Record<string, number>>({});
+  const [evalFeedback, setEvalFeedback] = useState("");
 
   const handleSaveMentorFeedback = () => {
     if (!selectedSession) return;
@@ -186,6 +195,56 @@ export default function TeacherRatingPage() {
     setIsAddingFeedback(false);
   };
 
+  const resetEvalForm = () => {
+    setSelectedTeacherId("");
+    setEvalDate("");
+    setEvalScores({});
+    setEvalFeedback("");
+  };
+
+  const handleAddEvaluation = () => {
+    if (!selectedTeacherId || !evalDate) return;
+
+    setTeachers((prev) =>
+      prev.map((t) => {
+        if (t.id === selectedTeacherId) {
+          const newSessionId = Math.max(...t.sessions.map((s) => s.id), 0) + 1;
+          const newSession: Session = {
+            id: newSessionId,
+            label: `ครั้งที่ ${newSessionId}`,
+            date: evalDate,
+          };
+
+          // Build new IDP session data
+          const newIdpSessionData = { ...t.idpSessionData };
+          t.idpItems.forEach((idp) => {
+            if (!newIdpSessionData[idp.id]) {
+              newIdpSessionData[idp.id] = {};
+            }
+            newIdpSessionData[idp.id][newSessionId] = evalScores[idp.id] || 0;
+          });
+
+          return {
+            ...t,
+            sessions: [...t.sessions, newSession],
+            idpSessionData: newIdpSessionData,
+            feedbackData: {
+              ...t.feedbackData,
+              [newSessionId]: {
+                teacherFeedback: "",
+                mentorFeedback: evalFeedback,
+              },
+            },
+          };
+        }
+        return t;
+      })
+    );
+
+    setIsEvalDialogOpen(false);
+    resetEvalForm();
+  };
+
   const filteredTeachers = teachers.filter((t) =>
     t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     t.subject.toLowerCase().includes(searchQuery.toLowerCase())
@@ -211,6 +270,99 @@ export default function TeacherRatingPage() {
             className="pl-10"
           />
         </div>
+        
+        {/* Add Evaluation Button */}
+        <Dialog open={isEvalDialogOpen} onOpenChange={setIsEvalDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="gap-2" onClick={() => resetEvalForm()}>
+              <Plus className="h-4 w-4" />
+              ประเมินครู
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>ประเมินคุณครู</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 mt-4">
+              {/* Select Teacher */}
+              <div className="space-y-2">
+                <Label>เลือกครู</Label>
+                <Select value={selectedTeacherId} onValueChange={setSelectedTeacherId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="เลือกครูที่ต้องการประเมิน" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teachers.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {t.name} - {t.subject}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Evaluation Date */}
+              <div className="space-y-2">
+                <Label>วันที่ประเมิน</Label>
+                <Input
+                  type="text"
+                  placeholder="เช่น 15 ม.ค. 68"
+                  value={evalDate}
+                  onChange={(e) => setEvalDate(e.target.value)}
+                />
+              </div>
+
+              {/* IDP Scores */}
+              <div className="space-y-3">
+                <Label>ให้คะแนนตามหัวข้อ IDP (1-5)</Label>
+                {commonIdpItems.map((idp) => (
+                  <div key={idp.id} className="flex items-center gap-3">
+                    <span className="text-sm w-40">{idp.id}: {idp.name}</span>
+                    <Select
+                      value={String(evalScores[idp.id] || "")}
+                      onValueChange={(val) =>
+                        setEvalScores((prev) => ({ ...prev, [idp.id]: parseInt(val) }))
+                      }
+                    >
+                      <SelectTrigger className="w-24">
+                        <SelectValue placeholder="คะแนน" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[1, 2, 3, 4, 5].map((score) => (
+                          <SelectItem key={score} value={String(score)}>
+                            {score}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ))}
+              </div>
+
+              {/* Mentor Feedback */}
+              <div className="space-y-2">
+                <Label>Feedback จาก Mentor</Label>
+                <Textarea
+                  value={evalFeedback}
+                  onChange={(e) => setEvalFeedback(e.target.value)}
+                  placeholder="เขียน Feedback ให้คุณครู..."
+                  rows={3}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsEvalDialogOpen(false)}>
+                ยกเลิก
+              </Button>
+              <Button
+                onClick={handleAddEvaluation}
+                disabled={!selectedTeacherId || !evalDate || Object.keys(evalScores).length < commonIdpItems.length}
+              >
+                บันทึกการประเมิน
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Stats Cards */}
