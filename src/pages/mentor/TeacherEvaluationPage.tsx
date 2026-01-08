@@ -27,10 +27,10 @@ interface Evaluation {
 }
 
 const mockEvaluations: Evaluation[] = [
-  { id: "1", teacherName: "อ.สมชาย ใจดี", course: "วิทยาศาสตร์ ม.1", ep: "EP 1", date: "2567-01-15", evalDateTime: "2567-01-15 09:00", status: "ontime", preStatus: "completed", postStatus: "completed", preFile: "lesson_plan_ep1.pdf" },
+  { id: "1", teacherName: "อ.สมชาย ใจดี", course: "วิทยาศาสตร์ ม.1", ep: "EP 1", date: "2567-01-15", evalDateTime: "2567-01-15 09:00", status: "ontime", preStatus: "completed", postStatus: "completed" },
   { id: "2", teacherName: "อ.สมชาย ใจดี", course: "วิทยาศาสตร์ ม.1", ep: "EP 2", date: "2567-01-22", evalDateTime: "2567-01-22 09:15", status: "late", preStatus: "completed", postStatus: "pending" },
   { id: "3", teacherName: "อ.สมหญิง รักวิทย์", course: "เคมี ม.2", ep: "EP 1", date: "2567-01-16", evalDateTime: "2567-01-16 08:45", status: "ontime", preStatus: "pending", postStatus: "pending" },
-  { id: "4", teacherName: "อ.ประสิทธิ์ เลขดี", course: "คณิตศาสตร์ ม.1", ep: "EP 1", date: "2567-01-17", evalDateTime: "2567-01-17 09:05", status: "ontime", preStatus: "completed", postStatus: "completed", preFile: "math_worksheet.pdf" },
+  { id: "4", teacherName: "อ.ประสิทธิ์ เลขดี", course: "คณิตศาสตร์ ม.1", ep: "EP 1", date: "2567-01-17", evalDateTime: "2567-01-17 09:05", status: "ontime", preStatus: "completed", postStatus: "completed" },
 ];
 
 const evaluationQuestions = [
@@ -190,22 +190,17 @@ export default function TeacherEvaluationPage() {
                       )}
                     </TableCell>
                     <TableCell className="text-center">
-                      <div className="flex flex-col items-center gap-1">
-                        {e.preStatus === "completed" ? (
-                          <Badge variant="default" className="gap-1">
-                            <CheckCircle className="h-3 w-3" />
-                            ประเมินแล้ว
-                          </Badge>
-                        ) : (
-                          <Button size="sm" variant="outline" onClick={() => handleOpenEval(e, "pre")}>
-                            <FileText className="h-4 w-4 mr-1" />
-                            ประเมิน
-                          </Button>
-                        )}
-                        {e.preFile && (
-                          <span className="text-xs text-muted-foreground">📎 {e.preFile}</span>
-                        )}
-                      </div>
+                      {e.preStatus === "completed" ? (
+                        <Badge variant="default" className="gap-1">
+                          <CheckCircle className="h-3 w-3" />
+                          ประเมินแล้ว
+                        </Badge>
+                      ) : (
+                        <Button size="sm" variant="outline" onClick={() => handleOpenEval(e, "pre")}>
+                          <FileText className="h-4 w-4 mr-1" />
+                          ประเมิน
+                        </Button>
+                      )}
                     </TableCell>
                     <TableCell className="text-center">
                       {e.postStatus === "completed" ? (
