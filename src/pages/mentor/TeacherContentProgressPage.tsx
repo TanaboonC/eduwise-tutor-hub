@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { 
   BookOpen, 
@@ -11,7 +12,9 @@ import {
   Circle,
   User,
   Calendar,
-  FileText
+  FileText,
+  Search,
+  Filter
 } from "lucide-react";
 import { useState } from "react";
 
@@ -154,13 +157,40 @@ const contentBySubject: Record<number, Episode[]> = {
 };
 
 export default function TeacherContentProgressPage() {
-  const [selectedCourseId, setSelectedCourseId] = useState<string>("");
+  // Set default course to first course
+  const [selectedCourseId, setSelectedCourseId] = useState<string>(courses[0]?.id.toString() || "");
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const selectedCourse = courses.find(c => c.id === parseInt(selectedCourseId));
   const subjects = selectedCourseId ? subjectsByCourse[parseInt(selectedCourseId)] || [] : [];
   const selectedSubject = subjects.find(s => s.id === parseInt(selectedSubjectId));
   const episodes = selectedSubjectId ? contentBySubject[parseInt(selectedSubjectId)] || [] : [];
+
+  // Filter episodes based on search and status
+  const filteredEpisodes = episodes.filter(ep => {
+    const matchesSearch = searchQuery === "" || 
+      ep.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ep.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ep.contentItems.some(item => 
+        item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.checkedBy?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    
+    if (statusFilter === "all") return matchesSearch;
+    if (statusFilter === "completed") {
+      return matchesSearch && ep.contentItems.every(item => item.checked);
+    }
+    if (statusFilter === "in_progress") {
+      const checkedCount = ep.contentItems.filter(item => item.checked).length;
+      return matchesSearch && checkedCount > 0 && checkedCount < ep.contentItems.length;
+    }
+    if (statusFilter === "not_started") {
+      return matchesSearch && ep.contentItems.every(item => !item.checked);
+    }
+    return matchesSearch;
+  });
 
   // Calculate progress
   const calculateProgress = (eps: Episode[]) => {
@@ -185,11 +215,12 @@ export default function TeacherContentProgressPage() {
         <Card className="border-border shadow-soft">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-primary" />
-              เลือกคอร์สและวิชา
+              <Filter className="h-5 w-5 text-primary" />
+              ค้นหาและกรองข้อมูล
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
+            {/* Course and Subject Selection */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">คอร์ส</label>
@@ -198,6 +229,8 @@ export default function TeacherContentProgressPage() {
                   onValueChange={(value) => {
                     setSelectedCourseId(value);
                     setSelectedSubjectId("");
+                    setSearchQuery("");
+                    setStatusFilter("all");
                   }}
                 >
                   <SelectTrigger>
@@ -233,6 +266,39 @@ export default function TeacherContentProgressPage() {
                 </Select>
               </div>
             </div>
+
+            {/* Search and Status Filter - Show only when subject is selected */}
+            {selectedSubjectId && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t">
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-sm font-medium">ค้นหา</label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="ค้นหาชื่อ EP, เนื้อหา, ชื่อครู..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">สถานะ</label>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">ทั้งหมด</SelectItem>
+                      <SelectItem value="completed">สอนครบแล้ว</SelectItem>
+                      <SelectItem value="in_progress">กำลังสอน</SelectItem>
+                      <SelectItem value="not_started">ยังไม่เริ่ม</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -267,8 +333,8 @@ export default function TeacherContentProgressPage() {
         {/* Content List */}
         {selectedSubjectId ? (
           <div className="space-y-4">
-            {episodes.length > 0 ? (
-              episodes.map((ep) => {
+            {filteredEpisodes.length > 0 ? (
+              filteredEpisodes.map((ep) => {
                 const epProgress = ep.contentItems.length > 0 
                   ? Math.round((ep.contentItems.filter(i => i.checked).length / ep.contentItems.length) * 100)
                   : 0;
@@ -347,7 +413,10 @@ export default function TeacherContentProgressPage() {
             ) : (
               <Card className="border-border shadow-soft">
                 <CardContent className="py-12 text-center text-muted-foreground">
-                  ไม่พบข้อมูลเนื้อหาสำหรับวิชานี้
+                  {searchQuery || statusFilter !== "all" 
+                    ? "ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหา"
+                    : "ไม่พบข้อมูลเนื้อหาสำหรับวิชานี้"
+                  }
                 </CardContent>
               </Card>
             )}
@@ -356,7 +425,7 @@ export default function TeacherContentProgressPage() {
           <Card className="border-border shadow-soft">
             <CardContent className="py-12 text-center text-muted-foreground">
               <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>กรุณาเลือกคอร์สและวิชาเพื่อดูเนื้อหาการสอน</p>
+              <p>กรุณาเลือกวิชาเพื่อดูเนื้อหาการสอน</p>
             </CardContent>
           </Card>
         )}
