@@ -75,7 +75,7 @@ const initialEpisodes: Episode[] = [
     description: "เรียนรู้หลักการพื้นฐานของพีชคณิตและการแก้สมการ",
     contentItems: [
       { id: "1-1", label: "สมการเชิงเส้น", checked: true, checkedBy: "อ.สมชาย ใจดี", checkedAt: "10 ม.ค. 2567 14:30" },
-      { id: "1-2", label: "การแยกตัวประกอบ", checked: true, checkedBy: "อ.สมชาย ใจดี", checkedAt: "12 ม.ค. 2567 09:15" },
+      { id: "1-2", label: "การแยกตัวประกอบ", checked: true, checkedBy: "อ.วิภา สุขสันต์", checkedAt: "12 ม.ค. 2567 09:15" },
       { id: "1-3", label: "การแก้สมการกำลังสอง", checked: false },
     ],
     date: "2024-01-15",
@@ -88,7 +88,7 @@ const initialEpisodes: Episode[] = [
     name: "EP.2 เรขาคณิตวิเคราะห์",
     description: "ศึกษาเส้นตรง วงกลม และพาราโบลา",
     contentItems: [
-      { id: "2-1", label: "สมการเส้นตรง", checked: true, checkedBy: "อ.สมชาย ใจดี", checkedAt: "20 ม.ค. 2567 10:00" },
+      { id: "2-1", label: "สมการเส้นตรง", checked: true, checkedBy: "อ.ประสิทธิ์ เก่งกาจ", checkedAt: "20 ม.ค. 2567 10:00" },
       { id: "2-2", label: "ระยะห่างระหว่างจุด", checked: true, checkedBy: "อ.สมชาย ใจดี", checkedAt: "21 ม.ค. 2567 11:45" },
       { id: "2-3", label: "สมการวงกลม", checked: true, checkedBy: "อ.สมชาย ใจดี", checkedAt: "22 ม.ค. 2567 08:30" },
     ],
@@ -269,31 +269,37 @@ export default function TeacherCoursesPage() {
                               <strong>เนื้อหา:</strong>
                             </div>
                             <div className="ml-6 space-y-3">
-                              {ep.contentItems.map((item) => (
-                                <div key={item.id} className="flex flex-col gap-1">
-                                  <div className="flex items-center gap-2">
-                                    <Checkbox 
-                                      id={item.id} 
-                                      checked={item.checked}
-                                      onCheckedChange={(checked) => 
-                                        handleContentCheck(ep.id, item.id, checked as boolean)
-                                      }
-                                    />
-                                    <label 
-                                      htmlFor={item.id} 
-                                      className="text-sm cursor-pointer"
-                                    >
-                                      {item.label}
-                                    </label>
-                                  </div>
-                                  {item.checked && item.checkedBy && (
-                                    <div className="ml-6 text-xs text-green-600 flex items-center gap-1">
-                                      <CheckCircle className="h-3 w-3" />
-                                      <span>โดย {item.checkedBy} • {item.checkedAt}</span>
+                              {ep.contentItems.map((item) => {
+                                const isCheckedByOther = item.checked && item.checkedBy && item.checkedBy !== currentTeacherName;
+                                return (
+                                  <div key={item.id} className="flex flex-col gap-1">
+                                    <div className="flex items-center gap-2">
+                                      <Checkbox 
+                                        id={item.id} 
+                                        checked={item.checked}
+                                        disabled={isCheckedByOther}
+                                        onCheckedChange={(checked) => 
+                                          handleContentCheck(ep.id, item.id, checked as boolean)
+                                        }
+                                        className={isCheckedByOther ? "opacity-60 cursor-not-allowed" : ""}
+                                      />
+                                      <label 
+                                        htmlFor={item.id} 
+                                        className={`text-sm ${isCheckedByOther ? "text-muted-foreground cursor-not-allowed" : "cursor-pointer"}`}
+                                      >
+                                        {item.label}
+                                      </label>
                                     </div>
-                                  )}
-                                </div>
-                              ))}
+                                    {item.checked && item.checkedBy && (
+                                      <div className={`ml-6 text-xs flex items-center gap-1 ${isCheckedByOther ? "text-orange-600" : "text-green-600"}`}>
+                                        <CheckCircle className="h-3 w-3" />
+                                        <span>โดย {item.checkedBy} • {item.checkedAt}</span>
+                                        {isCheckedByOther && <span className="text-muted-foreground">(ไม่สามารถแก้ไขได้)</span>}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
                           </div>
                           <div className="flex items-center gap-2 text-muted-foreground">
