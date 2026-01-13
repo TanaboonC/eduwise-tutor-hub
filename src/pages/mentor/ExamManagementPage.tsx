@@ -46,6 +46,8 @@ import {
   Circle,
   ListOrdered,
   GripVertical,
+  Search,
+  Filter,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -167,6 +169,28 @@ export default function ExamManagementPage() {
   const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [selectedCourseId, setSelectedCourseId] = useState<string>("");
+
+  // Filter states
+  const [filterCourseId, setFilterCourseId] = useState<string>(courses[0]?.id || "");
+  const [filterSubject, setFilterSubject] = useState<string>("all");
+  const [filterType, setFilterType] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const filterCourse = courses.find(c => c.id === filterCourseId);
+  const filterSubjects = filterCourse?.subjects || [];
+
+  // Filtered exams
+  const filteredExams = exams.filter(exam => {
+    const matchesCourse = !filterCourseId || filterCourseId === "all" || exam.course === filterCourse?.name;
+    const matchesSubject = filterSubject === "all" || exam.subject === filterSubject;
+    const matchesType = filterType === "all" || exam.type === filterType;
+    const matchesStatus = filterStatus === "all" || exam.status === filterStatus;
+    const matchesSearch = !searchQuery || 
+      exam.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      exam.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCourse && matchesSubject && matchesType && matchesStatus && matchesSearch;
+  });
 
   const [newExam, setNewExam] = useState<Partial<Exam>>({
     title: "",
@@ -397,7 +421,111 @@ export default function ExamManagementPage() {
   return (
     <MentorLayout title="จัดการข้อสอบ/แบบฝึกหัด" description="สร้างและจัดการข้อสอบ แบบฝึกหัด และแบบทดสอบ">
       <div className="space-y-6">
-        {/* Header */}
+        {/* Filter Section */}
+        <Card className="shadow-soft">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Filter className="h-5 w-5 text-primary" />
+              ค้นหาและกรองข้อมูล
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              {/* Search */}
+              <div className="lg:col-span-2">
+                <Label className="mb-2 block text-sm">ค้นหา</Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="ค้นหาชื่อข้อสอบ, รายละเอียด..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+
+              {/* Course Filter */}
+              <div>
+                <Label className="mb-2 block text-sm">คอร์ส</Label>
+                <Select value={filterCourseId} onValueChange={(value) => {
+                  setFilterCourseId(value);
+                  setFilterSubject("all");
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="เลือกคอร์ส" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">ทั้งหมด</SelectItem>
+                    {courses.map((course) => (
+                      <SelectItem key={course.id} value={course.id}>
+                        {course.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Subject Filter */}
+              <div>
+                <Label className="mb-2 block text-sm">วิชา</Label>
+                <Select value={filterSubject} onValueChange={setFilterSubject}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="เลือกวิชา" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">ทั้งหมด</SelectItem>
+                    {filterSubjects.map((subject) => (
+                      <SelectItem key={subject} value={subject}>
+                        {subject}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Type Filter */}
+              <div>
+                <Label className="mb-2 block text-sm">ประเภท</Label>
+                <Select value={filterType} onValueChange={setFilterType}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="เลือกประเภท" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">ทั้งหมด</SelectItem>
+                    <SelectItem value="exam">ข้อสอบ</SelectItem>
+                    <SelectItem value="exercise">แบบฝึกหัด</SelectItem>
+                    <SelectItem value="quiz">แบบทดสอบ</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Status Filter Row */}
+            <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t">
+              <span className="text-sm text-muted-foreground mr-2">สถานะ:</span>
+              {[
+                { value: "all", label: "ทั้งหมด" },
+                { value: "published", label: "เผยแพร่แล้ว" },
+                { value: "draft", label: "ฉบับร่าง" },
+              ].map((status) => (
+                <Button
+                  key={status.value}
+                  variant={filterStatus === status.value ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setFilterStatus(status.value)}
+                >
+                  {status.label}
+                </Button>
+              ))}
+              <div className="ml-auto text-sm text-muted-foreground">
+                พบ {filteredExams.length} รายการ
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Exam List */}
         <Card className="shadow-soft">
           <CardHeader>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -426,57 +554,58 @@ export default function ExamManagementPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {exams.map((exam) => (
-                    <TableRow key={exam.id}>
-                      <TableCell>
-                        <button
-                          className="text-primary hover:underline text-left font-medium"
-                          onClick={() => handleViewExam(exam)}
-                        >
-                          {exam.title}
-                        </button>
-                        <p className="text-xs text-muted-foreground">{exam.description}</p>
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm">{exam.course}</div>
-                        <div className="text-xs text-muted-foreground">{exam.subject}</div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getTypeBadgeColor(exam.type)}>
-                          {getTypeLabel(exam.type)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-center">{exam.questions.length} ข้อ</TableCell>
-                      <TableCell className="text-center">{exam.totalPoints} คะแนน</TableCell>
-                      <TableCell className="text-center">
-                        <Badge variant={exam.status === "published" ? "default" : "secondary"}>
-                          {exam.status === "published" ? "เผยแพร่แล้ว" : "ฉบับร่าง"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => handleViewExam(exam)} title="ดูรายละเอียด">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleOpenAddQuestion(exam)} title="เพิ่มคำถาม">
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDuplicateExam(exam)} title="คัดลอก">
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDeleteExam(exam.id)} title="ลบ">
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {exams.length === 0 && (
+                  {filteredExams.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                        ยังไม่มีข้อสอบ/แบบฝึกหัด กดปุ่ม "สร้างข้อสอบใหม่" เพื่อเริ่มต้น
+                        ไม่พบข้อสอบ/แบบฝึกหัดที่ตรงกับเงื่อนไข
                       </TableCell>
                     </TableRow>
+                  ) : (
+                    filteredExams.map((exam) => (
+                      <TableRow key={exam.id}>
+                        <TableCell>
+                          <button
+                            className="text-primary hover:underline text-left font-medium"
+                            onClick={() => handleViewExam(exam)}
+                          >
+                            {exam.title}
+                          </button>
+                          <p className="text-xs text-muted-foreground">{exam.description}</p>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm">{exam.course}</div>
+                          <div className="text-xs text-muted-foreground">{exam.subject}</div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={getTypeBadgeColor(exam.type)}>
+                            {getTypeLabel(exam.type)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-center">{exam.questions.length} ข้อ</TableCell>
+                        <TableCell className="text-center">{exam.totalPoints} คะแนน</TableCell>
+                        <TableCell className="text-center">
+                          <Badge variant={exam.status === "published" ? "default" : "secondary"}>
+                            {exam.status === "published" ? "เผยแพร่แล้ว" : "ฉบับร่าง"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => handleViewExam(exam)} title="ดูรายละเอียด">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleOpenAddQuestion(exam)} title="เพิ่มคำถาม">
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDuplicateExam(exam)} title="คัดลอก">
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDeleteExam(exam.id)} title="ลบ">
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
                   )}
                 </TableBody>
               </Table>
