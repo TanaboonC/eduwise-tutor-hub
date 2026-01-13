@@ -4,32 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  BookOpen, 
-  Calendar, 
-  Clock, 
-  User, 
-  CheckCircle, 
+import {
+  BookOpen,
+  Calendar,
+  Clock,
+  User,
+  CheckCircle,
   XCircle,
   TrendingUp,
   BarChart3,
   Filter,
   ChevronRight,
-  Users
+  Users,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  AreaChart,
-  Area
-} from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
 
 const availableCourses = [
   {
@@ -73,7 +63,7 @@ const subjects = [
       { name: "Jan", attendance: 94 },
       { name: "Feb", attendance: 95 },
       { name: "Mar", attendance: 96 },
-    ]
+    ],
   },
   {
     id: 2,
@@ -95,7 +85,7 @@ const subjects = [
       { name: "Jan", attendance: 90 },
       { name: "Feb", attendance: 92 },
       { name: "Mar", attendance: 94 },
-    ]
+    ],
   },
   {
     id: 3,
@@ -117,28 +107,28 @@ const subjects = [
       { name: "Jan", attendance: 100 },
       { name: "Feb", attendance: 100 },
       { name: "Mar", attendance: 100 },
-    ]
+    ],
   },
 ];
 
 const weeklySchedule = [
-  { day: "Monday", classes: [
-    { time: "9:00 - 10:30", subject: "Mathematics", teacher: "Dr. Prasert" },
-    { time: "14:00 - 15:30", subject: "English", teacher: "Ms. Sarah" }
-  ]},
-  { day: "Tuesday", classes: [
-    { time: "10:30 - 12:00", subject: "Science", teacher: "Prof. Naree" }
-  ]},
-  { day: "Wednesday", classes: [
-    { time: "9:00 - 10:30", subject: "Mathematics", teacher: "Dr. Prasert" },
-    { time: "14:00 - 15:30", subject: "English", teacher: "Ms. Sarah" }
-  ]},
-  { day: "Thursday", classes: [
-    { time: "10:30 - 12:00", subject: "Science", teacher: "Prof. Naree" }
-  ]},
-  { day: "Friday", classes: [
-    { time: "9:00 - 10:30", subject: "Mathematics", teacher: "Dr. Prasert" }
-  ]},
+  {
+    day: "Monday",
+    classes: [
+      { time: "9:00 - 10:30", subject: "Mathematics", teacher: "Dr. Prasert" },
+      { time: "14:00 - 15:30", subject: "English", teacher: "Ms. Sarah" },
+    ],
+  },
+  { day: "Tuesday", classes: [{ time: "10:30 - 12:00", subject: "Science", teacher: "Prof. Naree" }] },
+  {
+    day: "Wednesday",
+    classes: [
+      { time: "9:00 - 10:30", subject: "Mathematics", teacher: "Dr. Prasert" },
+      { time: "14:00 - 15:30", subject: "English", teacher: "Ms. Sarah" },
+    ],
+  },
+  { day: "Thursday", classes: [{ time: "10:30 - 12:00", subject: "Science", teacher: "Prof. Naree" }] },
+  { day: "Friday", classes: [{ time: "9:00 - 10:30", subject: "Mathematics", teacher: "Dr. Prasert" }] },
 ];
 
 const attendanceRecords = [
@@ -164,17 +154,13 @@ export default function CoursesAttendancePage() {
   const [subjectFilter, setSubjectFilter] = useState<string>("all");
 
   const attendanceData = viewMode === "weekly" ? selectedSubject.weeklyData : selectedSubject.monthlyData;
-  const filteredRecords = subjectFilter === "all" 
-    ? attendanceRecords 
-    : attendanceRecords.filter(r => r.subject === subjectFilter);
+  const filteredRecords =
+    subjectFilter === "all" ? attendanceRecords : attendanceRecords.filter((r) => r.subject === subjectFilter);
 
   // Course selection screen
   if (!selectedCourse) {
     return (
-      <StudentLayout
-        title="Courses & Attendance"
-        description="เลือกคอร์สเรียนเพื่อดูข้อมูลวิชาและ Attendance"
-      >
+      <StudentLayout title="Courses & Attendance" description="เลือกคอร์สเรียนเพื่อดูข้อมูลวิชาและ Attendance">
         <div className="space-y-4">
           {availableCourses.map((course) => (
             <Card
@@ -212,10 +198,7 @@ export default function CoursesAttendancePage() {
   }
 
   return (
-    <StudentLayout
-      title="Courses & Attendance"
-      description="View your registered courses and attendance records"
-    >
+    <StudentLayout title="Courses & Attendance" description="View your registered courses and attendance records">
       {/* Navigator Breadcrumb */}
       <div className="flex items-center gap-2 text-sm mb-6">
         <Button
@@ -233,15 +216,24 @@ export default function CoursesAttendancePage() {
 
       <Tabs defaultValue="courses" className="space-y-6">
         <TabsList className="bg-card border border-border p-1 rounded-xl">
-          <TabsTrigger value="courses" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+          <TabsTrigger
+            value="courses"
+            className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+          >
             <BookOpen className="h-4 w-4 mr-2" />
             My Courses
           </TabsTrigger>
-          <TabsTrigger value="schedule" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+          <TabsTrigger
+            value="schedule"
+            className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+          >
             <Calendar className="h-4 w-4 mr-2" />
             Schedule
           </TabsTrigger>
-          <TabsTrigger value="attendance" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+          <TabsTrigger
+            value="attendance"
+            className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+          >
             <BarChart3 className="h-4 w-4 mr-2" />
             Attendance
           </TabsTrigger>
@@ -255,7 +247,7 @@ export default function CoursesAttendancePage() {
                 key={subject.id}
                 className={cn(
                   "bg-card rounded-2xl shadow-soft border-2 overflow-hidden card-hover cursor-pointer transition-all",
-                  selectedSubject.id === subject.id ? "border-primary" : "border-border"
+                  selectedSubject.id === subject.id ? "border-primary" : "border-border",
                 )}
                 onClick={() => setSelectedSubject(subject)}
               >
@@ -270,9 +262,7 @@ export default function CoursesAttendancePage() {
                     <Clock className="h-4 w-4" />
                     {subject.schedule}
                   </div>
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                    {subject.description}
-                  </p>
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{subject.description}</p>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Attendance</span>
@@ -280,8 +270,15 @@ export default function CoursesAttendancePage() {
                     </div>
                     <Progress value={subject.attendance} className="h-2" />
                     <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>{subject.attended} of {subject.totalClasses} classes</span>
-                      <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium", getStatusBadge(subject.attendance).class)}>
+                      <span>
+                        {subject.attended} of {subject.totalClasses} classes
+                      </span>
+                      <span
+                        className={cn(
+                          "px-2 py-0.5 rounded-full text-xs font-medium",
+                          getStatusBadge(subject.attendance).class,
+                        )}
+                      >
                         {getStatusBadge(subject.attendance).label}
                       </span>
                     </div>
@@ -310,14 +307,6 @@ export default function CoursesAttendancePage() {
                 >
                   EP
                 </Button>
-                <Button
-                  variant={viewMode === "monthly" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("monthly")}
-                  className="rounded-md"
-                >
-                  Monthly
-                </Button>
               </div>
             </div>
             <div className="p-5">
@@ -325,26 +314,18 @@ export default function CoursesAttendancePage() {
                 <AreaChart data={attendanceData}>
                   <defs>
                     <linearGradient id="courseGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis 
-                    dataKey="name" 
-                    stroke="hsl(var(--muted-foreground))"
-                    fontSize={12}
-                  />
-                  <YAxis 
-                    domain={[70, 100]} 
-                    stroke="hsl(var(--muted-foreground))"
-                    fontSize={12}
-                  />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: "hsl(var(--card))", 
+                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <YAxis domain={[70, 100]} stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--card))",
                       border: "1px solid hsl(var(--border))",
-                      borderRadius: "8px"
+                      borderRadius: "8px",
                     }}
                     formatter={(value: number) => [`${value}%`, "Attendance"]}
                   />
@@ -355,10 +336,10 @@ export default function CoursesAttendancePage() {
                     strokeWidth={3}
                     fill="url(#courseGradient)"
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="attendance" 
-                    stroke="hsl(var(--primary))" 
+                  <Line
+                    type="monotone"
+                    dataKey="attendance"
+                    stroke="hsl(var(--primary))"
                     strokeWidth={3}
                     dot={{ fill: "hsl(var(--primary))", strokeWidth: 2, r: 5 }}
                   />
@@ -414,7 +395,12 @@ export default function CoursesAttendancePage() {
                 <div className={`h-1 w-12 ${subject.color} rounded-full mb-3`} />
                 <p className="text-sm text-muted-foreground mb-1">{subject.name}</p>
                 <p className="text-2xl font-bold text-foreground">{subject.attendance}%</p>
-                <span className={cn("inline-block mt-2 px-2 py-0.5 rounded-full text-xs font-medium", getStatusBadge(subject.attendance).class)}>
+                <span
+                  className={cn(
+                    "inline-block mt-2 px-2 py-0.5 rounded-full text-xs font-medium",
+                    getStatusBadge(subject.attendance).class,
+                  )}
+                >
                   {getStatusBadge(subject.attendance).label}
                 </span>
               </div>
@@ -467,7 +453,11 @@ export default function CoursesAttendancePage() {
                   {filteredRecords.map((record, index) => (
                     <tr key={index} className="hover:bg-muted/30 transition-colors">
                       <td className="p-4 text-sm text-foreground">
-                        {new Date(record.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                        {new Date(record.date).toLocaleDateString("en-US", {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                        })}
                       </td>
                       <td className="p-4 text-sm text-foreground">{record.subject}</td>
                       <td className="p-4 text-sm text-foreground font-medium">{record.ep}</td>
@@ -484,9 +474,7 @@ export default function CoursesAttendancePage() {
                           </span>
                         )}
                       </td>
-                      <td className="p-4 text-sm text-muted-foreground">
-                        {record.remarks || "-"}
-                      </td>
+                      <td className="p-4 text-sm text-muted-foreground">{record.remarks || "-"}</td>
                     </tr>
                   ))}
                 </tbody>
