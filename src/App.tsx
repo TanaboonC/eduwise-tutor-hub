@@ -20,6 +20,7 @@ import CourseManagementPage from "./pages/mentor/CourseManagementPage";
 import AttendanceManagementPage from "./pages/mentor/AttendanceManagementPage";
 import TeacherEvaluationPage from "./pages/mentor/TeacherEvaluationPage";
 import TeacherRatingPage from "./pages/mentor/TeacherRatingPage";
+import TeacherContentProgressPage from "./pages/mentor/TeacherContentProgressPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
@@ -56,6 +57,7 @@ const App = () => (
           <Route path="/mentor/attendance" element={<AttendanceManagementPage />} />
           <Route path="/mentor/evaluation" element={<TeacherEvaluationPage />} />
           <Route path="/mentor/teacher-rating" element={<TeacherRatingPage />} />
+          <Route path="/mentor/content-progress" element={<TeacherContentProgressPage />} />
           {/* Other Routes */}
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />

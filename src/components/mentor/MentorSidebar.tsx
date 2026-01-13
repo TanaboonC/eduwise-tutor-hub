@@ -22,6 +22,7 @@ const teacherSubmenuItems = [
   { icon: Clock, label: "เวลาเข้าสอน", path: "/mentor/attendance" },
   { icon: ClipboardCheck, label: "แบบประเมินก่อน-หลังสอน", path: "/mentor/evaluation" },
   { icon: Star, label: "ประเมินคุณครู", path: "/mentor/teacher-rating" },
+  { icon: BookOpen, label: "ติดตามเนื้อหาการสอน", path: "/mentor/content-progress" },
 ];
 
 export function MentorSidebar() {
