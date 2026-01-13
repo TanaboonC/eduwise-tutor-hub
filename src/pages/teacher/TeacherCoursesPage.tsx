@@ -49,14 +49,33 @@ const courses = [
   },
 ];
 
-const episodes = [
+interface ContentItem {
+  id: string;
+  label: string;
+  checked: boolean;
+  checkedBy?: string;
+  checkedAt?: string;
+}
+
+interface Episode {
+  id: number;
+  name: string;
+  description: string;
+  contentItems: ContentItem[];
+  date: string;
+  time: string;
+  hasFile: boolean;
+  hasVideo: boolean;
+}
+
+const initialEpisodes: Episode[] = [
   {
     id: 1,
     name: "EP.1 พื้นฐานพีชคณิต",
     description: "เรียนรู้หลักการพื้นฐานของพีชคณิตและการแก้สมการ",
     contentItems: [
-      { id: "1-1", label: "สมการเชิงเส้น", checked: true },
-      { id: "1-2", label: "การแยกตัวประกอบ", checked: true },
+      { id: "1-1", label: "สมการเชิงเส้น", checked: true, checkedBy: "อ.สมชาย ใจดี", checkedAt: "10 ม.ค. 2567 14:30" },
+      { id: "1-2", label: "การแยกตัวประกอบ", checked: true, checkedBy: "อ.สมชาย ใจดี", checkedAt: "12 ม.ค. 2567 09:15" },
       { id: "1-3", label: "การแก้สมการกำลังสอง", checked: false },
     ],
     date: "2024-01-15",
@@ -69,9 +88,9 @@ const episodes = [
     name: "EP.2 เรขาคณิตวิเคราะห์",
     description: "ศึกษาเส้นตรง วงกลม และพาราโบลา",
     contentItems: [
-      { id: "2-1", label: "สมการเส้นตรง", checked: true },
-      { id: "2-2", label: "ระยะห่างระหว่างจุด", checked: true },
-      { id: "2-3", label: "สมการวงกลม", checked: true },
+      { id: "2-1", label: "สมการเส้นตรง", checked: true, checkedBy: "อ.สมชาย ใจดี", checkedAt: "20 ม.ค. 2567 10:00" },
+      { id: "2-2", label: "ระยะห่างระหว่างจุด", checked: true, checkedBy: "อ.สมชาย ใจดี", checkedAt: "21 ม.ค. 2567 11:45" },
+      { id: "2-3", label: "สมการวงกลม", checked: true, checkedBy: "อ.สมชาย ใจดี", checkedAt: "22 ม.ค. 2567 08:30" },
     ],
     date: "2024-01-22",
     time: "09:00 - 12:00",
@@ -161,9 +180,44 @@ const getAttendanceStatusBadge = (status: string) => {
   }
 };
 
+// Mock current teacher name
+const currentTeacherName = "อ.สมชาย ใจดี";
+
 export default function TeacherCoursesPage() {
   const [selectedCourse, setSelectedCourse] = useState<(typeof courses)[0] | null>(null);
   const [viewMode, setViewMode] = useState<"daily" | "weekly" | "course">("weekly");
+  const [episodesData, setEpisodesData] = useState<Episode[]>(initialEpisodes);
+
+  const handleContentCheck = (episodeId: number, contentId: string, checked: boolean) => {
+    const now = new Date();
+    const thaiDate = now.toLocaleDateString('th-TH', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+    const thaiTime = now.toLocaleTimeString('th-TH', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    const checkedAt = `${thaiDate} ${thaiTime}`;
+
+    setEpisodesData(prev => prev.map(ep => {
+      if (ep.id === episodeId) {
+        return {
+          ...ep,
+          contentItems: ep.contentItems.map(item => {
+            if (item.id === contentId) {
+              return checked 
+                ? { ...item, checked: true, checkedBy: currentTeacherName, checkedAt }
+                : { ...item, checked: false, checkedBy: undefined, checkedAt: undefined };
+            }
+            return item;
+          })
+        };
+      }
+      return ep;
+    }));
+  };
 
   if (selectedCourse) {
     return (
@@ -193,7 +247,7 @@ export default function TeacherCoursesPage() {
 
             {/* Episodes Tab */}
             <TabsContent value="episodes" className="space-y-4">
-              {episodes.map((ep) => (
+              {episodesData.map((ep) => (
                 <Card key={ep.id} className="border-border shadow-soft">
                   <CardContent className="pt-6">
                     <div className="flex flex-col md:flex-row md:items-start gap-4">
@@ -214,19 +268,30 @@ export default function TeacherCoursesPage() {
                               <FileText className="h-4 w-4" />
                               <strong>เนื้อหา:</strong>
                             </div>
-                            <div className="ml-6 space-y-2">
+                            <div className="ml-6 space-y-3">
                               {ep.contentItems.map((item) => (
-                                <div key={item.id} className="flex items-center gap-2">
-                                  <Checkbox 
-                                    id={item.id} 
-                                    defaultChecked={item.checked}
-                                  />
-                                  <label 
-                                    htmlFor={item.id} 
-                                    className="text-sm cursor-pointer"
-                                  >
-                                    {item.label}
-                                  </label>
+                                <div key={item.id} className="flex flex-col gap-1">
+                                  <div className="flex items-center gap-2">
+                                    <Checkbox 
+                                      id={item.id} 
+                                      checked={item.checked}
+                                      onCheckedChange={(checked) => 
+                                        handleContentCheck(ep.id, item.id, checked as boolean)
+                                      }
+                                    />
+                                    <label 
+                                      htmlFor={item.id} 
+                                      className="text-sm cursor-pointer"
+                                    >
+                                      {item.label}
+                                    </label>
+                                  </div>
+                                  {item.checked && item.checkedBy && (
+                                    <div className="ml-6 text-xs text-green-600 flex items-center gap-1">
+                                      <CheckCircle className="h-3 w-3" />
+                                      <span>โดย {item.checkedBy} • {item.checkedAt}</span>
+                                    </div>
+                                  )}
                                 </div>
                               ))}
                             </div>
