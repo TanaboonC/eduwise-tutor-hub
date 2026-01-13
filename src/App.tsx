@@ -23,6 +23,7 @@ import TeacherRatingPage from "./pages/mentor/TeacherRatingPage";
 import TeacherContentProgressPage from "./pages/mentor/TeacherContentProgressPage";
 import ExamManagementPage from "./pages/mentor/ExamManagementPage";
 import StudentRegistrationPaymentPage from "./pages/mentor/StudentRegistrationPaymentPage";
+import StudentExamScoresPage from "./pages/mentor/StudentExamScoresPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
@@ -62,6 +63,7 @@ const App = () => (
           <Route path="/mentor/content-progress" element={<TeacherContentProgressPage />} />
           <Route path="/mentor/exams" element={<ExamManagementPage />} />
           <Route path="/mentor/student-registration" element={<StudentRegistrationPaymentPage />} />
+          <Route path="/mentor/student-exam-scores" element={<StudentExamScoresPage />} />
           {/* Other Routes */}
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
