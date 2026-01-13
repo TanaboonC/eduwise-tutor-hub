@@ -8,7 +8,8 @@ import {
   Clock,
   ChevronDown,
   ClipboardCheck,
-  Star
+  Star,
+  FileQuestion
 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -16,6 +17,7 @@ const mainMenuItems = [
   { icon: User, label: "โปรไฟล์ผู้ดูแล", path: "/mentor/profile" },
   { icon: Users, label: "จัดการบัญชีผู้ใช้", path: "/mentor/accounts" },
   { icon: BookOpen, label: "หลักสูตรการสอน", path: "/mentor/courses" },
+  { icon: FileQuestion, label: "จัดการข้อสอบ", path: "/mentor/exams" },
 ];
 
 const teacherSubmenuItems = [
