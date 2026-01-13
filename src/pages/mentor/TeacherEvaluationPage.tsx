@@ -10,8 +10,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Search, FileText, CheckCircle, Plus, Upload, Clock, AlertCircle } from "lucide-react";
+import { Search, FileText, CheckCircle, Plus, Upload, Clock, AlertCircle, Eye, Download, Star } from "lucide-react";
 import { toast } from "sonner";
+
+interface EvaluationAnswers {
+  answers: Record<number, string>;
+  notes: string;
+  submittedAt: string;
+  preFile?: string;
+}
 
 interface Evaluation {
   id: string;
@@ -24,14 +31,9 @@ interface Evaluation {
   preStatus: "pending" | "completed";
   postStatus: "pending" | "completed";
   preFile?: string;
+  preAnswers?: EvaluationAnswers;
+  postAnswers?: EvaluationAnswers;
 }
-
-const mockEvaluations: Evaluation[] = [
-  { id: "1", teacherName: "อ.สมชาย ใจดี", course: "วิทยาศาสตร์ ม.1", ep: "EP 1", date: "2567-01-15", evalDateTime: "2567-01-15 09:00", status: "ontime", preStatus: "completed", postStatus: "completed" },
-  { id: "2", teacherName: "อ.สมชาย ใจดี", course: "วิทยาศาสตร์ ม.1", ep: "EP 2", date: "2567-01-22", evalDateTime: "2567-01-22 09:15", status: "late", preStatus: "completed", postStatus: "pending" },
-  { id: "3", teacherName: "อ.สมหญิง รักวิทย์", course: "เคมี ม.2", ep: "EP 1", date: "2567-01-16", evalDateTime: "2567-01-16 08:45", status: "ontime", preStatus: "pending", postStatus: "pending" },
-  { id: "4", teacherName: "อ.ประสิทธิ์ เลขดี", course: "คณิตศาสตร์ ม.1", ep: "EP 1", date: "2567-01-17", evalDateTime: "2567-01-17 09:05", status: "ontime", preStatus: "completed", postStatus: "completed" },
-];
 
 const evaluationQuestions = [
   "ครูเตรียมอุปกรณ์และสื่อการสอนพร้อม",
@@ -41,12 +43,96 @@ const evaluationQuestions = [
   "ครูสรุปบทเรียนได้ครบถ้วน",
 ];
 
+const scoreLabels: Record<string, string> = {
+  "5": "ดีมาก",
+  "4": "ดี",
+  "3": "ปานกลาง",
+  "2": "ต้องปรับปรุง",
+  "1": "ต้องปรับปรุงมาก",
+};
+
+const mockEvaluations: Evaluation[] = [
+  { 
+    id: "1", 
+    teacherName: "อ.สมชาย ใจดี", 
+    course: "วิทยาศาสตร์ ม.1", 
+    ep: "EP 1", 
+    date: "2567-01-15", 
+    evalDateTime: "2567-01-15 09:00", 
+    status: "ontime", 
+    preStatus: "completed", 
+    postStatus: "completed",
+    preAnswers: {
+      answers: { 0: "5", 1: "4", 2: "5", 3: "4", 4: "5" },
+      notes: "เตรียมสื่อการสอนมาอย่างดี มีเอกสารประกอบครบ",
+      submittedAt: "2567-01-15 08:30",
+      preFile: "แผนการสอน_EP1.pdf"
+    },
+    postAnswers: {
+      answers: { 0: "5", 1: "5", 2: "4", 3: "5", 4: "4" },
+      notes: "นักเรียนเข้าใจเนื้อหาดี มีการถาม-ตอบตลอดการสอน",
+      submittedAt: "2567-01-15 12:15"
+    }
+  },
+  { 
+    id: "2", 
+    teacherName: "อ.สมชาย ใจดี", 
+    course: "วิทยาศาสตร์ ม.1", 
+    ep: "EP 2", 
+    date: "2567-01-22", 
+    evalDateTime: "2567-01-22 09:15", 
+    status: "late", 
+    preStatus: "completed", 
+    postStatus: "pending",
+    preAnswers: {
+      answers: { 0: "4", 1: "4", 2: "4", 3: "3", 4: "4" },
+      notes: "มีการเตรียมตัวมาดี แต่สื่อการสอนยังไม่ครบ",
+      submittedAt: "2567-01-22 09:00",
+      preFile: "แผนการสอน_EP2.pdf"
+    }
+  },
+  { 
+    id: "3", 
+    teacherName: "อ.สมหญิง รักวิทย์", 
+    course: "เคมี ม.2", 
+    ep: "EP 1", 
+    date: "2567-01-16", 
+    evalDateTime: "2567-01-16 08:45", 
+    status: "ontime", 
+    preStatus: "pending", 
+    postStatus: "pending" 
+  },
+  { 
+    id: "4", 
+    teacherName: "อ.ประสิทธิ์ เลขดี", 
+    course: "คณิตศาสตร์ ม.1", 
+    ep: "EP 1", 
+    date: "2567-01-17", 
+    evalDateTime: "2567-01-17 09:05", 
+    status: "ontime", 
+    preStatus: "completed", 
+    postStatus: "completed",
+    preAnswers: {
+      answers: { 0: "5", 1: "5", 2: "5", 3: "5", 4: "5" },
+      notes: "เตรียมการสอนมาอย่างดีเยี่ยม มีใบงานและแบบฝึกหัดครบ",
+      submittedAt: "2567-01-17 08:45",
+      preFile: "แผนการสอน_คณิต_EP1.pdf"
+    },
+    postAnswers: {
+      answers: { 0: "5", 1: "5", 2: "5", 3: "4", 4: "5" },
+      notes: "การสอนดำเนินไปได้ดี นักเรียนทำแบบฝึกหัดได้ถูกต้องเป็นส่วนใหญ่",
+      submittedAt: "2567-01-17 12:30"
+    }
+  },
+];
+
 export default function TeacherEvaluationPage() {
   const [evaluations, setEvaluations] = useState<Evaluation[]>(mockEvaluations);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [showEvalDialog, setShowEvalDialog] = useState(false);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showViewDialog, setShowViewDialog] = useState(false);
   const [evalType, setEvalType] = useState<"pre" | "post">("pre");
   const [selectedEval, setSelectedEval] = useState<Evaluation | null>(null);
   const [answers, setAnswers] = useState<Record<number, string>>({});
@@ -79,6 +165,12 @@ export default function TeacherEvaluationPage() {
     setNotes("");
     setPreFile(null);
     setShowEvalDialog(true);
+  };
+
+  const handleViewEval = (evaluation: Evaluation, type: "pre" | "post") => {
+    setSelectedEval(evaluation);
+    setEvalType(type);
+    setShowViewDialog(true);
   };
 
   const handleSubmitEval = () => {
@@ -191,10 +283,15 @@ export default function TeacherEvaluationPage() {
                     </TableCell>
                     <TableCell className="text-center">
                       {e.preStatus === "completed" ? (
-                        <Badge variant="default" className="gap-1">
-                          <CheckCircle className="h-3 w-3" />
-                          ประเมินแล้ว
-                        </Badge>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="gap-1 text-green-600 border-green-600 hover:bg-green-50"
+                          onClick={() => handleViewEval(e, "pre")}
+                        >
+                          <Eye className="h-3 w-3" />
+                          ดูรายละเอียด
+                        </Button>
                       ) : (
                         <Button size="sm" variant="outline" onClick={() => handleOpenEval(e, "pre")}>
                           <FileText className="h-4 w-4 mr-1" />
@@ -204,10 +301,15 @@ export default function TeacherEvaluationPage() {
                     </TableCell>
                     <TableCell className="text-center">
                       {e.postStatus === "completed" ? (
-                        <Badge variant="default" className="gap-1">
-                          <CheckCircle className="h-3 w-3" />
-                          ประเมินแล้ว
-                        </Badge>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="gap-1 text-green-600 border-green-600 hover:bg-green-50"
+                          onClick={() => handleViewEval(e, "post")}
+                        >
+                          <Eye className="h-3 w-3" />
+                          ดูรายละเอียด
+                        </Button>
                       ) : (
                         <Button size="sm" variant="outline" onClick={() => handleOpenEval(e, "post")}>
                           <FileText className="h-4 w-4 mr-1" />
@@ -378,6 +480,121 @@ export default function TeacherEvaluationPage() {
             </Button>
             <Button onClick={handleAddEvaluation}>
               เพิ่มแบบประเมิน
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Evaluation Dialog */}
+      <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5 text-primary" />
+              รายละเอียดแบบประเมิน{evalType === "pre" ? "ก่อน" : "หลัง"}สอน
+            </DialogTitle>
+          </DialogHeader>
+          {selectedEval && (
+            <div className="py-4 space-y-6">
+              {/* Info Section */}
+              <div className="bg-muted/50 rounded-lg p-4 space-y-1">
+                <p className="text-sm"><strong>ครู:</strong> {selectedEval.teacherName}</p>
+                <p className="text-sm"><strong>คอร์ส:</strong> {selectedEval.course}</p>
+                <p className="text-sm"><strong>EP:</strong> {selectedEval.ep}</p>
+                <p className="text-sm"><strong>วันที่สอน:</strong> {selectedEval.date}</p>
+              </div>
+
+              {/* Get the answers */}
+              {(() => {
+                const evalAnswers = evalType === "pre" ? selectedEval.preAnswers : selectedEval.postAnswers;
+                
+                if (!evalAnswers) {
+                  return (
+                    <div className="text-center text-muted-foreground py-8">
+                      ไม่พบข้อมูลการประเมิน
+                    </div>
+                  );
+                }
+
+                // Calculate average score
+                const scores = Object.values(evalAnswers.answers).map(Number);
+                const avgScore = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : 0;
+
+                return (
+                  <>
+                    {/* Submitted Info */}
+                    <div className="flex items-center justify-between text-sm bg-green-50 rounded-lg p-3">
+                      <div className="flex items-center gap-2 text-green-700">
+                        <CheckCircle className="h-4 w-4" />
+                        <span>ประเมินเมื่อ: {evalAnswers.submittedAt}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-amber-600 font-medium">
+                        <Star className="h-4 w-4 fill-amber-500" />
+                        <span>คะแนนเฉลี่ย: {avgScore}/5</span>
+                      </div>
+                    </div>
+
+                    {/* Pre File */}
+                    {evalType === "pre" && evalAnswers.preFile && (
+                      <div className="flex items-center justify-between bg-blue-50 rounded-lg p-3">
+                        <div className="flex items-center gap-2 text-blue-700">
+                          <FileText className="h-4 w-4" />
+                          <span className="text-sm">ไฟล์แนบ: {evalAnswers.preFile}</span>
+                        </div>
+                        <Button size="sm" variant="outline" className="gap-1">
+                          <Download className="h-3 w-3" />
+                          ดาวน์โหลด
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Questions and Answers */}
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-sm text-muted-foreground">ผลการประเมิน</h4>
+                      {evaluationQuestions.map((question, idx) => {
+                        const score = evalAnswers.answers[idx];
+                        const scoreLabel = score ? scoreLabels[score] : "-";
+                        const scoreNum = parseInt(score) || 0;
+                        const scoreColor = scoreNum >= 4 ? "text-green-600 bg-green-100" : 
+                                          scoreNum === 3 ? "text-yellow-600 bg-yellow-100" : 
+                                          "text-red-600 bg-red-100";
+                        
+                        return (
+                          <div key={idx} className="border rounded-lg p-3 space-y-2">
+                            <p className="text-sm font-medium">{idx + 1}. {question}</p>
+                            <div className="flex items-center gap-2">
+                              <Badge className={`${scoreColor} hover:${scoreColor}`}>
+                                {score}/5 - {scoreLabel}
+                              </Badge>
+                              <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div 
+                                  className={`h-full transition-all ${scoreNum >= 4 ? "bg-green-500" : scoreNum === 3 ? "bg-yellow-500" : "bg-red-500"}`}
+                                  style={{ width: `${(scoreNum / 5) * 100}%` }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Notes */}
+                    {evalAnswers.notes && (
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-sm text-muted-foreground">หมายเหตุ/ความคิดเห็น</h4>
+                        <div className="bg-muted/50 rounded-lg p-3">
+                          <p className="text-sm">{evalAnswers.notes}</p>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowViewDialog(false)}>
+              ปิด
             </Button>
           </DialogFooter>
         </DialogContent>
