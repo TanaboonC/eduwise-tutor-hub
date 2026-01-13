@@ -10,8 +10,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Search, FileText, CheckCircle, Plus, Upload, Clock, AlertCircle } from "lucide-react";
+import { Search, FileText, CheckCircle, Upload, Clock, AlertCircle, Eye } from "lucide-react";
 import { toast } from "sonner";
+
+interface EvaluationAnswers {
+  answers: Record<number, string>;
+  notes: string;
+  submittedAt: string;
+  preFile?: string;
+}
 
 interface Evaluation {
   id: string;
@@ -24,6 +31,8 @@ interface Evaluation {
   preStatus: "pending" | "completed";
   postStatus: "pending" | "completed";
   preFile?: string;
+  preAnswers?: EvaluationAnswers;
+  postAnswers?: EvaluationAnswers;
 }
 
 const mockEvaluations: Evaluation[] = [
@@ -37,6 +46,17 @@ const mockEvaluations: Evaluation[] = [
     status: "ontime",
     preStatus: "completed",
     postStatus: "completed",
+    preAnswers: {
+      answers: { 0: "5", 1: "4", 2: "5", 3: "4", 4: "5" },
+      notes: "ครูเตรียมสื่อการสอนมาอย่างดี",
+      submittedAt: "2567-01-15 08:45",
+      preFile: "lesson_plan_ep1.pdf",
+    },
+    postAnswers: {
+      answers: { 0: "5", 1: "5", 2: "4", 3: "5", 4: "4" },
+      notes: "การสอนเป็นไปได้ด้วยดี นักเรียนมีส่วนร่วม",
+      submittedAt: "2567-01-15 10:30",
+    },
   },
   {
     id: "2",
@@ -48,6 +68,11 @@ const mockEvaluations: Evaluation[] = [
     status: "late",
     preStatus: "completed",
     postStatus: "pending",
+    preAnswers: {
+      answers: { 0: "4", 1: "4", 2: "3", 3: "4", 4: "4" },
+      notes: "ควรเตรียมอุปกรณ์ให้พร้อมกว่านี้",
+      submittedAt: "2567-01-22 09:10",
+    },
   },
   {
     id: "3",
@@ -70,6 +95,16 @@ const mockEvaluations: Evaluation[] = [
     status: "ontime",
     preStatus: "completed",
     postStatus: "completed",
+    preAnswers: {
+      answers: { 0: "5", 1: "5", 2: "5", 3: "5", 4: "5" },
+      notes: "ดีเยี่ยม",
+      submittedAt: "2567-01-17 09:00",
+    },
+    postAnswers: {
+      answers: { 0: "5", 1: "4", 2: "5", 3: "5", 4: "5" },
+      notes: "สอนได้ดีมาก",
+      submittedAt: "2567-01-17 10:00",
+    },
   },
 ];
 
@@ -86,22 +121,13 @@ export default function TeacherEvaluationPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [showEvalDialog, setShowEvalDialog] = useState(false);
-  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showViewDialog, setShowViewDialog] = useState(false);
   const [evalType, setEvalType] = useState<"pre" | "post">("pre");
   const [selectedEval, setSelectedEval] = useState<Evaluation | null>(null);
+  const [viewEvalType, setViewEvalType] = useState<"pre" | "post">("pre");
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [notes, setNotes] = useState("");
   const [preFile, setPreFile] = useState<File | null>(null);
-
-  // New evaluation form state
-  const [newEval, setNewEval] = useState({
-    teacherName: "",
-    course: "",
-    ep: "",
-    date: "",
-    evalDateTime: "",
-    status: "ontime" as "ontime" | "late",
-  });
 
   const filteredEvaluations = evaluations.filter((e) => {
     const matchesSearch =
@@ -123,13 +149,26 @@ export default function TeacherEvaluationPage() {
     setShowEvalDialog(true);
   };
 
+  const handleViewEval = (evaluation: Evaluation, type: "pre" | "post") => {
+    setSelectedEval(evaluation);
+    setViewEvalType(type);
+    setShowViewDialog(true);
+  };
+
   const handleSubmitEval = () => {
     if (!selectedEval) return;
+    const evalAnswers: EvaluationAnswers = {
+      answers: { ...answers },
+      notes,
+      submittedAt: new Date().toLocaleString("th-TH"),
+      ...(evalType === "pre" && preFile ? { preFile: preFile.name } : {}),
+    };
     const updated = evaluations.map((e) => {
       if (e.id === selectedEval.id) {
         return {
           ...e,
           [evalType === "pre" ? "preStatus" : "postStatus"]: "completed" as const,
+          [evalType === "pre" ? "preAnswers" : "postAnswers"]: evalAnswers,
           ...(evalType === "pre" && preFile ? { preFile: preFile.name } : {}),
         };
       }
@@ -140,29 +179,19 @@ export default function TeacherEvaluationPage() {
     toast.success(`บันทึกแบบประเมิน${evalType === "pre" ? "ก่อน" : "หลัง"}สอนสำเร็จ`);
   };
 
-  const handleAddEvaluation = () => {
-    if (!newEval.teacherName || !newEval.course || !newEval.ep || !newEval.date || !newEval.evalDateTime) {
-      toast.error("กรุณากรอกข้อมูลให้ครบถ้วน");
-      return;
-    }
-    const newId = (evaluations.length + 1).toString();
-    setEvaluations([
-      ...evaluations,
-      {
-        id: newId,
-        ...newEval,
-        preStatus: "pending",
-        postStatus: "pending",
-      },
-    ]);
-    setShowAddDialog(false);
-    setNewEval({ teacherName: "", course: "", ep: "", date: "", evalDateTime: "", status: "ontime" });
-    toast.success("เพิ่มแบบประเมินสำเร็จ");
-  };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setPreFile(e.target.files[0]);
+    }
+  };
+
+  const getScoreLabel = (score: string) => {
+    switch (score) {
+      case "5": return "ดีมาก";
+      case "4": return "ดี";
+      case "3": return "ปานกลาง";
+      case "2": return "ต้องปรับปรุง";
+      default: return "-";
     }
   };
 
@@ -188,10 +217,6 @@ export default function TeacherEvaluationPage() {
             <SelectItem value="completed">ประเมินครบแล้ว</SelectItem>
           </SelectContent>
         </Select>
-        <Button onClick={() => setShowAddDialog(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          เพิ่มแบบประเมิน
-        </Button>
       </div>
 
       <Card className="shadow-soft">
@@ -236,28 +261,32 @@ export default function TeacherEvaluationPage() {
                     </TableCell>
                     <TableCell className="text-center">
                       {e.preStatus === "completed" ? (
-                        <Badge variant="default" className="gap-1">
-                          <CheckCircle className="h-3 w-3" />
-                          ประเมินแล้ว
-                        </Badge>
-                      ) : (
-                        <Button size="sm" variant="outline" onClick={() => handleOpenEval(e, "pre")}>
-                          <FileText className="h-4 w-4 mr-1" />
-                          ประเมิน
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="gap-1 text-green-600 hover:text-green-700 hover:bg-green-50"
+                          onClick={() => handleViewEval(e, "pre")}
+                        >
+                          <Eye className="h-4 w-4" />
+                          ดูรายละเอียด
                         </Button>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">ยังไม่ประเมิน</span>
                       )}
                     </TableCell>
                     <TableCell className="text-center">
                       {e.postStatus === "completed" ? (
-                        <Badge variant="default" className="gap-1">
-                          <CheckCircle className="h-3 w-3" />
-                          ประเมินแล้ว
-                        </Badge>
-                      ) : (
-                        <Button size="sm" variant="outline" onClick={() => handleOpenEval(e, "post")}>
-                          <FileText className="h-4 w-4 mr-1" />
-                          ประเมิน
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="gap-1 text-green-600 hover:text-green-700 hover:bg-green-50"
+                          onClick={() => handleViewEval(e, "post")}
+                        >
+                          <Eye className="h-4 w-4" />
+                          ดูรายละเอียด
                         </Button>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">ยังไม่ประเมิน</span>
                       )}
                     </TableCell>
                   </TableRow>
@@ -369,74 +398,70 @@ export default function TeacherEvaluationPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Add Evaluation Dialog */}
-      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="sm:max-w-lg">
+      {/* View Evaluation Dialog */}
+      <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>เพิ่มแบบประเมินใหม่</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5 text-primary" />
+              รายละเอียดแบบประเมิน{viewEvalType === "pre" ? "ก่อน" : "หลัง"}สอน
+            </DialogTitle>
           </DialogHeader>
-          <div className="py-4 space-y-4">
-            <div className="space-y-2">
-              <Label>ชื่อครู</Label>
-              <Input
-                value={newEval.teacherName}
-                onChange={(e) => setNewEval({ ...newEval, teacherName: e.target.value })}
-                placeholder="เช่น อ.สมชาย ใจดี"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>คอร์ส</Label>
-              <Input
-                value={newEval.course}
-                onChange={(e) => setNewEval({ ...newEval, course: e.target.value })}
-                placeholder="เช่น วิทยาศาสตร์ ม.1"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>EP</Label>
-              <Input
-                value={newEval.ep}
-                onChange={(e) => setNewEval({ ...newEval, ep: e.target.value })}
-                placeholder="เช่น EP 1"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>วันที่สอน</Label>
-                <Input
-                  type="date"
-                  value={newEval.date}
-                  onChange={(e) => setNewEval({ ...newEval, date: e.target.value })}
-                />
+          {selectedEval && (
+            <div className="py-4 space-y-6">
+              <div className="bg-muted/50 rounded-lg p-4 space-y-1">
+                <p className="text-sm"><strong>ครู:</strong> {selectedEval.teacherName}</p>
+                <p className="text-sm"><strong>คอร์ส:</strong> {selectedEval.course}</p>
+                <p className="text-sm"><strong>EP:</strong> {selectedEval.ep}</p>
+                <p className="text-sm"><strong>วันที่สอน:</strong> {selectedEval.date}</p>
+                {(viewEvalType === "pre" ? selectedEval.preAnswers : selectedEval.postAnswers) && (
+                  <p className="text-sm">
+                    <strong>ประเมินเมื่อ:</strong>{" "}
+                    {viewEvalType === "pre" 
+                      ? selectedEval.preAnswers?.submittedAt 
+                      : selectedEval.postAnswers?.submittedAt}
+                  </p>
+                )}
               </div>
-              <div className="space-y-2">
-                <Label>วัน-เวลาประเมิน</Label>
-                <Input
-                  type="datetime-local"
-                  value={newEval.evalDateTime}
-                  onChange={(e) => setNewEval({ ...newEval, evalDateTime: e.target.value })}
-                />
+
+              {viewEvalType === "pre" && selectedEval.preAnswers?.preFile && (
+                <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
+                  <FileText className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm text-blue-700">ไฟล์แนบ: {selectedEval.preAnswers.preFile}</span>
+                </div>
+              )}
+
+              <div className="space-y-4">
+                <h4 className="font-medium text-sm">ผลการประเมิน:</h4>
+                {evaluationQuestions.map((question, idx) => {
+                  const evalAnswers = viewEvalType === "pre" ? selectedEval.preAnswers : selectedEval.postAnswers;
+                  const score = evalAnswers?.answers[idx] || "-";
+                  return (
+                    <div key={idx} className="p-3 bg-muted/30 rounded-lg">
+                      <p className="text-sm font-medium mb-1">{idx + 1}. {question}</p>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={score === "5" || score === "4" ? "default" : "secondary"}>
+                          {score} - {getScoreLabel(score)}
+                        </Badge>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+
+              {(viewEvalType === "pre" ? selectedEval.preAnswers?.notes : selectedEval.postAnswers?.notes) && (
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">หมายเหตุ:</h4>
+                  <p className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">
+                    {viewEvalType === "pre" ? selectedEval.preAnswers?.notes : selectedEval.postAnswers?.notes}
+                  </p>
+                </div>
+              )}
             </div>
-            <div className="space-y-2">
-              <Label>สถานะเวลา</Label>
-              <Select
-                value={newEval.status}
-                onValueChange={(value: "ontime" | "late") => setNewEval({ ...newEval, status: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ontime">ตรงเวลา</SelectItem>
-                  <SelectItem value="late">สาย</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-              ยกเลิก
+            <Button variant="outline" onClick={() => setShowViewDialog(false)}>
+              ปิด
             </Button>
           </DialogFooter>
         </DialogContent>
