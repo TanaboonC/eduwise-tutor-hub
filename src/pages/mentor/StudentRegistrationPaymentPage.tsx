@@ -27,6 +27,14 @@ import {
 } from "lucide-react";
 
 // Mock data
+const mockStudents = [
+  { id: "S001", name: "สมชาย ใจดี" },
+  { id: "S002", name: "สมหญิง รักเรียน" },
+  { id: "S003", name: "วิชัย เก่งมาก" },
+  { id: "S004", name: "สุดา มานะ" },
+  { id: "S005", name: "ประเสริฐ ศรีสุข" },
+];
+
 const mockCourses = [
   { id: "1", name: "Basic English", price: 15000 },
   { id: "2", name: "Advanced English", price: 25000 },
@@ -130,6 +138,7 @@ export default function StudentRegistrationPaymentPage() {
   const [promotionDiscountValue, setPromotionDiscountValue] = useState("");
 
   // Registration form states
+  const [selectedStudent, setSelectedStudent] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [selectedPromotion, setSelectedPromotion] = useState("");
@@ -345,9 +354,28 @@ export default function StudentRegistrationPaymentPage() {
           <div className="grid lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>เลือกคอร์สและวิชา</CardTitle>
+                <CardTitle>เลือกนักเรียนและคอร์ส</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>เลือกนักเรียน</Label>
+                  <Select value={selectedStudent} onValueChange={setSelectedStudent}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="เลือกนักเรียน" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {mockStudents.map(student => (
+                        <SelectItem key={student.id} value={student.id}>
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4" />
+                            {student.name} ({student.id})
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="space-y-2">
                   <Label>เลือกคอร์สเรียน</Label>
                   <Select value={selectedCourse} onValueChange={(value) => {
