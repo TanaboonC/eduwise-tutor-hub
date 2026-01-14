@@ -376,104 +376,194 @@ export default function StudentExamScoresPage() {
             </CardContent>
           </Card>
 
-          {/* Charts */}
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Chart 1: Status vs Completion Rate */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">สถานะ vs % การทำข้อสอบ</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ChartContainer config={chartConfig} className="h-[250px]">
-                  <BarChart data={statusCompletionData} layout="vertical">
-                    <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
-                    <YAxis type="category" dataKey="status" width={60} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar 
-                      dataKey="percentage" 
-                      radius={[0, 4, 4, 0]}
-                      fill="hsl(var(--primary))"
-                    >
-                      {statusCompletionData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ChartContainer>
-              </CardContent>
-            </Card>
+          {/* Charts Section */}
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-foreground">กราฟวิเคราะห์ผลสอบ</h3>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Chart 1: Status vs Completion Rate */}
+              <Card className="overflow-hidden">
+                <CardHeader className="pb-2 bg-muted/30">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-primary" />
+                    สถานะ vs % การทำข้อสอบ
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <div className="h-[280px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart 
+                        data={statusCompletionData} 
+                        layout="vertical"
+                        margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
+                      >
+                        <XAxis 
+                          type="number" 
+                          domain={[0, 100]} 
+                          tickFormatter={(v) => `${v}%`}
+                          tick={{ fontSize: 11 }}
+                          axisLine={{ stroke: 'hsl(var(--border))' }}
+                          tickLine={{ stroke: 'hsl(var(--border))' }}
+                        />
+                        <YAxis 
+                          type="category" 
+                          dataKey="status" 
+                          width={60}
+                          tick={{ fontSize: 12, fontWeight: 500 }}
+                          axisLine={{ stroke: 'hsl(var(--border))' }}
+                          tickLine={false}
+                        />
+                        <ChartTooltip 
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              const data = payload[0].payload;
+                              return (
+                                <div className="bg-popover border border-border rounded-lg px-3 py-2 shadow-lg">
+                                  <p className="font-medium text-sm">สถานะ: {data.status}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    สัดส่วน: {data.percentage}%
+                                  </p>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }} 
+                        />
+                        <Bar 
+                          dataKey="percentage" 
+                          radius={[0, 6, 6, 0]}
+                          maxBarSize={35}
+                        >
+                          {statusCompletionData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.fill} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
 
-            {/* Chart 2: Exam Sets vs Completion Rate */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">ชุดข้อสอบ vs % การทำข้อสอบ</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ChartContainer config={chartConfig} className="h-[250px]">
-                  <BarChart data={examSetsCompletionData}>
-                    <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                    <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
-                    <ChartTooltip 
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          const data = payload[0].payload;
-                          return (
-                            <div className="bg-background border rounded-lg p-2 shadow-lg">
-                              <p className="font-medium">{data.fullName}</p>
-                              <p className="text-sm text-muted-foreground">
-                                อัตราการทำ: {data.percentage}%
-                              </p>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }} 
-                    />
-                    <Bar 
-                      dataKey="percentage" 
-                      fill="hsl(var(--primary))" 
-                      radius={[4, 4, 0, 0]}
-                    />
-                  </BarChart>
-                </ChartContainer>
-              </CardContent>
-            </Card>
+              {/* Chart 2: Exam Sets vs Completion Rate */}
+              <Card className="overflow-hidden">
+                <CardHeader className="pb-2 bg-muted/30">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-chart-1" />
+                    ชุดข้อสอบ vs % การทำข้อสอบ
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <div className="h-[280px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart 
+                        data={examSetsCompletionData}
+                        margin={{ top: 10, right: 20, left: 10, bottom: 60 }}
+                      >
+                        <XAxis 
+                          dataKey="name" 
+                          tick={{ fontSize: 10 }}
+                          angle={-45}
+                          textAnchor="end"
+                          interval={0}
+                          height={60}
+                          axisLine={{ stroke: 'hsl(var(--border))' }}
+                          tickLine={{ stroke: 'hsl(var(--border))' }}
+                        />
+                        <YAxis 
+                          domain={[0, 100]} 
+                          tickFormatter={(v) => `${v}%`}
+                          tick={{ fontSize: 11 }}
+                          axisLine={{ stroke: 'hsl(var(--border))' }}
+                          tickLine={{ stroke: 'hsl(var(--border))' }}
+                        />
+                        <ChartTooltip 
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              const data = payload[0].payload;
+                              return (
+                                <div className="bg-popover border border-border rounded-lg px-3 py-2 shadow-lg">
+                                  <p className="font-medium text-sm">{data.fullName}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    อัตราการทำ: {data.percentage}%
+                                  </p>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }} 
+                        />
+                        <Bar 
+                          dataKey="percentage" 
+                          fill="hsl(var(--primary))" 
+                          radius={[6, 6, 0, 0]}
+                          maxBarSize={50}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
 
-            {/* Chart 3: Score Distribution */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">คะแนนที่ได้ vs % ที่ได้</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ChartContainer config={chartConfig} className="h-[250px]">
-                  <BarChart data={scoreDistributionData}>
-                    <XAxis dataKey="range" tick={{ fontSize: 10 }} />
-                    <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
-                    <ChartTooltip 
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          const data = payload[0].payload;
-                          return (
-                            <div className="bg-background border rounded-lg p-2 shadow-lg">
-                              <p className="font-medium">ช่วงคะแนน: {data.range}</p>
-                              <p className="text-sm text-muted-foreground">
-                                จำนวน: {data.count} คน ({data.percentage}%)
-                              </p>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }} 
-                    />
-                    <Bar 
-                      dataKey="percentage" 
-                      fill="hsl(var(--chart-2))" 
-                      radius={[4, 4, 0, 0]}
-                    />
-                  </BarChart>
-                </ChartContainer>
-              </CardContent>
-            </Card>
+              {/* Chart 3: Score Distribution */}
+              <Card className="overflow-hidden">
+                <CardHeader className="pb-2 bg-muted/30">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-chart-2" />
+                    คะแนนที่ได้ vs % ที่ได้
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <div className="h-[280px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart 
+                        data={scoreDistributionData}
+                        margin={{ top: 10, right: 20, left: 10, bottom: 40 }}
+                      >
+                        <XAxis 
+                          dataKey="range" 
+                          tick={{ fontSize: 10 }}
+                          angle={-30}
+                          textAnchor="end"
+                          interval={0}
+                          height={50}
+                          axisLine={{ stroke: 'hsl(var(--border))' }}
+                          tickLine={{ stroke: 'hsl(var(--border))' }}
+                        />
+                        <YAxis 
+                          domain={[0, 100]} 
+                          tickFormatter={(v) => `${v}%`}
+                          tick={{ fontSize: 11 }}
+                          axisLine={{ stroke: 'hsl(var(--border))' }}
+                          tickLine={{ stroke: 'hsl(var(--border))' }}
+                        />
+                        <ChartTooltip 
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              const data = payload[0].payload;
+                              return (
+                                <div className="bg-popover border border-border rounded-lg px-3 py-2 shadow-lg">
+                                  <p className="font-medium text-sm">ช่วงคะแนน: {data.range}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    จำนวน: {data.count} คน ({data.percentage}%)
+                                  </p>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }} 
+                        />
+                        <Bar 
+                          dataKey="percentage" 
+                          fill="hsl(var(--chart-2))" 
+                          radius={[6, 6, 0, 0]}
+                          maxBarSize={45}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </>
       )}
