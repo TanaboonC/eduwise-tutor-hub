@@ -9,17 +9,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Gift, Trophy, Check, Package, Plus, Edit, Trash2, ImagePlus, User } from "lucide-react";
+import { Gift, Trophy, Check, Package, Plus, Edit, Trash2, ImagePlus, User, Save, X } from "lucide-react";
 import { toast } from "sonner";
 
 // Mock data for students with points
-const mockStudentsPoints = [
-  { id: 1, name: "นายสมชาย ใจดี", email: "somchai@email.com", totalPoints: 1500, usedPoints: 300, availablePoints: 1200 },
-  { id: 2, name: "นางสาวสมหญิง รักเรียน", email: "somying@email.com", totalPoints: 2200, usedPoints: 800, availablePoints: 1400 },
-  { id: 3, name: "นายวิชัย เก่งมาก", email: "wichai@email.com", totalPoints: 980, usedPoints: 500, availablePoints: 480 },
-  { id: 4, name: "นางสาวพิมพ์ใจ สวยงาม", email: "pimjai@email.com", totalPoints: 3100, usedPoints: 1500, availablePoints: 1600 },
-  { id: 5, name: "นายธนกร รวยมาก", email: "thanakorn@email.com", totalPoints: 750, usedPoints: 200, availablePoints: 550 },
+const initialStudentsPoints = [
+  { id: 1, name: "นายสมชาย ใจดี", email: "somchai@email.com", totalPoints: 1500, usedPoints: 300 },
+  { id: 2, name: "นางสาวสมหญิง รักเรียน", email: "somying@email.com", totalPoints: 2200, usedPoints: 800 },
+  { id: 3, name: "นายวิชัย เก่งมาก", email: "wichai@email.com", totalPoints: 980, usedPoints: 500 },
+  { id: 4, name: "นางสาวพิมพ์ใจ สวยงาม", email: "pimjai@email.com", totalPoints: 3100, usedPoints: 1500 },
+  { id: 5, name: "นายธนกร รวยมาก", email: "thanakorn@email.com", totalPoints: 750, usedPoints: 200 },
 ];
+
+interface StudentPoints {
+  id: number;
+  name: string;
+  email: string;
+  totalPoints: number;
+  usedPoints: number;
+}
 
 // Mock data for redemption requests
 const mockRedemptionRequests: RedemptionRequest[] = [
@@ -113,6 +121,9 @@ interface Reward {
 }
 
 const StudentRewardRedemptionPage = () => {
+  const [studentsPoints, setStudentsPoints] = useState<StudentPoints[]>(initialStudentsPoints);
+  const [editingStudentId, setEditingStudentId] = useState<number | null>(null);
+  const [editingPoints, setEditingPoints] = useState<{ totalPoints: number; usedPoints: number }>({ totalPoints: 0, usedPoints: 0 });
   const [redemptionRequests, setRedemptionRequests] = useState<RedemptionRequest[]>(mockRedemptionRequests);
   const [rewards, setRewards] = useState<Reward[]>(mockRewards);
   const [selectedRequest, setSelectedRequest] = useState<RedemptionRequest | null>(null);
@@ -120,6 +131,32 @@ const StudentRewardRedemptionPage = () => {
   const [rewardDialogOpen, setRewardDialogOpen] = useState(false);
   const [editingReward, setEditingReward] = useState<Reward | null>(null);
   const [newReward, setNewReward] = useState({ name: "", points: 0, stock: 0, image: "" });
+
+  const handleEditStudentPoints = (student: StudentPoints) => {
+    setEditingStudentId(student.id);
+    setEditingPoints({ totalPoints: student.totalPoints, usedPoints: student.usedPoints });
+  };
+
+  const handleSaveStudentPoints = (studentId: number) => {
+    if (editingPoints.usedPoints > editingPoints.totalPoints) {
+      toast.error("คะแนนที่ใช้ไปต้องไม่เกินคะแนนทั้งหมด");
+      return;
+    }
+    setStudentsPoints(prev => 
+      prev.map(s => 
+        s.id === studentId 
+          ? { ...s, totalPoints: editingPoints.totalPoints, usedPoints: editingPoints.usedPoints }
+          : s
+      )
+    );
+    setEditingStudentId(null);
+    toast.success("บันทึกคะแนนเรียบร้อยแล้ว");
+  };
+
+  const handleCancelEditPoints = () => {
+    setEditingStudentId(null);
+    setEditingPoints({ totalPoints: 0, usedPoints: 0 });
+  };
 
   const handleAcceptRequest = (requestId: number) => {
     setRedemptionRequests(prev => 
@@ -242,10 +279,11 @@ const StudentRewardRedemptionPage = () => {
                         <TableHead className="text-right">คะแนนทั้งหมด</TableHead>
                         <TableHead className="text-right">คะแนนที่ใช้ไป</TableHead>
                         <TableHead className="text-right">คะแนนคงเหลือ</TableHead>
+                        <TableHead className="text-center w-32">จัดการ</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {mockStudentsPoints.map((student, index) => (
+                      {studentsPoints.map((student, index) => (
                         <TableRow key={student.id}>
                           <TableCell className="font-medium">{index + 1}</TableCell>
                           <TableCell>
@@ -257,12 +295,68 @@ const StudentRewardRedemptionPage = () => {
                             </div>
                           </TableCell>
                           <TableCell className="text-muted-foreground">{student.email}</TableCell>
-                          <TableCell className="text-right font-semibold text-primary">{student.totalPoints.toLocaleString()}</TableCell>
-                          <TableCell className="text-right text-muted-foreground">{student.usedPoints.toLocaleString()}</TableCell>
+                          <TableCell className="text-right">
+                            {editingStudentId === student.id ? (
+                              <Input
+                                type="number"
+                                value={editingPoints.totalPoints}
+                                onChange={(e) => setEditingPoints(prev => ({ ...prev, totalPoints: parseInt(e.target.value) || 0 }))}
+                                className="w-24 ml-auto text-right"
+                              />
+                            ) : (
+                              <span className="font-semibold text-primary">{student.totalPoints.toLocaleString()}</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {editingStudentId === student.id ? (
+                              <Input
+                                type="number"
+                                value={editingPoints.usedPoints}
+                                onChange={(e) => setEditingPoints(prev => ({ ...prev, usedPoints: parseInt(e.target.value) || 0 }))}
+                                className="w-24 ml-auto text-right"
+                              />
+                            ) : (
+                              <span className="text-muted-foreground">{student.usedPoints.toLocaleString()}</span>
+                            )}
+                          </TableCell>
                           <TableCell className="text-right">
                             <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                              {student.availablePoints.toLocaleString()} คะแนน
+                              {editingStudentId === student.id 
+                                ? (editingPoints.totalPoints - editingPoints.usedPoints).toLocaleString()
+                                : (student.totalPoints - student.usedPoints).toLocaleString()
+                              } คะแนน
                             </Badge>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {editingStudentId === student.id ? (
+                              <div className="flex items-center justify-center gap-1">
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleSaveStudentPoints(student.id)}
+                                  className="gap-1"
+                                >
+                                  <Save className="h-3 w-3" />
+                                  บันทึก
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={handleCancelEditPoints}
+                                >
+                                  <X className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleEditStudentPoints(student)}
+                                className="gap-1"
+                              >
+                                <Edit className="h-3 w-3" />
+                                แก้ไข
+                              </Button>
+                            )}
                           </TableCell>
                         </TableRow>
                       ))}
