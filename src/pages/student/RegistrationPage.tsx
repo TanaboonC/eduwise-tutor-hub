@@ -30,58 +30,58 @@ import { Label } from "@/components/ui/label";
 const availableCourses = [
   {
     id: 1,
-    name: "MWIT Preparation Course",
-    teacher: "Dr. Prasert Siriwan",
+    name: "ตะลุยโจทย์ปัญหา ม.4",
+    teacher: "อ.ประเสริฐ ศิริวัน",
     price: 15000,
-    duration: "3 months",
-    description: "Comprehensive preparation for MWIT entrance examination covering all subjects.",
+    duration: "3 เดือน",
+    description: "คอร์สฝึกทำโจทย์ปัญหาครบทุกวิชา: คณิต วิทย์ อังกฤษ",
     rating: 4.9,
     students: 120,
-    features: ["Live Classes", "Practice Tests", "1-on-1 Mentoring"],
+    features: ["เรียนสด", "ทดสอบประจำสัปดาห์", "ติวเดี่ยว 1-on-1"],
     color: "bg-primary"
   },
   {
     id: 2,
-    name: "KVIS Science Program",
-    teacher: "Prof. Naree Thaweepong",
+    name: "ติวเข้มเนื้อหา ม.4",
+    teacher: "อ.นารี ทวีพงษ์",
     price: 18000,
-    duration: "4 months",
-    description: "Advanced science program tailored for KVIS examination requirements.",
+    duration: "4 เดือน",
+    description: "คอร์สติวเข้มเนื้อหาเต็มรูปแบบ: คณิต วิทย์ อังกฤษ",
     rating: 4.8,
     students: 85,
-    features: ["Lab Sessions", "Weekly Assessments", "Study Materials"],
+    features: ["ปฏิบัติการทดลอง", "ประเมินรายสัปดาห์", "เอกสารประกอบ"],
     color: "bg-info"
   },
   {
     id: 3,
-    name: "English Excellence",
-    teacher: "Ms. Sarah Johnson",
-    price: 8000,
-    duration: "2 months",
-    description: "Intensive English program for academic and examination purposes.",
+    name: "ตะลุยโจทย์ปัญหา ม.5",
+    teacher: "อ.สารา จอห์นสัน",
+    price: 16000,
+    duration: "3 เดือน",
+    description: "คอร์สฝึกทำโจทย์ปัญหาขั้นสูง: คณิต วิทย์ อังกฤษ",
     rating: 4.7,
     students: 200,
-    features: ["Speaking Practice", "Writing Workshop", "Grammar Mastery"],
+    features: ["ฝึกพูด", "เขียนเรียงความ", "ไวยากรณ์เข้มข้น"],
     color: "bg-warning"
   },
   {
     id: 4,
-    name: "Math Olympiad Prep",
-    teacher: "Dr. Somchai Wongburi",
-    price: 12000,
-    duration: "3 months",
-    description: "Advanced mathematics for competitive examinations and olympiads.",
+    name: "ติวเข้มเนื้อหา ม.5",
+    teacher: "อ.สมชาย วงศ์บุรี",
+    price: 19000,
+    duration: "4 เดือน",
+    description: "คอร์สติวเนื้อหาเข้มข้นสำหรับ ม.5: คณิต วิทย์ อังกฤษ",
     rating: 4.9,
     students: 45,
-    features: ["Problem Solving", "Mock Competitions", "Expert Guidance"],
+    features: ["แก้โจทย์", "สอบจำลอง", "คำแนะนำจากผู้เชี่ยวชาญ"],
     color: "bg-success"
   },
 ];
 
 const registrationHistory = [
-  { id: 1, course: "Mathematics Advanced", date: "2023-08-15", status: "Active", amount: 15000 },
-  { id: 2, course: "Science Integration", date: "2023-08-15", status: "Active", amount: 18000 },
-  { id: 3, course: "English Proficiency", date: "2023-08-20", status: "Active", amount: 8000 },
+  { id: 1, course: "ตะลุยโจทย์ปัญหา ม.4", date: "2023-08-15", status: "กำลังเรียน", amount: 15000 },
+  { id: 2, course: "ติวเข้มเนื้อหา ม.4", date: "2023-08-15", status: "กำลังเรียน", amount: 18000 },
+  { id: 3, course: "ตะลุยโจทย์ปัญหา ม.5", date: "2023-08-20", status: "กำลังเรียน", amount: 16000 },
 ];
 
 type PaymentOption = "full" | "installment3" | "installment6";
@@ -119,15 +119,15 @@ export default function RegistrationPage() {
 
   return (
     <StudentLayout
-      title="Course Registration"
-      description="Browse and register for available courses"
+      title="ลงทะเบียนคอร์ส"
+      description="เลือกดูและลงทะเบียนคอร์สที่เปิดรับ"
     >
       {/* Search and Filter */}
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search courses or teachers..."
+            placeholder="ค้นหาคอร์สหรือชื่อครู..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -135,7 +135,7 @@ export default function RegistrationPage() {
         </div>
         <Button variant="outline">
           <Filter className="h-4 w-4 mr-2" />
-          Filters
+          ตัวกรอง
         </Button>
       </div>
 
@@ -200,17 +200,17 @@ export default function RegistrationPage() {
         <div className="p-4 border-b border-border bg-muted/30">
           <h3 className="font-bold text-foreground flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-primary" />
-            Registration History
+            ประวัติการลงทะเบียน
           </h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Course</th>
-                <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Date</th>
-                <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Amount</th>
-                <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Status</th>
+                <th className="text-left p-4 text-sm font-semibold text-muted-foreground">คอร์ส</th>
+                <th className="text-left p-4 text-sm font-semibold text-muted-foreground">วันที่</th>
+                <th className="text-left p-4 text-sm font-semibold text-muted-foreground">จำนวนเงิน</th>
+                <th className="text-left p-4 text-sm font-semibold text-muted-foreground">สถานะ</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -218,7 +218,7 @@ export default function RegistrationPage() {
                 <tr key={item.id} className="hover:bg-muted/30 transition-colors">
                   <td className="p-4 font-medium text-foreground">{item.course}</td>
                   <td className="p-4 text-sm text-muted-foreground">
-                    {new Date(item.date).toLocaleDateString()}
+                    {new Date(item.date).toLocaleDateString('th-TH')}
                   </td>
                   <td className="p-4 text-sm text-foreground">฿{item.amount.toLocaleString()}</td>
                   <td className="p-4">

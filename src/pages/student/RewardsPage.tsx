@@ -29,64 +29,64 @@ const nextTierPoints = 1500;
 const rewards = [
   {
     id: 1,
-    name: "Early Worm T-Shirt",
+    name: "เสื้อยืด Early Worm",
     points: 500,
     image: "👕",
-    description: "Exclusive Early Worm Tutor branded t-shirt",
-    category: "Merchandise"
+    description: "เสื้อยืดพิเศษจาก Early Worm Tutor",
+    category: "ของที่ระลึก"
   },
   {
     id: 2,
-    name: "Study Notebook Set",
+    name: "ชุดสมุดจดบันทึก",
     points: 300,
     image: "📓",
-    description: "Premium quality notebooks for your studies",
-    category: "School Supplies"
+    description: "สมุดจดบันทึกคุณภาพสูงสำหรับการเรียน",
+    category: "อุปกรณ์การเรียน"
   },
   {
     id: 3,
-    name: "Course Discount Voucher",
+    name: "คูปองส่วนลดคอร์สเรียน",
     points: 800,
     image: "🎟️",
-    description: "10% discount on your next course registration",
-    category: "Vouchers"
+    description: "ส่วนลด 10% สำหรับการลงทะเบียนคอร์สถัดไป",
+    category: "คูปอง"
   },
   {
     id: 4,
-    name: "Wireless Earbuds",
+    name: "หูฟังไร้สาย",
     points: 2000,
     image: "🎧",
-    description: "High-quality wireless earbuds for focused study",
-    category: "Electronics"
+    description: "หูฟังไร้สายคุณภาพสูงสำหรับการเรียน",
+    category: "อิเล็กทรอนิกส์"
   },
   {
     id: 5,
-    name: "Book Store Gift Card",
+    name: "บัตรของขวัญร้านหนังสือ",
     points: 1000,
     image: "📚",
-    description: "฿500 gift card for educational books",
-    category: "Vouchers"
+    description: "บัตรของขวัญมูลค่า ฿500 สำหรับซื้อหนังสือ",
+    category: "คูปอง"
   },
   {
     id: 6,
-    name: "Premium Backpack",
+    name: "กระเป๋าเป้พรีเมี่ยม",
     points: 1500,
     image: "🎒",
-    description: "Durable backpack with laptop compartment",
-    category: "Merchandise"
+    description: "กระเป๋าเป้ทนทานพร้อมช่องใส่แล็ปท็อป",
+    category: "ของที่ระลึก"
   },
 ];
 
 const redemptionHistory = [
-  { id: 1, reward: "Study Notebook Set", points: 300, date: "2024-01-15", status: "Delivered" },
-  { id: 2, reward: "Early Worm T-Shirt", points: 500, date: "2024-01-20", status: "Shipped" },
+  { id: 1, reward: "ชุดสมุดจดบันทึก", points: 300, date: "2024-01-15", status: "ส่งแล้ว" },
+  { id: 2, reward: "เสื้อยืด Early Worm", points: 500, date: "2024-01-20", status: "กำลังจัดส่ง" },
 ];
 
 const pointsHistory = [
-  { id: 1, action: "Completed Math Quiz", points: 50, date: "2024-01-28" },
-  { id: 2, action: "100% Attendance Bonus", points: 100, date: "2024-01-27" },
-  { id: 3, action: "Exam Score Above 90%", points: 75, date: "2024-01-25" },
-  { id: 4, action: "Completed Practice Set", points: 25, date: "2024-01-24" },
+  { id: 1, action: "ทำแบบฝึกหัดคณิตศาสตร์เสร็จ", points: 50, date: "2024-01-28" },
+  { id: 2, action: "โบนัสเข้าเรียนครบ 100%", points: 100, date: "2024-01-27" },
+  { id: 3, action: "คะแนนสอบเกิน 90%", points: 75, date: "2024-01-25" },
+  { id: 4, action: "ทำชุดฝึกหัดเสร็จ", points: 25, date: "2024-01-24" },
 ];
 
 export default function RewardsPage() {
@@ -97,8 +97,8 @@ export default function RewardsPage() {
     if (selectedReward && currentPoints >= selectedReward.points) {
       setShowRedemption(false);
       toast({
-        title: "Reward Redeemed! 🎉",
-        description: `You've successfully redeemed ${selectedReward.name}. Check your delivery status.`,
+        title: "แลกของรางวัลสำเร็จ! 🎉",
+        description: `คุณได้แลก ${selectedReward.name} เรียบร้อยแล้ว กรุณาตรวจสอบสถานะการจัดส่ง`,
       });
       setSelectedReward(null);
     }
@@ -106,8 +106,8 @@ export default function RewardsPage() {
 
   return (
     <StudentLayout
-      title="Rewards Center"
-      description="Earn points and redeem exciting rewards"
+      title="ศูนย์ของรางวัล"
+      description="สะสมคะแนนและแลกของรางวัลพิเศษ"
     >
       {/* Points Overview */}
       <div className="grid gap-6 md:grid-cols-3 mb-8">
@@ -117,12 +117,12 @@ export default function RewardsPage() {
           <div className="relative">
             <div className="flex items-center gap-2 mb-2">
               <Star className="h-5 w-5 fill-current" />
-              <span className="font-medium">Your Points Balance</span>
+              <span className="font-medium">คะแนนสะสมของคุณ</span>
             </div>
             <p className="text-5xl font-bold mb-4">{currentPoints.toLocaleString()}</p>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Progress to Gold Tier</span>
+                <span>ความคืบหน้าสู่ระดับทอง</span>
                 <span>{currentPoints}/{nextTierPoints}</span>
               </div>
               <div className="h-3 bg-card/20 rounded-full overflow-hidden">
@@ -131,7 +131,7 @@ export default function RewardsPage() {
                   style={{ width: `${(currentPoints / nextTierPoints) * 100}%` }}
                 />
               </div>
-              <p className="text-sm opacity-80">{nextTierPoints - currentPoints} points until Gold Tier</p>
+              <p className="text-sm opacity-80">อีก {nextTierPoints - currentPoints} คะแนนจะถึงระดับทอง</p>
             </div>
           </div>
         </div>
@@ -139,20 +139,20 @@ export default function RewardsPage() {
         <div className="bg-card rounded-2xl shadow-soft border border-border p-6">
           <h3 className="font-bold text-foreground flex items-center gap-2 mb-4">
             <Zap className="h-5 w-5 text-warning" />
-            Quick Stats
+            สถิติด่วน
           </h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">This Month</span>
-              <span className="font-bold text-foreground">+250 pts</span>
+              <span className="text-muted-foreground">เดือนนี้</span>
+              <span className="font-bold text-foreground">+250 คะแนน</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Total Earned</span>
-              <span className="font-bold text-foreground">2,050 pts</span>
+              <span className="text-muted-foreground">รวมที่ได้รับ</span>
+              <span className="font-bold text-foreground">2,050 คะแนน</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Redeemed</span>
-              <span className="font-bold text-foreground">800 pts</span>
+              <span className="text-muted-foreground">แลกไปแล้ว</span>
+              <span className="font-bold text-foreground">800 คะแนน</span>
             </div>
           </div>
         </div>
@@ -162,13 +162,13 @@ export default function RewardsPage() {
       <div className="mb-8">
         <h3 className="font-bold text-lg text-foreground mb-4 flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
-          Recent Points Earned
+          คะแนนที่ได้รับล่าสุด
         </h3>
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
           {pointsHistory.map((item) => (
             <div key={item.id} className="bg-card rounded-xl p-4 shadow-soft border border-border">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground">{new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                <span className="text-sm text-muted-foreground">{new Date(item.date).toLocaleDateString('th-TH', { month: 'short', day: 'numeric' })}</span>
                 <span className="text-success font-bold">+{item.points}</span>
               </div>
               <p className="text-sm font-medium text-foreground">{item.action}</p>
@@ -181,7 +181,7 @@ export default function RewardsPage() {
       <div className="mb-8">
         <h3 className="font-bold text-lg text-foreground mb-4 flex items-center gap-2">
           <Gift className="h-5 w-5 text-primary" />
-          Available Rewards
+          ของรางวัลที่สามารถแลกได้
         </h3>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {rewards.map((reward) => {
@@ -204,7 +204,7 @@ export default function RewardsPage() {
                     <div className="flex items-center gap-1">
                       <Star className="h-4 w-4 text-gold fill-gold" />
                       <span className="font-bold text-foreground">{reward.points}</span>
-                      <span className="text-sm text-muted-foreground">pts</span>
+                      <span className="text-sm text-muted-foreground">คะแนน</span>
                     </div>
                     <Button 
                       size="sm"
@@ -215,7 +215,7 @@ export default function RewardsPage() {
                         setShowRedemption(true);
                       }}
                     >
-                      {canAfford ? "Redeem" : "Need more pts"}
+                      {canAfford ? "แลก" : "คะแนนไม่พอ"}
                     </Button>
                   </div>
                 </div>
@@ -230,7 +230,7 @@ export default function RewardsPage() {
         <div className="p-4 border-b border-border bg-muted/30">
           <h3 className="font-bold text-foreground flex items-center gap-2">
             <Package className="h-5 w-5 text-primary" />
-            Redemption History
+            ประวัติการแลกของรางวัล
           </h3>
         </div>
         <div className="divide-y divide-border">
@@ -239,11 +239,11 @@ export default function RewardsPage() {
               <div>
                 <p className="font-medium text-foreground">{item.reward}</p>
                 <p className="text-sm text-muted-foreground">
-                  {new Date(item.date).toLocaleDateString()} • {item.points} points
+                  {new Date(item.date).toLocaleDateString('th-TH')} • {item.points} คะแนน
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                {item.status === "Delivered" ? (
+                {item.status === "ส่งแล้ว" ? (
                   <span className="inline-flex items-center gap-1 px-3 py-1 bg-success/10 text-success text-sm font-medium rounded-full">
                     <CheckCircle className="h-4 w-4" />
                     {item.status}
@@ -264,9 +264,9 @@ export default function RewardsPage() {
       <Dialog open={showRedemption} onOpenChange={setShowRedemption}>
         <DialogContent className="bg-card">
           <DialogHeader>
-            <DialogTitle>Redeem Reward</DialogTitle>
+            <DialogTitle>แลกของรางวัล</DialogTitle>
             <DialogDescription>
-              Confirm your reward redemption
+              ยืนยันการแลกของรางวัล
             </DialogDescription>
           </DialogHeader>
           
@@ -282,10 +282,10 @@ export default function RewardsPage() {
                 <div className="flex items-center justify-center gap-2">
                   <Star className="h-5 w-5 text-gold fill-gold" />
                   <span className="text-2xl font-bold text-foreground">{selectedReward.points}</span>
-                  <span className="text-muted-foreground">points</span>
+                  <span className="text-muted-foreground">คะแนน</span>
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Balance after: {(currentPoints - selectedReward.points).toLocaleString()} points
+                  คะแนนคงเหลือ: {(currentPoints - selectedReward.points).toLocaleString()} คะแนน
                 </p>
               </div>
             </div>
@@ -293,11 +293,11 @@ export default function RewardsPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowRedemption(false)}>
-              Cancel
+              ยกเลิก
             </Button>
             <Button onClick={handleRedeem}>
               <Gift className="h-4 w-4 mr-2" />
-              Confirm Redemption
+              ยืนยันการแลก
             </Button>
           </DialogFooter>
         </DialogContent>

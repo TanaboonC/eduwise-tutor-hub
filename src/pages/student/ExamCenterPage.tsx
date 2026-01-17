@@ -33,36 +33,43 @@ import {
 const courses = [
   { 
     id: 1, 
-    name: "Intensive Program 2024", 
-    code: "IP-2024",
+    name: "ตะลุยโจทย์ปัญหา ม.4", 
+    code: "TLP-M4",
     subjects: 3,
     totalExams: 24,
-    description: "คอร์สเตรียมสอบเข้ามหาวิทยาลัย"
+    description: "คอร์สฝึกทำโจทย์ปัญหาสำหรับ ม.4"
   },
   { 
     id: 2, 
-    name: "Summer Camp 2024", 
-    code: "SC-2024",
-    subjects: 2,
-    totalExams: 14,
-    description: "คอร์สเรียนช่วงซัมเมอร์"
+    name: "ติวเข้มเนื้อหา ม.4", 
+    code: "TKN-M4",
+    subjects: 3,
+    totalExams: 18,
+    description: "คอร์สติวเข้มเนื้อหาสำหรับ ม.4"
   },
   { 
     id: 3, 
-    name: "Weekend Tutorial", 
-    code: "WT-2024",
-    subjects: 4,
-    totalExams: 32,
-    description: "คอร์สเรียนเสริมวันหยุด"
+    name: "ตะลุยโจทย์ปัญหา ม.5", 
+    code: "TLP-M5",
+    subjects: 3,
+    totalExams: 24,
+    description: "คอร์สฝึกทำโจทย์ปัญหาสำหรับ ม.5"
+  },
+  { 
+    id: 4, 
+    name: "ติวเข้มเนื้อหา ม.5", 
+    code: "TKN-M5",
+    subjects: 3,
+    totalExams: 18,
+    description: "คอร์สติวเข้มเนื้อหาสำหรับ ม.5"
   },
 ];
 
-// Subject exam overview data (Thai-style as requested)
+// Subject exam overview data
 const subjectExams = [
   {
     id: 1,
-    name: "Mathematics Advanced",
-    nameTH: "",
+    name: "คณิตศาสตร์",
     totalSets: 10,
     completedSets: 6,
     passedSets: 5,
@@ -71,8 +78,7 @@ const subjectExams = [
   },
   {
     id: 2,
-    name: "Science Integration",
-    nameTH: "",
+    name: "วิทยาศาสตร์",
     totalSets: 8,
     completedSets: 4,
     passedSets: 3,
@@ -81,8 +87,7 @@ const subjectExams = [
   },
   {
     id: 3,
-    name: "English Proficiency",
-    nameTH: "",
+    name: "ภาษาอังกฤษ",
     totalSets: 6,
     completedSets: 6,
     passedSets: 6,
@@ -93,32 +98,32 @@ const subjectExams = [
 
 // Detailed CLO (Course Learning Outcome) data per subject
 const examDetailData = [
-  { clo: "CLO1", status: "passed", score: 85, max: 100, mean: 72, min: 45 },
-  { clo: "CLO2", status: "passed", score: 78, max: 100, mean: 68, min: 38 },
-  { clo: "CLO3", status: "not_done", score: null, max: 100, mean: null, min: null },
-  { clo: "CLO4", status: "failed", score: 52, max: 100, mean: 65, min: 42 },
-  { clo: "CLO5", status: "passed", score: 91, max: 100, mean: 75, min: 55 },
+  { clo: "EP1", status: "passed", score: 85, max: 100, mean: 72, min: 45 },
+  { clo: "EP2", status: "passed", score: 78, max: 100, mean: 68, min: 38 },
+  { clo: "EP3", status: "not_done", score: null, max: 100, mean: null, min: null },
+  { clo: "EP4", status: "failed", score: 52, max: 100, mean: 65, min: 42 },
+  { clo: "EP5", status: "passed", score: 91, max: 100, mean: 75, min: 55 },
 ];
 
 const upcomingExams = [
   {
     id: 1,
-    name: "Mathematics Mid-Term",
-    subject: "Mathematics Advanced",
+    name: "สอบกลางภาคคณิตศาสตร์",
+    subject: "คณิตศาสตร์",
     date: "2024-02-15",
-    time: "09:00 AM",
-    duration: "2 hours",
-    topics: ["Algebra", "Calculus", "Trigonometry"],
+    time: "09:00 น.",
+    duration: "2 ชั่วโมง",
+    topics: ["พีชคณิต", "แคลคูลัส", "ตรีโกณมิติ"],
     status: "upcoming"
   },
   {
     id: 2,
-    name: "Science Integration Quiz",
-    subject: "Science",
+    name: "ทดสอบวิทยาศาสตร์",
+    subject: "วิทยาศาสตร์",
     date: "2024-02-18",
-    time: "10:30 AM",
-    duration: "1 hour",
-    topics: ["Physics - Mechanics", "Chemistry - Bonds"],
+    time: "10:30 น.",
+    duration: "1 ชั่วโมง",
+    topics: ["ฟิสิกส์ - กลศาสตร์", "เคมี - พันธะเคมี"],
     status: "upcoming"
   },
 ];
@@ -126,7 +131,7 @@ const upcomingExams = [
 const examResults = [
   {
     id: 1,
-    name: "Mathematics Practice Exam",
+    name: "แบบฝึกหัดคณิตศาสตร์",
     date: "2024-01-28",
     score: 85,
     maxScore: 100,
@@ -138,7 +143,7 @@ const examResults = [
   },
   {
     id: 2,
-    name: "Science Mock Test",
+    name: "ทดสอบวิทยาศาสตร์",
     date: "2024-01-20",
     score: 78,
     maxScore: 100,
@@ -153,13 +158,13 @@ const examResults = [
 function getStatusBadge(status: string) {
   switch (status) {
     case "passed":
-      return { label: "ผ่านแล้ว", labelEN: "Passed", class: "bg-success/10 text-success", icon: CheckCircle };
+      return { label: "ผ่านแล้ว", labelEN: "ผ่าน", class: "bg-success/10 text-success", icon: CheckCircle };
     case "failed":
-      return { label: "ยังไม่ผ่าน", labelEN: "Not Passed", class: "bg-destructive/10 text-destructive", icon: XCircle };
+      return { label: "ยังไม่ผ่าน", labelEN: "ไม่ผ่าน", class: "bg-destructive/10 text-destructive", icon: XCircle };
     case "not_done":
-      return { label: "ยังไม่ทำ", labelEN: "Not Done", class: "bg-muted text-muted-foreground", icon: AlertCircle };
+      return { label: "ยังไม่ทำ", labelEN: "ยังไม่ทำ", class: "bg-muted text-muted-foreground", icon: AlertCircle };
     default:
-      return { label: "Unknown", labelEN: "Unknown", class: "bg-muted text-muted-foreground", icon: AlertCircle };
+      return { label: "ไม่ทราบ", labelEN: "ไม่ทราบ", class: "bg-muted text-muted-foreground", icon: AlertCircle };
   }
 }
 
@@ -174,8 +179,8 @@ export default function ExamCenterPage() {
   if (!selectedCourse) {
     return (
       <StudentLayout
-        title="Exam Center"
-        description="Schedule, practice sets, and results"
+        title="ศูนย์สอบ"
+        description="ตารางสอบ ชุดแบบฝึกหัด และผลสอบ"
       >
         <div className="space-y-6">
           <div className="bg-card rounded-2xl shadow-soft border border-border overflow-hidden">
@@ -186,7 +191,7 @@ export default function ExamCenterPage() {
               </h3>
               <p className="text-sm text-muted-foreground mt-1">กรุณาเลือกคอร์สเพื่อดูข้อมูลการสอบ</p>
             </div>
-            <div className="grid gap-4 p-5 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 p-5 md:grid-cols-2 lg:grid-cols-2">
               {courses.map((course) => (
                 <div 
                   key={course.id}
@@ -224,8 +229,8 @@ export default function ExamCenterPage() {
 
   return (
     <StudentLayout
-      title="Exam Center"
-      description="Schedule, practice sets, and results"
+      title="ศูนย์สอบ"
+      description="ตารางสอบ ชุดแบบฝึกหัด และผลสอบ"
     >
       {/* Navigator Breadcrumb */}
       <div className="mb-6">
@@ -239,7 +244,7 @@ export default function ExamCenterPage() {
                   setSelectedSubject(null);
                 }}
               >
-                Exam Center
+                ศูนย์สอบ
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
@@ -293,19 +298,19 @@ export default function ExamCenterPage() {
         <TabsList className="bg-card border border-border p-1 rounded-xl">
           <TabsTrigger value="overview" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <FileText className="h-4 w-4 mr-2" />
-            Exam Overview
+            ภาพรวมการสอบ
           </TabsTrigger>
           <TabsTrigger value="schedule" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Calendar className="h-4 w-4 mr-2" />
-            Schedule
+            ตารางสอบ
           </TabsTrigger>
           <TabsTrigger value="results" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Trophy className="h-4 w-4 mr-2" />
-            Results
+            ผลสอบ
           </TabsTrigger>
         </TabsList>
 
-        {/* Exam Overview Tab - Thai Style */}
+        {/* Exam Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
           {selectedSubject === null ? (
             // Subject list view
@@ -313,7 +318,7 @@ export default function ExamCenterPage() {
               <div className="p-5 border-b border-border bg-muted/30">
                 <h3 className="font-bold text-foreground flex items-center gap-2">
                   <FileText className="h-5 w-5 text-primary" />
-                  Exam Progress by Subject
+                  ความคืบหน้าการสอบตามวิชา
                 </h3>
               </div>
               <div className="divide-y divide-border">
@@ -332,11 +337,10 @@ export default function ExamCenterPage() {
                           <div className={cn("w-3 h-10 rounded-full", subject.color)} />
                           <div>
                             <h4 className="font-bold text-foreground">{subject.name}</h4>
-                            <p className="text-sm text-muted-foreground">{subject.nameTH}</p>
                           </div>
                         </div>
                         <Button variant="ghost" size="sm" className="gap-2">
-                          View Scores & Stats
+                          ดูคะแนน & สถิติ
                           <ArrowRight className="h-4 w-4" />
                         </Button>
                       </div>
@@ -345,8 +349,8 @@ export default function ExamCenterPage() {
                         {/* Completed sets */}
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Completed Sets</span>
-                            <span className="font-medium text-foreground">{subject.completedSets} sets</span>
+                            <span className="text-muted-foreground">ชุดที่ทำแล้ว</span>
+                            <span className="font-medium text-foreground">{subject.completedSets} ชุด</span>
                           </div>
                           <div className="relative h-3 bg-muted rounded-full overflow-hidden">
                             <div 
@@ -354,14 +358,14 @@ export default function ExamCenterPage() {
                               style={{ width: `${progressPercent}%` }}
                             />
                           </div>
-                          <p className="text-xs text-muted-foreground">Out of {subject.totalSets} sets</p>
+                          <p className="text-xs text-muted-foreground">จากทั้งหมด {subject.totalSets} ชุด</p>
                         </div>
 
                         {/* Passed sets */}
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Passed {subject.passThreshold}%</span>
-                            <span className="font-medium text-success">{subject.passedSets} sets</span>
+                            <span className="text-muted-foreground">ผ่าน {subject.passThreshold}%</span>
+                            <span className="font-medium text-success">{subject.passedSets} ชุด</span>
                           </div>
                           <div className="relative h-3 bg-muted rounded-full overflow-hidden">
                             <div 
@@ -369,7 +373,7 @@ export default function ExamCenterPage() {
                               style={{ width: `${passedPercent}%` }}
                             />
                           </div>
-                          <p className="text-xs text-muted-foreground">Pass threshold {subject.passThreshold}%</p>
+                          <p className="text-xs text-muted-foreground">เกณฑ์ผ่าน {subject.passThreshold}%</p>
                         </div>
                       </div>
                     </div>
@@ -386,16 +390,16 @@ export default function ExamCenterPage() {
                 className="gap-2"
               >
                 <ChevronRight className="h-4 w-4 rotate-180" />
-                Back to Subject List
+                กลับไปรายการวิชา
               </Button>
               
               <div className="bg-card rounded-2xl shadow-soft border border-border overflow-hidden">
                 <div className="p-5 border-b border-border bg-muted/30">
                   <h3 className="font-bold text-foreground">
-                    {subjectExams.find(s => s.id === selectedSubject)?.name} - CLO Detail
+                    {subjectExams.find(s => s.id === selectedSubject)?.name} - รายละเอียดตาม EP
                   </h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Exam results by Course Learning Outcomes
+                    ผลสอบแยกตาม EP
                   </p>
                 </div>
                 
@@ -403,13 +407,13 @@ export default function ExamCenterPage() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-border bg-muted/50">
-                        <th className="text-left p-4 text-sm font-semibold text-muted-foreground">CLO</th>
-                        <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Status</th>
-                        <th className="text-center p-4 text-sm font-semibold text-muted-foreground">Score</th>
-                        <th className="text-center p-4 text-sm font-semibold text-muted-foreground">Max</th>
-                        <th className="text-center p-4 text-sm font-semibold text-muted-foreground">Mean</th>
-                        <th className="text-center p-4 text-sm font-semibold text-muted-foreground">Min</th>
-                        <th className="text-center p-4 text-sm font-semibold text-muted-foreground">Action</th>
+                        <th className="text-left p-4 text-sm font-semibold text-muted-foreground">EP</th>
+                        <th className="text-left p-4 text-sm font-semibold text-muted-foreground">สถานะ</th>
+                        <th className="text-center p-4 text-sm font-semibold text-muted-foreground">คะแนน</th>
+                        <th className="text-center p-4 text-sm font-semibold text-muted-foreground">คะแนนสูงสุด</th>
+                        <th className="text-center p-4 text-sm font-semibold text-muted-foreground">ค่าเฉลี่ย</th>
+                        <th className="text-center p-4 text-sm font-semibold text-muted-foreground">คะแนนต่ำสุด</th>
+                        <th className="text-center p-4 text-sm font-semibold text-muted-foreground">การดำเนินการ</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
@@ -452,15 +456,13 @@ export default function ExamCenterPage() {
                               {item.status === "not_done" ? (
                                 <Button size="sm" className="gap-2">
                                   <Play className="h-4 w-4" />
-                                  Start
-                                </Button>
-                              ) : item.status === "failed" ? (
-                                <Button variant="outline" size="sm" className="gap-2">
-                                  <Play className="h-4 w-4" />
-                                  Retry
+                                  เริ่มทำ
                                 </Button>
                               ) : (
-                                <span className="text-muted-foreground text-sm">-</span>
+                                <Button variant="outline" size="sm" className="gap-2">
+                                  <BarChart3 className="h-4 w-4" />
+                                  ดูรายละเอียด
+                                </Button>
                               )}
                             </td>
                           </tr>
@@ -477,53 +479,47 @@ export default function ExamCenterPage() {
         {/* Schedule Tab */}
         <TabsContent value="schedule" className="space-y-6">
           <div className="bg-card rounded-2xl shadow-soft border border-border overflow-hidden">
-            <div className="p-4 border-b border-border bg-muted/30">
+            <div className="p-5 border-b border-border bg-muted/30">
               <h3 className="font-bold text-foreground flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-primary" />
-                Upcoming Exams
+                การสอบที่กำลังจะมาถึง
               </h3>
             </div>
             <div className="divide-y divide-border">
               {upcomingExams.map((exam) => (
-                <div key={exam.id} className="p-6 hover:bg-muted/30 transition-colors">
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">
-                          {exam.subject}
-                        </span>
-                        <span className="px-2 py-1 bg-warning/10 text-warning text-xs font-medium rounded-full">
-                          Upcoming
-                        </span>
-                      </div>
-                      <h4 className="text-lg font-bold text-foreground">{exam.name}</h4>
-                      <div className="flex flex-wrap gap-4 mt-2 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          {new Date(exam.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          {exam.time} ({exam.duration})
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap gap-2 mt-3">
-                        {exam.topics.map((topic, i) => (
-                          <span key={i} className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded-lg">
-                            {topic}
-                          </span>
-                        ))}
-                      </div>
+                <div key={exam.id} className="p-5 hover:bg-muted/30 transition-colors">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h4 className="font-bold text-foreground">{exam.name}</h4>
+                      <p className="text-sm text-muted-foreground">{exam.subject}</p>
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        View Details
-                      </Button>
-                      <Button size="sm">
-                        <Play className="h-4 w-4 mr-2" />
-                        Start Exam
-                      </Button>
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-warning/10 text-warning text-sm font-medium rounded-full">
+                      <Clock className="h-4 w-4" />
+                      กำลังจะมาถึง
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-foreground">{new Date(exam.date).toLocaleDateString('th-TH')}</span>
                     </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-foreground">{exam.time}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-foreground">{exam.duration}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {exam.topics.map((topic, i) => (
+                      <span key={i} className="text-xs px-2 py-1 bg-muted rounded-full text-muted-foreground">
+                        {topic}
+                      </span>
+                    ))}
                   </div>
                 </div>
               ))}
@@ -533,89 +529,58 @@ export default function ExamCenterPage() {
 
         {/* Results Tab */}
         <TabsContent value="results" className="space-y-6">
-          {/* Results Summary */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-card rounded-xl p-4 shadow-soft border border-border text-center">
-              <Trophy className="h-8 w-8 text-gold mx-auto mb-2" />
-              <p className="text-2xl font-bold text-foreground">82</p>
-              <p className="text-xs text-muted-foreground">Average Score</p>
-            </div>
-            <div className="bg-card rounded-xl p-4 shadow-soft border border-border text-center">
-              <BarChart3 className="h-8 w-8 text-primary mx-auto mb-2" />
-              <p className="text-2xl font-bold text-foreground">2</p>
-              <p className="text-xs text-muted-foreground">Exams Taken</p>
-            </div>
-            <div className="bg-card rounded-xl p-4 shadow-soft border border-border text-center">
-              <CheckCircle className="h-8 w-8 text-success mx-auto mb-2" />
-              <p className="text-2xl font-bold text-foreground">85</p>
-              <p className="text-xs text-muted-foreground">Highest Score</p>
-            </div>
-            <div className="bg-card rounded-xl p-4 shadow-soft border border-border text-center">
-              <AlertCircle className="h-8 w-8 text-info mx-auto mb-2" />
-              <p className="text-2xl font-bold text-foreground">#5</p>
-              <p className="text-xs text-muted-foreground">Best Rank</p>
-            </div>
-          </div>
-
-          {/* Detailed Results */}
           <div className="bg-card rounded-2xl shadow-soft border border-border overflow-hidden">
-            <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
+            <div className="p-5 border-b border-border bg-muted/30">
               <h3 className="font-bold text-foreground flex items-center gap-2">
                 <Trophy className="h-5 w-5 text-primary" />
-                Exam Results
+                ผลสอบล่าสุด
               </h3>
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
             </div>
             <div className="divide-y divide-border">
               {examResults.map((result) => (
-                <div key={result.id} className="p-6 hover:bg-muted/30 transition-colors">
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div key={result.id} className="p-5 hover:bg-muted/30 transition-colors">
+                  <div className="flex items-start justify-between mb-4">
                     <div>
                       <h4 className="font-bold text-foreground">{result.name}</h4>
                       <p className="text-sm text-muted-foreground">
-                        {new Date(result.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                        {new Date(result.date).toLocaleDateString('th-TH')}
                       </p>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
-                      <div>
-                        <p className="text-2xl font-bold text-primary">{result.score}</p>
-                        <p className="text-xs text-muted-foreground">Your Score</p>
-                      </div>
-                      <div>
-                        <p className="text-lg font-semibold text-foreground">{result.average}</p>
-                        <p className="text-xs text-muted-foreground">Average</p>
-                      </div>
-                      <div>
-                        <p className="text-lg font-semibold text-foreground">{result.min}</p>
-                        <p className="text-xs text-muted-foreground">Min</p>
-                      </div>
-                      <div>
-                        <p className="text-lg font-semibold text-foreground">{result.max}</p>
-                        <p className="text-xs text-muted-foreground">Max</p>
-                      </div>
-                      <div>
-                        <p className="text-lg font-semibold text-gold">#{result.rank}</p>
-                        <p className="text-xs text-muted-foreground">of {result.totalStudents}</p>
-                      </div>
+                    <div className="text-right">
+                      <p className={cn(
+                        "text-3xl font-bold",
+                        result.score >= 60 ? "text-success" : "text-destructive"
+                      )}>
+                        {result.score}
+                      </p>
+                      <p className="text-sm text-muted-foreground">จาก {result.maxScore}</p>
                     </div>
                   </div>
-                  {/* Score bar visualization */}
-                  <div className="mt-4 relative h-3 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="absolute left-0 top-0 h-full bg-muted-foreground/20"
-                      style={{ width: `${result.max}%` }}
-                    />
-                    <div 
-                      className="absolute left-0 top-0 h-full bg-primary"
-                      style={{ width: `${result.score}%` }}
-                    />
-                    <div 
-                      className="absolute top-1/2 -translate-y-1/2 w-1 h-4 bg-foreground rounded"
-                      style={{ left: `${result.average}%` }}
-                    />
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-muted/50 rounded-lg p-3 text-center">
+                      <p className="text-xs text-muted-foreground mb-1">อันดับ</p>
+                      <p className="font-bold text-foreground">{result.rank}/{result.totalStudents}</p>
+                    </div>
+                    <div className="bg-muted/50 rounded-lg p-3 text-center">
+                      <p className="text-xs text-muted-foreground mb-1">ค่าเฉลี่ย</p>
+                      <p className="font-bold text-foreground">{result.average}</p>
+                    </div>
+                    <div className="bg-muted/50 rounded-lg p-3 text-center">
+                      <p className="text-xs text-muted-foreground mb-1">คะแนนสูงสุด</p>
+                      <p className="font-bold text-foreground">{result.max}</p>
+                    </div>
+                    <div className="bg-muted/50 rounded-lg p-3 text-center">
+                      <p className="text-xs text-muted-foreground mb-1">คะแนนต่ำสุด</p>
+                      <p className="font-bold text-foreground">{result.min}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex justify-end">
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Download className="h-4 w-4" />
+                      ดาวน์โหลดใบรายงานผล
+                    </Button>
                   </div>
                 </div>
               ))}
