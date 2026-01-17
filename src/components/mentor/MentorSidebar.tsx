@@ -12,7 +12,8 @@ import {
   FileQuestion,
   GraduationCap,
   CreditCard,
-  FileText
+  FileText,
+  Gift
 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -26,6 +27,7 @@ const mainMenuItems = [
 const studentSubmenuItems = [
   { icon: CreditCard, label: "ลงทะเบียนและชำระเงิน", path: "/mentor/student-registration" },
   { icon: FileText, label: "คะแนนสอบ", path: "/mentor/student-exam-scores" },
+  { icon: Gift, label: "แลกคะแนน", path: "/mentor/student-rewards" },
 ];
 
 const teacherSubmenuItems = [
