@@ -4,13 +4,15 @@ import {
   User, 
   BookOpen, 
   Users, 
-  BarChart3
+  BarChart3,
+  ClipboardCheck
 } from "lucide-react";
 
 const menuItems = [
   { icon: User, label: "ข้อมูลโปรไฟล์ครู", path: "/teacher/profile" },
   { icon: BookOpen, label: "หลักสูตรการสอน", path: "/teacher/courses" },
   { icon: Users, label: "ข้อมูลนักเรียน", path: "/teacher/students" },
+  { icon: ClipboardCheck, label: "ประเมินนักเรียน", path: "/teacher/student-evaluation" },
   { icon: BarChart3, label: "ผลการสอนและประสิทธิภาพครู", path: "/teacher/performance" },
 ];
 
