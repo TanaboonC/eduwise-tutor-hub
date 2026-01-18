@@ -13,7 +13,10 @@ import {
   ShoppingCart,
   BookOpen,
   CreditCard,
-  Wallet
+  Wallet,
+  AlertTriangle,
+  Bell,
+  Calendar
 } from "lucide-react";
 import {
   Dialog,
@@ -78,10 +81,59 @@ const availableCourses = [
   },
 ];
 
+// Registration history with payment types and installment details
 const registrationHistory = [
-  { id: 1, course: "ตะลุยโจทย์ปัญหา ม.4", date: "2023-08-15", status: "กำลังเรียน", amount: 15000 },
-  { id: 2, course: "ติวเข้มเนื้อหา ม.4", date: "2023-08-15", status: "กำลังเรียน", amount: 18000 },
-  { id: 3, course: "ตะลุยโจทย์ปัญหา ม.5", date: "2023-08-20", status: "กำลังเรียน", amount: 16000 },
+  { 
+    id: 1, 
+    course: "ตะลุยโจทย์ปัญหา ม.4", 
+    date: "2023-08-15", 
+    status: "กำลังเรียน", 
+    amount: 15000,
+    paymentType: "full" as const, // ชำระเต็มจำนวน
+    totalPaid: 15000,
+    installments: null
+  },
+  { 
+    id: 2, 
+    course: "ติวเข้มเนื้อหา ม.4", 
+    date: "2023-08-15", 
+    status: "กำลังเรียน", 
+    amount: 18000,
+    paymentType: "installment3" as const, // ผ่อน 3 งวด
+    totalPaid: 12000, // ชำระแล้ว 2 งวด
+    installments: [
+      { installment: 1, amount: 6000, status: "paid", paidDate: "2023-08-15", dueDate: "2023-08-15" },
+      { installment: 2, amount: 6000, status: "paid", paidDate: "2023-09-15", dueDate: "2023-09-15" },
+      { installment: 3, amount: 6000, status: "due", paidDate: null, dueDate: "2024-01-20" } // ถึงกำหนดชำระ!
+    ]
+  },
+  { 
+    id: 3, 
+    course: "ตะลุยโจทย์ปัญหา ม.5", 
+    date: "2023-08-20", 
+    status: "กำลังเรียน", 
+    amount: 16000,
+    paymentType: "installment6" as const, // ผ่อน 6 งวด
+    totalPaid: 5334, // ชำระแล้ว 2 งวด
+    installments: [
+      { installment: 1, amount: 2667, status: "paid", paidDate: "2023-08-20", dueDate: "2023-08-20" },
+      { installment: 2, amount: 2667, status: "paid", paidDate: "2023-09-20", dueDate: "2023-09-20" },
+      { installment: 3, amount: 2667, status: "pending", paidDate: null, dueDate: "2024-02-20" },
+      { installment: 4, amount: 2667, status: "pending", paidDate: null, dueDate: "2024-03-20" },
+      { installment: 5, amount: 2667, status: "pending", paidDate: null, dueDate: "2024-04-20" },
+      { installment: 6, amount: 2665, status: "pending", paidDate: null, dueDate: "2024-05-20" }
+    ]
+  },
+  { 
+    id: 4, 
+    course: "ติวเข้มเนื้อหา ม.5", 
+    date: "2023-09-01", 
+    status: "กำลังเรียน", 
+    amount: 19000,
+    paymentType: "full" as const,
+    totalPaid: 19000,
+    installments: null
+  },
 ];
 
 type PaymentOption = "full" | "installment3" | "installment6";
@@ -195,42 +247,204 @@ export default function RegistrationPage() {
         ))}
       </div>
 
+      {/* Payment Alert Notification */}
+      {registrationHistory.some(item => 
+        item.installments?.some(inst => inst.status === "due")
+      ) && (
+        <div className="bg-destructive/10 border border-destructive/30 rounded-2xl p-4 mb-6">
+          <div className="flex items-start gap-3">
+            <div className="p-2 bg-destructive/20 rounded-full">
+              <Bell className="h-5 w-5 text-destructive" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-bold text-destructive flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                แจ้งเตือน: ถึงกำหนดชำระเงิน
+              </h4>
+              <div className="mt-2 space-y-2">
+                {registrationHistory.filter(item => 
+                  item.installments?.some(inst => inst.status === "due")
+                ).map(item => {
+                  const dueInstallment = item.installments?.find(inst => inst.status === "due");
+                  return (
+                    <div key={item.id} className="bg-card/50 rounded-lg p-3 border border-destructive/20">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-foreground">{item.course}</p>
+                          <p className="text-sm text-destructive">
+                            งวดที่ {dueInstallment?.installment} - ครบกำหนด {new Date(dueInstallment?.dueDate || "").toLocaleDateString('th-TH')}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-destructive">
+                            ฿{dueInstallment?.amount.toLocaleString()}
+                          </p>
+                          <Button size="sm" variant="destructive" className="mt-1">
+                            <CreditCard className="h-3 w-3 mr-1" />
+                            ชำระเลย
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Registration History */}
       <div className="bg-card rounded-2xl shadow-soft border border-border overflow-hidden">
         <div className="p-4 border-b border-border bg-muted/30">
           <h3 className="font-bold text-foreground flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-primary" />
-            ประวัติการลงทะเบียน
+            ประวัติการลงทะเบียนและการชำระเงิน
           </h3>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="text-left p-4 text-sm font-semibold text-muted-foreground">คอร์ส</th>
-                <th className="text-left p-4 text-sm font-semibold text-muted-foreground">วันที่</th>
-                <th className="text-left p-4 text-sm font-semibold text-muted-foreground">จำนวนเงิน</th>
-                <th className="text-left p-4 text-sm font-semibold text-muted-foreground">สถานะ</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {registrationHistory.map((item) => (
-                <tr key={item.id} className="hover:bg-muted/30 transition-colors">
-                  <td className="p-4 font-medium text-foreground">{item.course}</td>
-                  <td className="p-4 text-sm text-muted-foreground">
-                    {new Date(item.date).toLocaleDateString('th-TH')}
-                  </td>
-                  <td className="p-4 text-sm text-foreground">฿{item.amount.toLocaleString()}</td>
-                  <td className="p-4">
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-success/10 text-success text-xs font-medium rounded-full">
+        
+        <div className="divide-y divide-border">
+          {registrationHistory.map((item) => {
+            const remainingAmount = item.amount - item.totalPaid;
+            const paidInstallments = item.installments?.filter(inst => inst.status === "paid").length || 0;
+            const totalInstallments = item.installments?.length || 0;
+            const hasDuePayment = item.installments?.some(inst => inst.status === "due");
+            
+            return (
+              <div key={item.id} className={`p-4 ${hasDuePayment ? "bg-destructive/5" : ""}`}>
+                {/* Course Header */}
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h4 className="font-bold text-foreground">{item.course}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      ลงทะเบียน: {new Date(item.date).toLocaleDateString('th-TH')}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full ${
+                      item.paymentType === "full" 
+                        ? "bg-success/10 text-success" 
+                        : "bg-info/10 text-info"
+                    }`}>
+                      {item.paymentType === "full" ? (
+                        <>
+                          <CheckCircle className="h-3 w-3" />
+                          ชำระเต็มจำนวน
+                        </>
+                      ) : (
+                        <>
+                          <Calendar className="h-3 w-3" />
+                          ผ่อนชำระ {totalInstallments} งวด
+                        </>
+                      )}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Payment Summary */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+                  <div className="bg-muted/30 rounded-lg p-2">
+                    <p className="text-xs text-muted-foreground">ราคาคอร์ส</p>
+                    <p className="font-bold text-foreground">฿{item.amount.toLocaleString()}</p>
+                  </div>
+                  <div className="bg-success/10 rounded-lg p-2">
+                    <p className="text-xs text-muted-foreground">ชำระแล้ว</p>
+                    <p className="font-bold text-success">฿{item.totalPaid.toLocaleString()}</p>
+                  </div>
+                  <div className={`rounded-lg p-2 ${remainingAmount > 0 ? "bg-destructive/10" : "bg-success/10"}`}>
+                    <p className="text-xs text-muted-foreground">ยอดค้างชำระ</p>
+                    <p className={`font-bold ${remainingAmount > 0 ? "text-destructive" : "text-success"}`}>
+                      ฿{remainingAmount.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="bg-muted/30 rounded-lg p-2">
+                    <p className="text-xs text-muted-foreground">สถานะ</p>
+                    <span className="inline-flex items-center gap-1 text-success text-sm font-medium">
                       <CheckCircle className="h-3 w-3" />
                       {item.status}
                     </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                </div>
+
+                {/* Installment Details (if applicable) */}
+                {item.installments && (
+                  <div className="border border-border rounded-lg overflow-hidden">
+                    <div className="bg-muted/50 px-3 py-2 text-xs font-semibold text-muted-foreground grid grid-cols-4">
+                      <span>งวดที่</span>
+                      <span>กำหนดชำระ</span>
+                      <span>สถานะ</span>
+                      <span className="text-right">จำนวนเงิน</span>
+                    </div>
+                    {item.installments.map((inst) => (
+                      <div 
+                        key={inst.installment} 
+                        className={`px-3 py-2 text-sm grid grid-cols-4 items-center border-t border-border ${
+                          inst.status === "due" ? "bg-destructive/10" : 
+                          inst.status === "paid" ? "bg-success/5" : ""
+                        }`}
+                      >
+                        <span className="font-medium text-foreground">
+                          งวดที่ {inst.installment}
+                        </span>
+                        <span className="text-muted-foreground text-xs">
+                          {new Date(inst.dueDate).toLocaleDateString('th-TH')}
+                        </span>
+                        <span>
+                          {inst.status === "paid" ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-success/20 text-success text-xs rounded-full">
+                              <CheckCircle className="h-3 w-3" />
+                              ชำระแล้ว
+                            </span>
+                          ) : inst.status === "due" ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-destructive/20 text-destructive text-xs rounded-full animate-pulse">
+                              <AlertTriangle className="h-3 w-3" />
+                              ถึงกำหนด!
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-muted text-muted-foreground text-xs rounded-full">
+                              <Clock className="h-3 w-3" />
+                              รอชำระ
+                            </span>
+                          )}
+                        </span>
+                        <span className={`text-right font-medium ${
+                          inst.status === "due" ? "text-destructive" : 
+                          inst.status === "paid" ? "text-success" : "text-foreground"
+                        }`}>
+                          ฿{inst.amount.toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
+                    
+                    {/* Progress Bar */}
+                    <div className="px-3 py-2 bg-muted/30 border-t border-border">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                        <span>ความคืบหน้าการชำระ</span>
+                        <span>{paidInstallments}/{totalInstallments} งวด</span>
+                      </div>
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-success rounded-full transition-all"
+                          style={{ width: `${(paidInstallments / totalInstallments) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Full Payment Badge */}
+                {item.paymentType === "full" && (
+                  <div className="bg-success/10 rounded-lg p-3 flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-success" />
+                    <div>
+                      <p className="font-medium text-success">ชำระเต็มจำนวนเรียบร้อย</p>
+                      <p className="text-xs text-muted-foreground">ไม่มียอดค้างชำระ</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
