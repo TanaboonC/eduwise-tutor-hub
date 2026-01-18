@@ -15,7 +15,6 @@ import {
   BarChart3,
   Filter,
   ChevronRight,
-  Users,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -25,26 +24,26 @@ const availableCourses = [
   {
     id: 1,
     name: "ตะลุยโจทย์ปัญหา ม.4",
-    students: 32,
     status: "active",
+    subjects: ["คณิตศาสตร์", "วิทยาศาสตร์"],
   },
   {
     id: 2,
     name: "ติวเข้มเนื้อหา ม.4",
-    students: 28,
     status: "active",
+    subjects: ["คณิตศาสตร์", "ภาษาอังกฤษ"],
   },
   {
     id: 3,
     name: "ตะลุยโจทย์ปัญหา ม.5",
-    students: 45,
     status: "active",
+    subjects: ["คณิตศาสตร์", "วิทยาศาสตร์", "ภาษาอังกฤษ"],
   },
   {
     id: 4,
     name: "ติวเข้มเนื้อหา ม.5",
-    students: 38,
-    status: "active",
+    status: "studying",
+    subjects: ["วิทยาศาสตร์"],
   },
 ];
 
@@ -168,13 +167,17 @@ export default function CoursesAttendancePage() {
                     </div>
                     <div>
                       <h3 className="font-bold text-lg text-foreground">{course.name}</h3>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
-                        <span className="flex items-center gap-1">
-                          <Users className="h-4 w-4" />
-                          {course.students} นักเรียน
-                        </span>
+                      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mt-2">
+                        <span className="text-muted-foreground">รายวิชา:</span>
+                        {course.subjects.map((subject, idx) => (
+                          <Badge key={idx} variant="secondary" className="text-xs">
+                            {subject}
+                          </Badge>
+                        ))}
+                      </div>
+                      <div className="mt-2">
                         <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">
-                          {course.status === "active" ? "กำลังเรียน" : "ยังไม่เริ่ม"}
+                          กำลังเรียน
                         </Badge>
                       </div>
                     </div>
