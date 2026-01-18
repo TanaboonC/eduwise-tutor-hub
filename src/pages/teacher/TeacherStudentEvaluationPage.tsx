@@ -11,13 +11,6 @@ import { Label } from "@/components/ui/label";
 import { Edit, Save, X } from "lucide-react";
 import { toast } from "sonner";
 
-// Mock data
-const courses = [
-  { id: "1", name: "คอร์สติวเข้มเนื้อหา ม.4", subjects: ["คณิตศาสตร์", "ฟิสิกส์", "เคมี", "ชีววิทยา"] },
-  { id: "2", name: "คอร์สติวเข้มเนื้อหา ม.5", subjects: ["คณิตศาสตร์", "ฟิสิกส์", "เคมี", "ชีววิทยา"] },
-  { id: "3", name: "คอร์สติวเข้มเนื้อหา ม.6", subjects: ["คณิตศาสตร์", "ฟิสิกส์", "เคมี", "ชีววิทยา"] },
-];
-
 const epRanges = ["EP1-5", "EP6-10", "EP11-15"];
 
 interface StudentEvaluation {
@@ -141,15 +134,12 @@ function getLevelBadgeVariant(level: string): "default" | "secondary" | "outline
 }
 
 export default function TeacherStudentEvaluationPage() {
-  const [selectedCourse, setSelectedCourse] = useState<string>("");
-  const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [selectedEpRange, setSelectedEpRange] = useState<string>("EP1-5");
   const [evaluations, setEvaluations] = useState<StudentEvaluation[]>(mockEvaluations);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<StudentEvaluation | null>(null);
   const [teacherSuggestion, setTeacherSuggestion] = useState("");
 
-  const selectedCourseData = courses.find(c => c.id === selectedCourse);
   const filteredEvaluations = evaluations.filter(e => e.epRange === selectedEpRange);
 
   const openEditDialog = (student: StudentEvaluation) => {
@@ -177,76 +167,36 @@ export default function TeacherStudentEvaluationPage() {
   return (
     <TeacherLayout title="ประเมินนักเรียน" description="ดูผลการประเมินและให้คำแนะนำนักเรียน">
       <div className="space-y-6">
-        {/* Course Selection */}
+        {/* EP Selection */}
         <Card>
           <CardHeader>
-            <CardTitle>เลือกคอร์สเรียน รายวิชา และ EP</CardTitle>
+            <CardTitle>เลือก EP</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap gap-4">
-              <div className="w-full sm:w-64">
-                <Select value={selectedCourse} onValueChange={(value) => {
-                  setSelectedCourse(value);
-                  setSelectedSubject("");
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="เลือกคอร์สเรียน" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {courses.map(course => (
-                      <SelectItem key={course.id} value={course.id}>
-                        {course.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              {selectedCourse && selectedCourseData && (
-                <div className="w-full sm:w-48">
-                  <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="เลือกรายวิชา" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {selectedCourseData.subjects.map(subject => (
-                        <SelectItem key={subject} value={subject}>
-                          {subject}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              
-              {selectedCourse && selectedSubject && (
-                <div className="w-full sm:w-48">
-                  <Select value={selectedEpRange} onValueChange={setSelectedEpRange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="เลือก EP" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {epRanges.map(ep => (
-                        <SelectItem key={ep} value={ep}>
-                          {ep}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+            <div className="w-full sm:w-48">
+              <Select value={selectedEpRange} onValueChange={setSelectedEpRange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="เลือก EP" />
+                </SelectTrigger>
+                <SelectContent>
+                  {epRanges.map(ep => (
+                    <SelectItem key={ep} value={ep}>
+                      {ep}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>
 
-        {selectedCourse && selectedSubject && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-primary"></div>
-                รายการประเมินนักเรียน - วิชา{selectedSubject} - {selectedEpRange}
-              </CardTitle>
-            </CardHeader>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-primary"></div>
+              รายการประเมินนักเรียน - {selectedEpRange}
+            </CardTitle>
+          </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <Table>
@@ -328,7 +278,6 @@ export default function TeacherStudentEvaluationPage() {
               </div>
             </CardContent>
           </Card>
-        )}
 
         {/* Edit Teacher Suggestion Dialog */}
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
