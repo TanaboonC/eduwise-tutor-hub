@@ -285,8 +285,7 @@ export default function TeacherStudentsPage() {
                         <TableHead>โรงเรียน</TableHead>
                         <TableHead>เบอร์นักเรียน</TableHead>
                         <TableHead>เบอร์ผู้ปกครอง</TableHead>
-                        <TableHead>สถานะ</TableHead>
-                        <TableHead>Feedback</TableHead>
+                        <TableHead>โรงเรียนที่ต้องการศึกษาต่อ</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -301,82 +300,7 @@ export default function TeacherStudentsPage() {
                           <TableCell className="text-xs">{student.school}</TableCell>
                           <TableCell>{student.phone}</TableCell>
                           <TableCell>{student.parentPhone}</TableCell>
-                          <TableCell>
-                            <Badge className={getStatusColor(student.status)}>{getStatusLabel(student.status)}</Badge>
-                          </TableCell>
-                          <TableCell>
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                  <MessageSquare className="h-4 w-4" />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-lg">
-                                <DialogHeader>
-                                  <DialogTitle>
-                                    Feedback - {student.firstName} {student.lastName}
-                                  </DialogTitle>
-                                </DialogHeader>
-                                <div className="space-y-4 pt-4">
-                                  <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                      <Label className="text-muted-foreground">ชื่อ</Label>
-                                      <p className="font-medium">{student.firstName}</p>
-                                    </div>
-                                    <div>
-                                      <Label className="text-muted-foreground">นามสกุล</Label>
-                                      <p className="font-medium">{student.lastName}</p>
-                                    </div>
-                                    <div>
-                                      <Label className="text-muted-foreground">ชื่อเล่น</Label>
-                                      <p className="font-medium">{student.nickname}</p>
-                                    </div>
-                                    <div>
-                                      <Label className="text-muted-foreground">คอร์ส</Label>
-                                      <p className="font-medium text-xs">{student.course}</p>
-                                    </div>
-                                    <div>
-                                      <Label className="text-muted-foreground">รายวิชา</Label>
-                                      <p className="font-medium">{student.subject}</p>
-                                    </div>
-                                    <div>
-                                      <Label className="text-muted-foreground">วันที่</Label>
-                                      <p className="font-medium">{new Date().toLocaleDateString("th-TH")}</p>
-                                    </div>
-                                  </div>
-                                  <div>
-                                    <Label className="text-muted-foreground">โรงเรียนที่ต้องการศึกษาต่อ</Label>
-                                    <p className="font-medium">{student.targetSchool}</p>
-                                  </div>
-                                  <div>
-                                    <Label className="text-muted-foreground">รายละเอียดการสัมภาษณ์</Label>
-                                    <p className="font-medium text-sm">{student.interviewNotes}</p>
-                                  </div>
-                                  <div className="space-y-2">
-                                    <Label>รายละเอียด Feedback</Label>
-                                    <div className="bg-muted/50 rounded-lg p-3 space-y-2 text-sm max-h-[200px] overflow-y-auto">
-                                      <div className="border-b border-border pb-2">
-                                        <span className="text-muted-foreground">10/11/2024</span>
-                                        <p className="font-medium">น้องแจ้งว่าไม่มาเพราะไปธุระ</p>
-                                      </div>
-                                      <div className="border-b border-border pb-2">
-                                        <span className="text-muted-foreground">05/11/2024</span>
-                                        <p className="font-medium">น้องมีความก้าวหน้าในวิชาคณิตศาสตร์ดีมาก</p>
-                                      </div>
-                                      <div className="border-b border-border pb-2">
-                                        <span className="text-muted-foreground">28/10/2024</span>
-                                        <p className="font-medium">ผู้ปกครองโทรมาสอบถามเรื่องการบ้าน</p>
-                                      </div>
-                                      <div>
-                                        <span className="text-muted-foreground">15/10/2024</span>
-                                        <p className="font-medium">เริ่มเรียนวันแรก มีความตั้งใจดี</p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </DialogContent>
-                            </Dialog>
-                          </TableCell>
+                          <TableCell className="text-xs">{student.targetSchool}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
