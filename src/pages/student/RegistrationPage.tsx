@@ -272,10 +272,11 @@ export default function RegistrationPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-semibold text-foreground">ชำระเต็มจำนวน</p>
-                        <p className="text-sm text-muted-foreground">ชำระครั้งเดียว</p>
+                        <p className="text-sm text-muted-foreground">ชำระครั้งเดียวจบ ไม่มียอดค้าง</p>
                       </div>
                       <div className="text-right">
                         <p className="text-xl font-bold text-foreground">฿{selectedCourse.price.toLocaleString()}</p>
+                        <p className="text-xs text-success">✓ ไม่มียอดค้าง</p>
                       </div>
                     </div>
                   </Label>
@@ -320,28 +321,98 @@ export default function RegistrationPage() {
                 </div>
               </RadioGroup>
 
-              {/* Payment Summary */}
-              <div className="bg-muted/30 rounded-xl p-4 space-y-2">
+              {/* Detailed Payment Summary */}
+              <div className="bg-muted/30 rounded-xl p-4 space-y-3">
+                <h4 className="font-semibold text-foreground border-b border-border pb-2">สรุปการชำระเงิน</h4>
+                
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">ราคาคอร์ส</span>
-                  <span className="text-foreground">฿{selectedCourse.price.toLocaleString()}</span>
+                  <span className="text-foreground font-medium">฿{selectedCourse.price.toLocaleString()}</span>
                 </div>
-                {paymentOption !== "full" && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">จำนวนงวด</span>
-                    <span className="text-foreground">{paymentOption === "installment3" ? "3" : "6"} งวด</span>
-                  </div>
+
+                {paymentOption === "full" ? (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">รูปแบบการชำระ</span>
+                      <span className="text-foreground">ชำระเต็มจำนวน</span>
+                    </div>
+                    <div className="bg-success/10 rounded-lg p-3 mt-2">
+                      <div className="flex justify-between items-center">
+                        <span className="font-semibold text-foreground">ยอดชำระวันนี้</span>
+                        <span className="text-xl font-bold text-success">฿{selectedCourse.price.toLocaleString()}</span>
+                      </div>
+                      <p className="text-xs text-success mt-1">✓ ไม่มียอดค้างชำระ</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">รูปแบบการชำระ</span>
+                      <span className="text-foreground">ผ่อนชำระ {paymentOption === "installment3" ? "3" : "6"} งวด</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">ค่างวดละ</span>
+                      <span className="text-foreground font-medium">฿{getInstallmentAmount(selectedCourse.price, paymentOption === "installment3" ? 3 : 6).toLocaleString()}</span>
+                    </div>
+
+                    {/* Installment Details Table */}
+                    <div className="border border-border rounded-lg overflow-hidden mt-2">
+                      <div className="bg-muted/50 px-3 py-2 text-xs font-semibold text-muted-foreground grid grid-cols-3">
+                        <span>งวดที่</span>
+                        <span className="text-center">สถานะ</span>
+                        <span className="text-right">จำนวนเงิน</span>
+                      </div>
+                      {Array.from({ length: paymentOption === "installment3" ? 3 : 6 }).map((_, index) => (
+                        <div key={index} className={`px-3 py-2 text-sm grid grid-cols-3 items-center ${index === 0 ? "bg-primary/5" : ""} ${index > 0 ? "border-t border-border" : ""}`}>
+                          <span className={`font-medium ${index === 0 ? "text-primary" : "text-foreground"}`}>
+                            งวดที่ {index + 1}
+                            {index === 0 && <span className="ml-1 text-xs text-primary">(ชำระวันนี้)</span>}
+                          </span>
+                          <span className="text-center">
+                            {index === 0 ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-warning/20 text-warning text-xs rounded-full">
+                                รอชำระ
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-muted text-muted-foreground text-xs rounded-full">
+                                ยังไม่ถึงกำหนด
+                              </span>
+                            )}
+                          </span>
+                          <span className={`text-right font-medium ${index === 0 ? "text-primary" : "text-foreground"}`}>
+                            ฿{getInstallmentAmount(selectedCourse.price, paymentOption === "installment3" ? 3 : 6).toLocaleString()}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Payment Today */}
+                    <div className="bg-primary/10 rounded-lg p-3 mt-2">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <span className="font-semibold text-foreground">ชำระวันนี้ (งวดที่ 1)</span>
+                          <p className="text-xs text-muted-foreground">จาก {paymentOption === "installment3" ? "3" : "6"} งวด</p>
+                        </div>
+                        <span className="text-xl font-bold text-primary">
+                          ฿{getInstallmentAmount(selectedCourse.price, paymentOption === "installment3" ? 3 : 6).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Remaining Balance */}
+                    <div className="bg-destructive/10 rounded-lg p-3">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <span className="font-semibold text-destructive">ยอดค้างชำระ</span>
+                          <p className="text-xs text-destructive/80">อีก {(paymentOption === "installment3" ? 3 : 6) - 1} งวด</p>
+                        </div>
+                        <span className="text-xl font-bold text-destructive">
+                          ฿{(selectedCourse.price - getInstallmentAmount(selectedCourse.price, paymentOption === "installment3" ? 3 : 6)).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </>
                 )}
-                <div className="flex justify-between pt-2 border-t border-border">
-                  <span className="font-semibold text-foreground">
-                    {paymentOption === "full" ? "ยอดชำระ" : "ชำระงวดแรก"}
-                  </span>
-                  <span className="text-xl font-bold text-primary">
-                    ฿{paymentOption === "full" 
-                      ? selectedCourse.price.toLocaleString() 
-                      : getInstallmentAmount(selectedCourse.price, paymentOption === "installment3" ? 3 : 6).toLocaleString()}
-                  </span>
-                </div>
               </div>
             </div>
           )}
