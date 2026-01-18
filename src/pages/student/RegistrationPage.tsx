@@ -172,7 +172,7 @@ export default function RegistrationPage() {
   return (
     <StudentLayout
       title="ลงทะเบียนคอร์ส"
-      description="เลือกดูและลงทะเบียนคอร์สที่เปิดรับ"
+      description="เลือกชำระเงินคอร์สที่ลงทะเบียน"
     >
       {/* Search and Filter */}
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
