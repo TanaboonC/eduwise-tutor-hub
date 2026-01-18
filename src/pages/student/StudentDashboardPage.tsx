@@ -1,25 +1,6 @@
 import { StudentLayout } from "@/components/student/StudentLayout";
-import { 
-  TrendingUp, 
-  TrendingDown,
-  BookOpen, 
-  Trophy, 
-  Calendar,
-  Target,
-  Flag,
-  ChevronRight
-} from "lucide-react";
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  AreaChart,
-  Area
-} from "recharts";
+import { TrendingUp, TrendingDown, BookOpen, Trophy, Calendar, Target, Flag, ChevronRight } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -35,29 +16,29 @@ const epAttendanceData = [
 ];
 
 const courseAttendance = [
-  { 
-    name: "ตะลุยโจทย์ปัญหา ม.4", 
-    overall: 95, 
-    ep1_5: 96, 
-    ep6_10: 94, 
+  {
+    name: "ตะลุยโจทย์ปัญหา ม.4",
+    overall: 95,
+    ep1_5: 96,
+    ep6_10: 94,
     status: "excellent",
-    color: "hsl(var(--success))"
+    color: "hsl(var(--success))",
   },
-  { 
-    name: "ติวเข้มเนื้อหา ม.4", 
-    overall: 92, 
-    ep1_5: 90, 
-    ep6_10: 94, 
+  {
+    name: "ติวเข้มเนื้อหา ม.4",
+    overall: 92,
+    ep1_5: 90,
+    ep6_10: 94,
     status: "good",
-    color: "hsl(var(--info))"
+    color: "hsl(var(--info))",
   },
-  { 
-    name: "ตะลุยโจทย์ปัญหา ม.5", 
-    overall: 100, 
-    ep1_5: 100, 
-    ep6_10: 100, 
+  {
+    name: "ตะลุยโจทย์ปัญหา ม.5",
+    overall: 100,
+    ep1_5: 100,
+    ep6_10: 100,
     status: "excellent",
-    color: "hsl(var(--success))"
+    color: "hsl(var(--success))",
   },
 ];
 
@@ -81,14 +62,10 @@ function getStatusConfig(status: string) {
 }
 
 export default function StudentDashboardPage() {
-  const [selectedEpRange, setSelectedEpRange] = useState<"EP1-5" | "EP6-10" | "EP11-15">("EP1-5");
   const [selectedCourse, setSelectedCourse] = useState<string>("all");
 
   return (
-    <StudentLayout
-      title="แดชบอร์ดนักเรียน"
-      description="ติดตามผลการเรียนและการเข้าเรียนของคุณ"
-    >
+    <StudentLayout title="Dashboard" description="ติดตามผลการเรียนและการเข้าเรียนของคุณ">
       <div className="space-y-6">
         {/* Filters */}
         <div className="flex flex-wrap gap-3">
@@ -125,7 +102,9 @@ export default function StudentDashboardPage() {
           >
             <option value="all">คอร์สทั้งหมด</option>
             {courseAttendance.map((course) => (
-              <option key={course.name} value={course.name}>{course.name}</option>
+              <option key={course.name} value={course.name}>
+                {course.name}
+              </option>
             ))}
           </select>
         </div>
@@ -168,8 +147,8 @@ export default function StudentDashboardPage() {
               </div>
             </div>
             <p className="text-3xl font-bold text-foreground">52</p>
-            <p className="text-sm text-muted-foreground mt-1">คาบที่เข้าเรียน</p>
-            <p className="text-xs text-muted-foreground mt-2">จากทั้งหมด 55 คาบ</p>
+            <p className="text-sm text-muted-foreground mt-1">EPที่เข้าเรียน</p>
+            <p className="text-xs text-muted-foreground mt-2">จากทั้งหมด 55 EP</p>
           </div>
 
           <div className="bg-card rounded-xl p-5 shadow-soft border border-border">
@@ -193,43 +172,33 @@ export default function StudentDashboardPage() {
               <TrendingUp className="h-5 w-5 text-primary" />
               ผลการเข้าเรียน
             </h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              แนวโน้มการเข้าเรียนตาม EP
-            </p>
+            <p className="text-sm text-muted-foreground mt-1">แนวโน้มการเข้าเรียนตาม EP</p>
           </div>
           <div className="p-5">
             <ResponsiveContainer width="100%" height={300}>
               <AreaChart data={epAttendanceData}>
                 <defs>
                   <linearGradient id="attendanceGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis 
-                  dataKey="name" 
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
-                />
-                <YAxis 
-                  domain={[70, 100]} 
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: "hsl(var(--card))", 
+                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <YAxis domain={[70, 100]} stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--card))",
                     border: "1px solid hsl(var(--border))",
                     borderRadius: "8px",
-                    boxShadow: "0 4px 20px -2px rgba(0,0,0,0.1)"
+                    boxShadow: "0 4px 20px -2px rgba(0,0,0,0.1)",
                   }}
                   formatter={(value: number) => [`${value}%`, "การเข้าเรียน"]}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="target" 
-                  stroke="hsl(var(--muted-foreground))" 
+                <Line
+                  type="monotone"
+                  dataKey="target"
+                  stroke="hsl(var(--muted-foreground))"
                   strokeDasharray="5 5"
                   strokeWidth={2}
                   dot={false}
@@ -241,10 +210,10 @@ export default function StudentDashboardPage() {
                   strokeWidth={3}
                   fill="url(#attendanceGradient)"
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="attendance" 
-                  stroke="hsl(var(--primary))" 
+                <Line
+                  type="monotone"
+                  dataKey="attendance"
+                  stroke="hsl(var(--primary))"
                   strokeWidth={3}
                   dot={{ fill: "hsl(var(--primary))", strokeWidth: 2, r: 6 }}
                   activeDot={{ r: 8, fill: "hsl(var(--primary))" }}
@@ -279,16 +248,15 @@ export default function StudentDashboardPage() {
                 <div key={course.name} className="p-4 rounded-xl bg-muted/30 border border-border">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div 
-                        className="w-3 h-3 rounded-full" 
-                        style={{ backgroundColor: course.color }}
-                      />
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: course.color }} />
                       <span className="font-semibold text-foreground">{course.name}</span>
                     </div>
-                    <span className={cn(
-                      "text-xs px-2 py-1 rounded-full border flex items-center gap-1",
-                      statusConfig.class
-                    )}>
+                    <span
+                      className={cn(
+                        "text-xs px-2 py-1 rounded-full border flex items-center gap-1",
+                        statusConfig.class,
+                      )}
+                    >
                       {statusConfig.icon} {statusConfig.label}
                     </span>
                   </div>
@@ -334,21 +302,11 @@ export default function StudentDashboardPage() {
               {subjectAttendance.map((subject) => {
                 const statusConfig = getStatusConfig(subject.status);
                 return (
-                  <div 
-                    key={subject.name} 
-                    className="p-4 rounded-xl bg-muted/30 border border-border text-center"
-                  >
+                  <div key={subject.name} className="p-4 rounded-xl bg-muted/30 border border-border text-center">
                     <p className="text-sm text-muted-foreground mb-2">{subject.name}</p>
                     <div className="relative inline-flex items-center justify-center">
                       <svg className="w-20 h-20 transform -rotate-90">
-                        <circle
-                          cx="40"
-                          cy="40"
-                          r="35"
-                          stroke="hsl(var(--muted))"
-                          strokeWidth="6"
-                          fill="none"
-                        />
+                        <circle cx="40" cy="40" r="35" stroke="hsl(var(--muted))" strokeWidth="6" fill="none" />
                         <circle
                           cx="40"
                           cy="40"
@@ -360,14 +318,9 @@ export default function StudentDashboardPage() {
                           strokeLinecap="round"
                         />
                       </svg>
-                      <span className="absolute text-lg font-bold text-foreground">
-                        {subject.attendance}%
-                      </span>
+                      <span className="absolute text-lg font-bold text-foreground">{subject.attendance}%</span>
                     </div>
-                    <span className={cn(
-                      "inline-block mt-2 text-xs px-2 py-1 rounded-full border",
-                      statusConfig.class
-                    )}>
+                    <span className={cn("inline-block mt-2 text-xs px-2 py-1 rounded-full border", statusConfig.class)}>
                       {statusConfig.icon}
                     </span>
                   </div>
