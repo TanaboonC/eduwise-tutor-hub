@@ -63,6 +63,7 @@ function getStatusConfig(status: string) {
 
 export default function StudentDashboardPage() {
   const [selectedCourse, setSelectedCourse] = useState<string>("all");
+  const [selectedEpRange, setSelectedEpRange] = useState<string>("EP1-5");
 
   return (
     <StudentLayout title="Dashboard" description="ติดตามผลการเรียนและการเข้าเรียนของคุณ">
