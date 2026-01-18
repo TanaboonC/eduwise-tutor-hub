@@ -15,6 +15,7 @@ import {
   BarChart3,
   Filter,
   ChevronRight,
+  ClipboardCheck,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -134,19 +135,94 @@ const attendanceRecords = [
   { date: "2024-01-19", subject: "คณิตศาสตร์", ep: "EP3", status: "present", remarks: "" },
 ];
 
+// Student evaluation mock data
+const studentEvaluations = [
+  {
+    id: 1,
+    subject: "คณิตศาสตร์",
+    epRange: "EP1-5",
+    participation: "ดีมาก",
+    practice: "ดี",
+    understanding: "ดีมาก",
+    application: "ดี",
+    overallStatus: "green",
+    mentorSuggestion: "ตั้งใจเรียนดีมาก ควรพัฒนาการแก้โจทย์ประยุกต์",
+    teacherSuggestion: "มีความกระตือรือร้นในการเรียน",
+  },
+  {
+    id: 2,
+    subject: "คณิตศาสตร์",
+    epRange: "EP6-10",
+    participation: "ดี",
+    practice: "ดีมาก",
+    understanding: "ดี",
+    application: "ดีมาก",
+    overallStatus: "green",
+    mentorSuggestion: "พัฒนาขึ้นมาก",
+    teacherSuggestion: "ทำแบบฝึกหัดครบถ้วน",
+  },
+  {
+    id: 3,
+    subject: "วิทยาศาสตร์",
+    epRange: "EP1-5",
+    participation: "ดี",
+    practice: "ปานกลาง",
+    understanding: "ดี",
+    application: "ปานกลาง",
+    overallStatus: "yellow",
+    mentorSuggestion: "ควรฝึกการทดลองเพิ่มเติม",
+    teacherSuggestion: "ตั้งใจเรียนแต่ต้องทบทวนเพิ่ม",
+  },
+  {
+    id: 4,
+    subject: "ภาษาอังกฤษ",
+    epRange: "EP1-5",
+    participation: "ดีมาก",
+    practice: "ดีมาก",
+    understanding: "ดีมาก",
+    application: "ดีมาก",
+    overallStatus: "green",
+    mentorSuggestion: "ยอดเยี่ยม!",
+    teacherSuggestion: "เป็นตัวอย่างที่ดี",
+  },
+];
+
 function getStatusBadge(percentage: number) {
   if (percentage >= 95) return { label: "ดีเยี่ยม", class: "status-excellent", status: "excellent" };
   if (percentage >= 80) return { label: "ดี", class: "status-good", status: "good" };
   return { label: "ต้องปรับปรุง", class: "status-improve", status: "needs_improvement" };
 }
 
+function getEvalStatusColor(status: string) {
+  switch (status) {
+    case "green": return "bg-green-500";
+    case "yellow": return "bg-yellow-500";
+    case "orange": return "bg-orange-500";
+    case "red": return "bg-red-500";
+    default: return "bg-gray-500";
+  }
+}
+
+function getLevelBadgeVariant(level: string): "default" | "secondary" | "outline" | "destructive" {
+  switch (level) {
+    case "ดีมาก": return "default";
+    case "ดี": return "secondary";
+    case "ปานกลาง": return "outline";
+    case "ต้องปรับปรุง": return "destructive";
+    default: return "outline";
+  }
+}
+
 export default function CoursesAttendancePage() {
   const [selectedCourse, setSelectedCourse] = useState<(typeof availableCourses)[0] | null>(null);
   const [selectedSubject, setSelectedSubject] = useState(subjects[0]);
   const [subjectFilter, setSubjectFilter] = useState<string>("all");
+  const [evalSubjectFilter, setEvalSubjectFilter] = useState<string>("คณิตศาสตร์");
 
   const filteredRecords =
     subjectFilter === "all" ? attendanceRecords : attendanceRecords.filter((r) => r.subject === subjectFilter);
+
+  const filteredEvaluations = studentEvaluations.filter((e) => e.subject === evalSubjectFilter);
 
   // Course selection screen
   if (!selectedCourse) {
@@ -231,6 +307,13 @@ export default function CoursesAttendancePage() {
           >
             <BarChart3 className="h-4 w-4 mr-2" />
             การเข้าเรียน
+          </TabsTrigger>
+          <TabsTrigger
+            value="evaluation"
+            className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+          >
+            <ClipboardCheck className="h-4 w-4 mr-2" />
+            การประเมินนักเรียน
           </TabsTrigger>
         </TabsList>
 
@@ -465,6 +548,96 @@ export default function CoursesAttendancePage() {
                 </tbody>
               </table>
             </div>
+          </div>
+        </TabsContent>
+
+        {/* Evaluation Tab */}
+        <TabsContent value="evaluation" className="space-y-6">
+          {/* Subject Filter */}
+          <div className="bg-card rounded-2xl shadow-soft border border-border p-4">
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">เลือกรายวิชา:</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {subjects.map((subject) => (
+                  <Button
+                    key={subject.id}
+                    variant={evalSubjectFilter === subject.name ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setEvalSubjectFilter(subject.name)}
+                  >
+                    {subject.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Evaluation Cards */}
+          <div className="space-y-4">
+            {filteredEvaluations.length > 0 ? (
+              filteredEvaluations.map((evaluation) => (
+                <Card key={evaluation.id} className="overflow-hidden">
+                  <div className={`h-1 ${getEvalStatusColor(evaluation.overallStatus)}`} />
+                  <CardContent className="pt-6">
+                    <div className="flex flex-wrap items-center gap-3 mb-4">
+                      <Badge variant="outline" className="text-sm">
+                        {evaluation.epRange}
+                      </Badge>
+                      <span className="text-lg font-semibold text-foreground">{evaluation.subject}</span>
+                      <div className={`w-4 h-4 rounded-full ${getEvalStatusColor(evaluation.overallStatus)}`} />
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">การมีส่วนร่วม</p>
+                        <Badge variant={getLevelBadgeVariant(evaluation.participation)}>
+                          {evaluation.participation}
+                        </Badge>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">การปฏิบัติ</p>
+                        <Badge variant={getLevelBadgeVariant(evaluation.practice)}>
+                          {evaluation.practice}
+                        </Badge>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">ความเข้าใจ</p>
+                        <Badge variant={getLevelBadgeVariant(evaluation.understanding)}>
+                          {evaluation.understanding}
+                        </Badge>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">การต่อยอด</p>
+                        <Badge variant={getLevelBadgeVariant(evaluation.application)}>
+                          {evaluation.application}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4 pt-4 border-t border-border">
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground font-medium">ข้อเสนอแนะจาก Mentor</p>
+                        <p className="text-sm text-foreground">{evaluation.mentorSuggestion}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground font-medium">ข้อเสนอแนะจากครู</p>
+                        <p className="text-sm text-foreground">{evaluation.teacherSuggestion}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <ClipboardCheck className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">ยังไม่มีข้อมูลการประเมินสำหรับวิชานี้</p>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </TabsContent>
       </Tabs>
