@@ -575,28 +575,37 @@ export default function CoursesAttendancePage() {
             </div>
           </div>
 
-          {/* Overall Status Summary */}
+          {/* Overall Status Summary by EP */}
           {filteredEvaluations.length > 0 && (
             <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
               <CardContent className="pt-6">
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div>
-                    <h3 className="font-bold text-lg text-foreground mb-1">สถานะรวมวิชา{evalSubjectFilter}</h3>
-                    <p className="text-sm text-muted-foreground">สรุปผลการประเมินจากทุก EP</p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    {["green", "yellow", "orange", "red"].map((status) => {
-                      const count = filteredEvaluations.filter(e => e.overallStatus === status).length;
-                      const statusLabel = status === "green" ? "ดีมาก" : status === "yellow" ? "ดี" : status === "orange" ? "ปานกลาง" : "ต้องปรับปรุง";
-                      return count > 0 ? (
-                        <div key={status} className="flex items-center gap-2 bg-card px-3 py-2 rounded-lg border border-border">
-                          <div className={`w-3 h-3 rounded-full ${getEvalStatusColor(status)}`} />
-                          <span className="text-sm font-medium">{statusLabel}</span>
-                          <Badge variant="secondary">{count} EP</Badge>
+                <div className="mb-4">
+                  <h3 className="font-bold text-lg text-foreground mb-1">สถานะรวมวิชา{evalSubjectFilter}</h3>
+                  <p className="text-sm text-muted-foreground">สถานะของแต่ละช่วง EP</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {["EP1-5", "EP6-10", "EP11-15"].map((epRange) => {
+                    const evaluation = filteredEvaluations.find(e => e.epRange === epRange);
+                    const statusLabel = evaluation?.overallStatus === "green" ? "ดีมาก" : 
+                                        evaluation?.overallStatus === "yellow" ? "ดี" : 
+                                        evaluation?.overallStatus === "orange" ? "ปานกลาง" : 
+                                        evaluation?.overallStatus === "red" ? "ต้องปรับปรุง" : "ยังไม่มีข้อมูล";
+                    return (
+                      <div key={epRange} className="bg-card px-4 py-3 rounded-lg border border-border">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-muted-foreground">{epRange}</span>
+                          {evaluation ? (
+                            <div className="flex items-center gap-2">
+                              <div className={`w-3 h-3 rounded-full ${getEvalStatusColor(evaluation.overallStatus)}`} />
+                              <span className="text-sm font-semibold">{statusLabel}</span>
+                            </div>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">-</span>
+                          )}
                         </div>
-                      ) : null;
-                    })}
-                  </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
