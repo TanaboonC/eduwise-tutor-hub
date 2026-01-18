@@ -191,61 +191,6 @@ export default function RegistrationPage() {
         </Button>
       </div>
 
-      {/* Course Catalog */}
-      <div className="grid gap-6 md:grid-cols-2 mb-12">
-        {filteredCourses.map((course) => (
-          <div key={course.id} className="bg-card rounded-2xl shadow-soft border border-border overflow-hidden card-hover">
-            <div className={`h-2 ${course.color}`} />
-            <div className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-lg font-bold text-foreground">{course.name}</h3>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                    <User className="h-4 w-4" />
-                    {course.teacher}
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 px-2 py-1 bg-gold/10 rounded-full">
-                  <Star className="h-4 w-4 text-gold fill-gold" />
-                  <span className="text-sm font-medium text-foreground">{course.rating}</span>
-                </div>
-              </div>
-              
-              <p className="text-sm text-muted-foreground mb-4">{course.description}</p>
-              
-              <div className="flex flex-wrap gap-2 mb-4">
-                {course.features.map((feature, i) => (
-                  <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-muted text-muted-foreground text-xs rounded-lg">
-                    <CheckCircle className="h-3 w-3 text-success" />
-                    {feature}
-                  </span>
-                ))}
-              </div>
-
-              <div className="flex items-center justify-between pt-4 border-t border-border">
-                <div>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Clock className="h-4 w-4" />
-                    {course.duration}
-                  </div>
-                  <p className="text-xl font-bold text-foreground mt-1">
-                    ฿{course.price.toLocaleString()}
-                  </p>
-                </div>
-                <Button 
-                  onClick={() => {
-                    setSelectedCourse(course);
-                    setShowPaymentDialog(true);
-                  }}
-                >
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  ชำระเงิน
-                </Button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
 
       {/* Payment Alert Notification */}
       {registrationHistory.some(item => 
