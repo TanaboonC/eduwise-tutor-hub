@@ -294,11 +294,7 @@ export default function CoursesAttendancePage() {
                 <p className="text-sm text-muted-foreground mt-1">คลิกที่การ์ดวิชาด้านบนเพื่อดูแนวโน้ม</p>
               </div>
               <div className="flex bg-muted rounded-lg p-1">
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="rounded-md"
-                >
+                <Button variant="default" size="sm" className="rounded-md">
                   EP
                 </Button>
               </div>
@@ -419,7 +415,9 @@ export default function CoursesAttendancePage() {
             >
               <option value="all">วิชาทั้งหมด</option>
               {subjects.map((s) => (
-                <option key={s.id} value={s.name}>{s.name}</option>
+                <option key={s.id} value={s.name}>
+                  {s.name}
+                </option>
               ))}
             </select>
           </div>
@@ -437,14 +435,14 @@ export default function CoursesAttendancePage() {
                     <th className="text-left p-4 text-sm font-semibold text-muted-foreground">วิชา</th>
                     <th className="text-left p-4 text-sm font-semibold text-muted-foreground">EP</th>
                     <th className="text-left p-4 text-sm font-semibold text-muted-foreground">สถานะ</th>
-                    <th className="text-left p-4 text-sm font-semibold text-muted-foreground">หมายเหตุ</th>
+                    <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Remark</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {filteredRecords.map((record, index) => (
                     <tr key={index} className="hover:bg-muted/30 transition-colors">
                       <td className="p-4 text-sm text-foreground">
-                        {new Date(record.date).toLocaleDateString('th-TH')}
+                        {new Date(record.date).toLocaleDateString("th-TH")}
                       </td>
                       <td className="p-4 text-sm font-medium text-foreground">{record.subject}</td>
                       <td className="p-4 text-sm text-muted-foreground">{record.ep}</td>
