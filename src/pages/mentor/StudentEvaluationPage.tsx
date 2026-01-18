@@ -13,9 +13,8 @@ import { toast } from "sonner";
 
 // Mock data
 const courses = [
-  { id: "1", name: "English for Kids Level 1" },
-  { id: "2", name: "English for Kids Level 2" },
-  { id: "3", name: "Business English" },
+  { id: "1", name: "ตะลุยโจทย์ปัญหาม.4", subjects: ["คณิต", "วิทย์", "อังกฤษ"] },
+  { id: "2", name: "ติวเข้มเนื้อหาม.4", subjects: ["คณิต", "วิทย์", "อังกฤษ"] },
 ];
 
 const epRanges = ["EP1-5", "EP6-10", "EP11-15"];
@@ -144,12 +143,14 @@ function getLevelBadgeVariant(level: string): "default" | "secondary" | "outline
 
 export default function StudentEvaluationPage() {
   const [selectedCourse, setSelectedCourse] = useState<string>("");
+  const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [selectedEpRange, setSelectedEpRange] = useState<string>("EP1-5");
   const [evaluations, setEvaluations] = useState<StudentEvaluation[]>(mockEvaluations);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<StudentEvaluation | null>(null);
   const [editForm, setEditForm] = useState<Partial<StudentEvaluation>>({});
 
+  const selectedCourseData = courses.find(c => c.id === selectedCourse);
   const filteredEvaluations = evaluations.filter(e => e.epRange === selectedEpRange);
 
   const openEditDialog = (student: StudentEvaluation) => {
@@ -205,12 +206,15 @@ export default function StudentEvaluationPage() {
         {/* Course Selection */}
         <Card>
           <CardHeader>
-            <CardTitle>เลือกคอร์สเรียนและ EP</CardTitle>
+            <CardTitle>เลือกคอร์สเรียน รายวิชา และ EP</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-4">
               <div className="w-full sm:w-64">
-                <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+                <Select value={selectedCourse} onValueChange={(value) => {
+                  setSelectedCourse(value);
+                  setSelectedSubject("");
+                }}>
                   <SelectTrigger>
                     <SelectValue placeholder="เลือกคอร์สเรียน" />
                   </SelectTrigger>
@@ -224,7 +228,24 @@ export default function StudentEvaluationPage() {
                 </Select>
               </div>
               
-              {selectedCourse && (
+              {selectedCourse && selectedCourseData && (
+                <div className="w-full sm:w-48">
+                  <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="เลือกรายวิชา" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {selectedCourseData.subjects.map(subject => (
+                        <SelectItem key={subject} value={subject}>
+                          {subject}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              
+              {selectedCourse && selectedSubject && (
                 <div className="w-full sm:w-48">
                   <Select value={selectedEpRange} onValueChange={setSelectedEpRange}>
                     <SelectTrigger>
@@ -244,12 +265,12 @@ export default function StudentEvaluationPage() {
           </CardContent>
         </Card>
 
-        {selectedCourse && (
+        {selectedCourse && selectedSubject && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-primary"></div>
-                รายการประเมินนักเรียน - {selectedEpRange}
+                รายการประเมินนักเรียน - วิชา{selectedSubject} - {selectedEpRange}
               </CardTitle>
             </CardHeader>
             <CardContent>
