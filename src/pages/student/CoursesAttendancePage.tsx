@@ -575,6 +575,33 @@ export default function CoursesAttendancePage() {
             </div>
           </div>
 
+          {/* Overall Status Summary */}
+          {filteredEvaluations.length > 0 && (
+            <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+              <CardContent className="pt-6">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <h3 className="font-bold text-lg text-foreground mb-1">สถานะรวมวิชา{evalSubjectFilter}</h3>
+                    <p className="text-sm text-muted-foreground">สรุปผลการประเมินจากทุก EP</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    {["green", "yellow", "orange", "red"].map((status) => {
+                      const count = filteredEvaluations.filter(e => e.overallStatus === status).length;
+                      const statusLabel = status === "green" ? "ดีมาก" : status === "yellow" ? "ดี" : status === "orange" ? "ปานกลาง" : "ต้องปรับปรุง";
+                      return count > 0 ? (
+                        <div key={status} className="flex items-center gap-2 bg-card px-3 py-2 rounded-lg border border-border">
+                          <div className={`w-3 h-3 rounded-full ${getEvalStatusColor(status)}`} />
+                          <span className="text-sm font-medium">{statusLabel}</span>
+                          <Badge variant="secondary">{count} EP</Badge>
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Evaluation Cards */}
           <div className="space-y-4">
             {filteredEvaluations.length > 0 ? (
