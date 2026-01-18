@@ -623,12 +623,21 @@ export default function CoursesAttendancePage() {
                 <Card key={evaluation.id} className="overflow-hidden">
                   <div className={`h-1 ${getEvalStatusColor(evaluation.overallStatus)}`} />
                   <CardContent className="pt-6">
-                    <div className="flex flex-wrap items-center gap-3 mb-4">
-                      <Badge variant="outline" className="text-sm">
-                        {evaluation.epRange}
-                      </Badge>
-                      <span className="text-lg font-semibold text-foreground">{evaluation.subject}</span>
-                      <div className={`w-4 h-4 rounded-full ${getEvalStatusColor(evaluation.overallStatus)}`} />
+                    <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                      <div className="flex items-center gap-3">
+                        <Badge variant="outline" className="text-sm">
+                          {evaluation.epRange}
+                        </Badge>
+                        <span className="text-lg font-semibold text-foreground">{evaluation.subject}</span>
+                      </div>
+                      <div className="flex items-center gap-2 bg-muted/50 px-3 py-1.5 rounded-full">
+                        <div className={`w-3 h-3 rounded-full ${getEvalStatusColor(evaluation.overallStatus)}`} />
+                        <span className="text-sm font-medium">
+                          {evaluation.overallStatus === "green" ? "ดีมาก" : 
+                           evaluation.overallStatus === "yellow" ? "ดี" : 
+                           evaluation.overallStatus === "orange" ? "ปานกลาง" : "ต้องปรับปรุง"}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
