@@ -575,46 +575,6 @@ export default function CoursesAttendancePage() {
             </div>
           </div>
 
-          {/* Overall Status Summary by EP - Each in its own Card */}
-          {filteredEvaluations.length > 0 && (
-            <div className="space-y-3">
-              <div className="mb-2">
-                <h3 className="font-bold text-lg text-foreground">สถานะรวมวิชา{evalSubjectFilter}</h3>
-                <p className="text-sm text-muted-foreground">สถานะของแต่ละช่วง EP</p>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {["EP1-5", "EP6-10", "EP11-15"].map((epRange) => {
-                  const evaluation = filteredEvaluations.find(e => e.epRange === epRange);
-                  const statusLabel = evaluation?.overallStatus === "green" ? "ดีมาก" : 
-                                      evaluation?.overallStatus === "yellow" ? "ดี" : 
-                                      evaluation?.overallStatus === "orange" ? "ปานกลาง" : 
-                                      evaluation?.overallStatus === "red" ? "ต้องปรับปรุง" : "ยังไม่มีข้อมูล";
-                  const bgGradient = evaluation?.overallStatus === "green" ? "from-green-500/10 to-green-500/5 border-green-500/30" :
-                                    evaluation?.overallStatus === "yellow" ? "from-yellow-500/10 to-yellow-500/5 border-yellow-500/30" :
-                                    evaluation?.overallStatus === "orange" ? "from-orange-500/10 to-orange-500/5 border-orange-500/30" :
-                                    evaluation?.overallStatus === "red" ? "from-red-500/10 to-red-500/5 border-red-500/30" :
-                                    "from-muted/10 to-muted/5 border-border";
-                  return (
-                    <Card key={epRange} className={`bg-gradient-to-br ${bgGradient}`}>
-                      <CardContent className="pt-4 pb-4">
-                        <div className="flex flex-col items-center text-center gap-2">
-                          <span className="text-sm font-medium text-muted-foreground">{epRange}</span>
-                          {evaluation ? (
-                            <div className="flex items-center gap-2">
-                              <div className={`w-4 h-4 rounded-full ${getEvalStatusColor(evaluation.overallStatus)}`} />
-                              <span className="text-base font-bold">{statusLabel}</span>
-                            </div>
-                          ) : (
-                            <span className="text-sm text-muted-foreground">ยังไม่มีข้อมูล</span>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </div>
-          )}
 
           {/* Evaluation Cards */}
           <div className="space-y-4">
