@@ -185,10 +185,6 @@ export default function RegistrationPage() {
             className="pl-10"
           />
         </div>
-        <Button variant="outline">
-          <Filter className="h-4 w-4 mr-2" />
-          ตัวกรอง
-        </Button>
       </div>
 
 
