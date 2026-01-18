@@ -13,7 +13,6 @@ import RewardsPage from "./pages/student/RewardsPage";
 import TeacherProfilePage from "./pages/teacher/TeacherProfilePage";
 import TeacherCoursesPage from "./pages/teacher/TeacherCoursesPage";
 import TeacherStudentsPage from "./pages/teacher/TeacherStudentsPage";
-import TeacherStudentEvaluationPage from "./pages/teacher/TeacherStudentEvaluationPage";
 import TeacherPerformancePage from "./pages/teacher/TeacherPerformancePage";
 import MentorProfilePage from "./pages/mentor/MentorProfilePage";
 import AccountManagementPage from "./pages/mentor/AccountManagementPage";
@@ -55,7 +54,6 @@ const App = () => (
           <Route path="/teacher/profile" element={<TeacherProfilePage />} />
           <Route path="/teacher/courses" element={<TeacherCoursesPage />} />
           <Route path="/teacher/students" element={<TeacherStudentsPage />} />
-          <Route path="/teacher/student-evaluation" element={<TeacherStudentEvaluationPage />} />
           <Route path="/teacher/performance" element={<TeacherPerformancePage />} />
           {/* Mentor Module Routes */}
           <Route path="/mentor" element={<Navigate to="/mentor/profile" replace />} />
