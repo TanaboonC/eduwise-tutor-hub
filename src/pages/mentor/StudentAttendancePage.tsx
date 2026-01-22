@@ -371,7 +371,6 @@ export default function StudentAttendancePage() {
                                 <X className="h-5 w-5 text-red-500 mx-auto" />
                               )}
                             </TableCell>
-                            <TableCell className="max-w-[200px] truncate">{record.remark || "-"}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
