@@ -142,6 +142,7 @@ function getLevelBadgeVariant(level: string): "default" | "secondary" | "outline
 }
 
 export default function StudentEvaluationPage() {
+  const [selectedCourse, setSelectedCourse] = useState<string>("");
   const [selectedEpRange, setSelectedEpRange] = useState<string>("EP1-5");
   const [evaluations, setEvaluations] = useState<StudentEvaluation[]>(mockEvaluations);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -200,30 +201,49 @@ export default function StudentEvaluationPage() {
   return (
     <MentorLayout title="ประเมินนักเรียน">
       <div className="space-y-6">
-        {/* EP Selection */}
+        {/* Course and EP Selection */}
         <Card>
           <CardHeader>
-            <CardTitle>เลือก EP</CardTitle>
+            <CardTitle>เลือกคอร์สเรียนและ EP</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="w-full sm:w-48">
-              <Select value={selectedEpRange} onValueChange={setSelectedEpRange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="เลือก EP" />
-                </SelectTrigger>
-                <SelectContent>
-                  {epRanges.map(ep => (
-                    <SelectItem key={ep} value={ep}>
-                      {ep}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="flex flex-wrap gap-4">
+              <div className="w-full sm:w-64">
+                <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="เลือกคอร์สเรียน" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {courses.map(course => (
+                      <SelectItem key={course.id} value={course.id}>
+                        {course.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {selectedCourse && (
+                <div className="w-full sm:w-48">
+                  <Select value={selectedEpRange} onValueChange={setSelectedEpRange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="เลือก EP" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {epRanges.map(ep => (
+                        <SelectItem key={ep} value={ep}>
+                          {ep}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
 
-        {(
+        {selectedCourse && (
           <Card>
             <CardHeader>
             <CardTitle className="flex items-center gap-2">
