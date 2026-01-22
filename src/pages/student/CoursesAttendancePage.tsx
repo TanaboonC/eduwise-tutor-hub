@@ -336,8 +336,8 @@ export default function CoursesAttendancePage() {
         </Button>
         <ChevronRight className="h-4 w-4 text-muted-foreground" />
         <span className="font-medium text-foreground">{selectedCourse.name}</span>
-        <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        <span className="text-primary font-medium">{selectedSubject.name}</span>
+        
+        
       </div>
 
       <Tabs defaultValue="courses" className="space-y-6">
