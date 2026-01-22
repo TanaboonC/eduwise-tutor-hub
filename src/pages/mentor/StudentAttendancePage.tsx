@@ -71,7 +71,7 @@ const mockStudents = [
 ];
 
 const mockStudentAttendanceDetail = [
-  { id: "1", studentName: "สมชาย ใจดี", date: "2024-01-15", time: "09:00", ep: "EP1", attended: true, remark: "" },
+  { id: "1", studentName: "สมชาย ใจดี", date: "2024-01-15", time: "09:00", ep: "EP1", attended: true },
   {
     id: "2",
     studentName: "สมชาย ใจดี",
@@ -79,9 +79,8 @@ const mockStudentAttendanceDetail = [
     time: "09:00",
     ep: "EP2",
     attended: true,
-    remark: "เข้าเรียนตรงเวลา",
   },
-  { id: "3", studentName: "สมหญิง รักเรียน", date: "2024-01-15", time: "09:00", ep: "EP1", attended: true, remark: "" },
+  { id: "3", studentName: "สมหญิง รักเรียน", date: "2024-01-15", time: "09:00", ep: "EP1", attended: true },
   {
     id: "4",
     studentName: "สมหญิง รักเรียน",
@@ -89,9 +88,8 @@ const mockStudentAttendanceDetail = [
     time: "09:15",
     ep: "EP2",
     attended: true,
-    remark: "มาสาย 15 นาที",
   },
-  { id: "5", studentName: "วิชัย เก่งมาก", date: "2024-01-15", time: "09:00", ep: "EP1", attended: true, remark: "" },
+  { id: "5", studentName: "วิชัย เก่งมาก", date: "2024-01-15", time: "09:00", ep: "EP1", attended: true },
   {
     id: "6",
     studentName: "วิชัย เก่งมาก",
@@ -99,7 +97,6 @@ const mockStudentAttendanceDetail = [
     time: "09:00",
     ep: "EP2",
     attended: false,
-    remark: "ลาป่วย",
   },
 ];
 
