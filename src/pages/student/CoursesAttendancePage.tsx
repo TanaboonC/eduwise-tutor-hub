@@ -549,19 +549,7 @@ export default function CoursesAttendancePage() {
         {/* Evaluation Tab */}
         <TabsContent value="evaluation" className="space-y-6">
           {/* Subject Filter */}
-          <div className="bg-card rounded-2xl shadow-soft border border-border p-4">
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">เลือกรายวิชา:</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {subjects.map(subject => <Button key={subject.id} variant={evalSubjectFilter === subject.name ? "default" : "outline"} size="sm" onClick={() => setEvalSubjectFilter(subject.name)}>
-                    {subject.name}
-                  </Button>)}
-              </div>
-            </div>
-          </div>
+          
 
 
           {/* Evaluation Cards */}
@@ -574,7 +562,7 @@ export default function CoursesAttendancePage() {
                         <Badge variant="outline" className="text-sm">
                           {evaluation.epRange}
                         </Badge>
-                        <span className="text-lg font-semibold text-foreground">{evaluation.subject}</span>
+                        
                       </div>
                       <div className="flex items-center gap-2 bg-muted/50 px-3 py-1.5 rounded-full">
                         <div className={`w-3 h-3 rounded-full ${getEvalStatusColor(evaluation.overallStatus)}`} />
