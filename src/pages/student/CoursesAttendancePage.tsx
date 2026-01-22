@@ -548,9 +548,38 @@ export default function CoursesAttendancePage() {
 
         {/* Evaluation Tab */}
         <TabsContent value="evaluation" className="space-y-6">
-          {/* Subject Filter */}
-          
-
+          {/* Attendance Summary for All Subjects */}
+          <div className="grid gap-4 md:grid-cols-3">
+            {subjects.map(subject => {
+              const subjectRecords = attendanceRecords.filter(r => r.subject === subject.name);
+              const attendedCount = subjectRecords.filter(r => r.status === "present").length;
+              const absentCount = subjectRecords.filter(r => r.status === "absent").length;
+              return (
+                <Card key={subject.id} className="overflow-hidden">
+                  <div className={`h-1.5 ${subject.color}`} />
+                  <CardContent className="pt-4">
+                    <h4 className="font-semibold text-foreground mb-3">{subject.name}</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex items-center gap-2 p-2.5 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">เข้าเรียน</p>
+                          <p className="font-bold text-green-600">{attendedCount} ครั้ง</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 p-2.5 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                        <XCircle className="h-4 w-4 text-red-600" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">ขาดเรียน</p>
+                          <p className="font-bold text-red-600">{absentCount} ครั้ง</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
 
           {/* Evaluation Cards */}
           <div className="space-y-4">
