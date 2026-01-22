@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -20,7 +20,7 @@ import {
   LineChart,
   Line,
 } from "recharts";
-import { MessageSquare, Check, X } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 
 // Mock data
@@ -70,34 +70,23 @@ const mockStudents = [
   },
 ];
 
-const mockStudentAttendanceDetail = [
+interface AttendanceDetail {
+  id: string;
+  studentName: string;
+  date: string;
+  time: string;
+  ep: string;
+  attended: boolean;
+  remark?: string;
+}
+
+const mockStudentAttendanceDetail: AttendanceDetail[] = [
   { id: "1", studentName: "สมชาย ใจดี", date: "2024-01-15", time: "09:00", ep: "EP1", attended: true },
-  {
-    id: "2",
-    studentName: "สมชาย ใจดี",
-    date: "2024-01-22",
-    time: "09:00",
-    ep: "EP2",
-    attended: true,
-  },
+  { id: "2", studentName: "สมชาย ใจดี", date: "2024-01-22", time: "09:00", ep: "EP2", attended: true },
   { id: "3", studentName: "สมหญิง รักเรียน", date: "2024-01-15", time: "09:00", ep: "EP1", attended: true },
-  {
-    id: "4",
-    studentName: "สมหญิง รักเรียน",
-    date: "2024-01-22",
-    time: "09:15",
-    ep: "EP2",
-    attended: true,
-  },
+  { id: "4", studentName: "สมหญิง รักเรียน", date: "2024-01-22", time: "09:15", ep: "EP2", attended: true },
   { id: "5", studentName: "วิชัย เก่งมาก", date: "2024-01-15", time: "09:00", ep: "EP1", attended: true },
-  {
-    id: "6",
-    studentName: "วิชัย เก่งมาก",
-    date: "2024-01-22",
-    time: "09:00",
-    ep: "EP2",
-    attended: false,
-  },
+  { id: "6", studentName: "วิชัย เก่งมาก", date: "2024-01-22", time: "09:00", ep: "EP2", attended: false },
 ];
 
 const statusChartData = [
@@ -113,6 +102,7 @@ const subjectChartData = [
 ];
 
 const epFilters = ["ทั้งหมด", "EP1-5", "EP6-10", "EP11-15"];
+const epListFilters = ["ทั้งหมด", "EP1", "EP2", "EP3", "EP4", "EP5", "EP6", "EP7", "EP8"];
 
 function getStatusColor(status: string) {
   switch (status) {
@@ -140,10 +130,12 @@ export default function StudentAttendancePage() {
   const [selectedCourse, setSelectedCourse] = useState<string>("");
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [selectedEpFilter, setSelectedEpFilter] = useState<string>("ทั้งหมด");
-  const [attendanceData, setAttendanceData] = useState(mockStudentAttendanceDetail);
+  const [selectedEpListFilter, setSelectedEpListFilter] = useState<string>("ทั้งหมด");
+  const [attendanceData, setAttendanceData] = useState<AttendanceDetail[]>(mockStudentAttendanceDetail);
   const [remarkDialogOpen, setRemarkDialogOpen] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<(typeof mockStudentAttendanceDetail)[0] | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<AttendanceDetail | null>(null);
   const [remarkText, setRemarkText] = useState("");
+  const [activeTab, setActiveTab] = useState("student-list");
 
   const filteredSubjects = subjects.filter((s) => s.courseId === selectedCourse);
 
@@ -159,9 +151,9 @@ export default function StudentAttendancePage() {
     }
   };
 
-  const openRemarkDialog = (record: (typeof mockStudentAttendanceDetail)[0]) => {
+  const openRemarkDialog = (record: AttendanceDetail) => {
     setSelectedRecord(record);
-    setRemarkText(record.remark);
+    setRemarkText(record.remark || "");
     setRemarkDialogOpen(true);
   };
 
@@ -189,9 +181,95 @@ export default function StudentAttendancePage() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+          </CardContent>
+        </Card>
 
-              {selectedCourse && (
-                <div className="w-full sm:w-64">
+        {selectedCourse && (
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="student-list">รายชื่อนักเรียน</TabsTrigger>
+              <TabsTrigger value="charts">กราฟสถิติ</TabsTrigger>
+              <TabsTrigger value="subject-detail">รายละเอียดรายวิชา</TabsTrigger>
+            </TabsList>
+
+            {/* Tab 1: Student List with EP Filter */}
+            <TabsContent value="student-list" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <CardTitle className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-primary"></div>
+                      รายชื่อนักเรียนและ % การเข้าเรียน
+                    </CardTitle>
+                    <div className="w-full sm:w-48">
+                      <Select value={selectedEpListFilter} onValueChange={setSelectedEpListFilter}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Filter EP" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {epListFilters.map((ep) => (
+                            <SelectItem key={ep} value={ep}>
+                              {ep}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="min-w-[150px]">ชื่อนักเรียน</TableHead>
+                          <TableHead className="min-w-[40px]">สถานะ</TableHead>
+                          {["Grammar", "Vocabulary", "Speaking", "Listening"].map((subject) => (
+                            <TableHead key={subject} className="text-center min-w-[100px]">
+                              {subject} (%)
+                            </TableHead>
+                          ))}
+                          <TableHead className="text-center min-w-[100px]">เฉลี่ย (%)</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {mockStudents.map((student) => {
+                          const subjectData = student.subjects as Record<string, number>;
+                          const avg = Math.round(
+                            Object.values(subjectData).reduce((a, b) => a + b, 0) / Object.values(subjectData).length,
+                          );
+                          return (
+                            <TableRow key={student.id}>
+                              <TableCell className="font-medium">{student.name}</TableCell>
+                              <TableCell>
+                                <div className={`w-4 h-4 rounded-full ${getStatusColor(student.status)}`}></div>
+                              </TableCell>
+                              {["Grammar", "Vocabulary", "Speaking", "Listening"].map((subject) => (
+                                <TableCell
+                                  key={subject}
+                                  className={`text-center ${getAttendanceStatusColor(subjectData[subject])}`}
+                                >
+                                  {subjectData[subject]}%
+                                </TableCell>
+                              ))}
+                              <TableCell className={`text-center font-semibold ${getAttendanceStatusColor(avg)}`}>
+                                {avg}%
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Tab 2: Charts with EP Range Filter */}
+            <TabsContent value="charts" className="space-y-4">
+              <div className="flex justify-end mb-4">
+                <div className="w-full sm:w-48">
                   <Select value={selectedEpFilter} onValueChange={setSelectedEpFilter}>
                     <SelectTrigger>
                       <SelectValue placeholder="Filter EP" />
@@ -205,181 +283,128 @@ export default function StudentAttendancePage() {
                     </SelectContent>
                   </Select>
                 </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+              </div>
 
-        {selectedCourse && (
-          <>
-            {/* Student Attendance Table */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-primary"></div>
-                  รายชื่อนักเรียนและ % การเข้าเรียน
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="min-w-[150px]">ชื่อนักเรียน</TableHead>
-                        <TableHead className="min-w-[40px]">สถานะ</TableHead>
-                        {["Grammar", "Vocabulary", "Speaking", "Listening"].map((subject) => (
-                          <TableHead key={subject} className="text-center min-w-[100px]">
-                            {subject} (%)
-                          </TableHead>
-                        ))}
-                        <TableHead className="text-center min-w-[100px]">เฉลี่ย (%)</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {mockStudents.map((student) => {
-                        const subjects = student.subjects as Record<string, number>;
-                        const avg = Math.round(
-                          Object.values(subjects).reduce((a, b) => a + b, 0) / Object.values(subjects).length,
-                        );
-                        return (
-                          <TableRow key={student.id}>
-                            <TableCell className="font-medium">{student.name}</TableCell>
-                            <TableCell>
-                              <div className={`w-4 h-4 rounded-full ${getStatusColor(student.status)}`}></div>
-                            </TableCell>
-                            {["Grammar", "Vocabulary", "Speaking", "Listening"].map((subject) => (
-                              <TableCell
-                                key={subject}
-                                className={`text-center ${getAttendanceStatusColor(subjects[subject])}`}
-                              >
-                                {subjects[subject]}%
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Status Chart */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <div className="w-2 h-2 rounded-full bg-primary"></div>% การเข้าเรียนตามสถานะ vs EP
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={statusChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="ep" />
+                          <YAxis domain={[0, 100]} />
+                          <Tooltip />
+                          <Legend />
+                          <Bar dataKey="green" name="Green" fill="#22c55e" />
+                          <Bar dataKey="yellow" name="Yellow" fill="#eab308" />
+                          <Bar dataKey="orange" name="Orange" fill="#f97316" />
+                          <Bar dataKey="red" name="Red" fill="#ef4444" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Subject Chart */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <div className="w-2 h-2 rounded-full bg-primary"></div>% การเข้าเรียนตามรายวิชา vs EP
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={subjectChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="ep" />
+                          <YAxis domain={[0, 100]} />
+                          <Tooltip />
+                          <Legend />
+                          <Line type="monotone" dataKey="Grammar" stroke="#8884d8" strokeWidth={2} />
+                          <Line type="monotone" dataKey="Vocabulary" stroke="#82ca9d" strokeWidth={2} />
+                          <Line type="monotone" dataKey="Speaking" stroke="#ffc658" strokeWidth={2} />
+                          <Line type="monotone" dataKey="Listening" stroke="#ff7300" strokeWidth={2} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            {/* Tab 3: Subject Detail */}
+            <TabsContent value="subject-detail" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <CardTitle>รายละเอียดการเข้าเรียนตามรายวิชา</CardTitle>
+                    <div className="w-full sm:w-64">
+                      <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="เลือกรายวิชา" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {filteredSubjects.map((subject) => (
+                            <SelectItem key={subject.id} value={subject.id}>
+                              {subject.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {selectedSubject ? (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>ชื่อนักเรียน</TableHead>
+                            <TableHead>วันที่</TableHead>
+                            <TableHead>เวลา</TableHead>
+                            <TableHead>EP</TableHead>
+                            <TableHead className="text-center">สถานะ</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {attendanceData.map((record) => (
+                            <TableRow key={record.id}>
+                              <TableCell className="font-medium">{record.studentName}</TableCell>
+                              <TableCell>{record.date}</TableCell>
+                              <TableCell>{record.time}</TableCell>
+                              <TableCell>
+                                <Badge variant="outline">{record.ep}</Badge>
                               </TableCell>
-                            ))}
-                            <TableCell className={`text-center font-semibold ${getAttendanceStatusColor(avg)}`}>
-                              {avg}%
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Status Chart */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <div className="w-2 h-2 rounded-full bg-primary"></div>% การเข้าเรียนตามสถานะ vs EP
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={statusChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="ep" />
-                        <YAxis domain={[0, 100]} />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="green" name="Green" fill="#22c55e" />
-                        <Bar dataKey="yellow" name="Yellow" fill="#eab308" />
-                        <Bar dataKey="orange" name="Orange" fill="#f97316" />
-                        <Bar dataKey="red" name="Red" fill="#ef4444" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
+                              <TableCell className="text-center">
+                                {record.attended ? (
+                                  <Check className="h-5 w-5 text-green-500 mx-auto" />
+                                ) : (
+                                  <X className="h-5 w-5 text-red-500 mx-auto" />
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      กรุณาเลือกรายวิชาเพื่อดูรายละเอียด
+                    </div>
+                  )}
                 </CardContent>
               </Card>
-
-              {/* Subject Chart */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <div className="w-2 h-2 rounded-full bg-primary"></div>% การเข้าเรียนตามรายวิชา vs EP
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={subjectChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="ep" />
-                        <YAxis domain={[0, 100]} />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="Grammar" stroke="#8884d8" strokeWidth={2} />
-                        <Line type="monotone" dataKey="Vocabulary" stroke="#82ca9d" strokeWidth={2} />
-                        <Line type="monotone" dataKey="Speaking" stroke="#ffc658" strokeWidth={2} />
-                        <Line type="monotone" dataKey="Listening" stroke="#ff7300" strokeWidth={2} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Subject Detail View */}
-            <Card>
-              <CardHeader>
-                <CardTitle>รายละเอียดการเข้าเรียนตามรายวิชา</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-4">
-                  <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-                    <SelectTrigger className="w-full sm:w-64">
-                      <SelectValue placeholder="เลือกรายวิชา" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {filteredSubjects.map((subject) => (
-                        <SelectItem key={subject.id} value={subject.id}>
-                          {subject.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {selectedSubject && (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>ชื่อนักเรียน</TableHead>
-                          <TableHead>วันที่</TableHead>
-                          <TableHead>เวลา</TableHead>
-                          <TableHead>EP</TableHead>
-                          <TableHead className="text-center">สถานะ</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {attendanceData.map((record) => (
-                          <TableRow key={record.id}>
-                            <TableCell className="font-medium">{record.studentName}</TableCell>
-                            <TableCell>{record.date}</TableCell>
-                            <TableCell>{record.time}</TableCell>
-                            <TableCell>
-                              <Badge variant="outline">{record.ep}</Badge>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              {record.attended ? (
-                                <Check className="h-5 w-5 text-green-500 mx-auto" />
-                              ) : (
-                                <X className="h-5 w-5 text-red-500 mx-auto" />
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </>
+            </TabsContent>
+          </Tabs>
         )}
 
         {/* Remark Dialog */}
