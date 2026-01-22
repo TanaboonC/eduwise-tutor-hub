@@ -8,7 +8,18 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LineChart, Line } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+  LineChart,
+  Line,
+} from "recharts";
 import { MessageSquare, Check, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -27,45 +38,69 @@ const subjects = [
 ];
 
 const mockStudents = [
-  { 
-    id: "1", 
-    name: "สมชาย ใจดี", 
+  {
+    id: "1",
+    name: "สมชาย ใจดี",
     subjects: { Grammar: 85, Vocabulary: 90, Speaking: 75, Listening: 80 },
-    status: "green"
+    status: "green",
   },
-  { 
-    id: "2", 
-    name: "สมหญิง รักเรียน", 
+  {
+    id: "2",
+    name: "สมหญิง รักเรียน",
     subjects: { Grammar: 70, Vocabulary: 65, Speaking: 80, Listening: 75 },
-    status: "yellow"
+    status: "yellow",
   },
-  { 
-    id: "3", 
-    name: "วิชัย เก่งมาก", 
+  {
+    id: "3",
+    name: "วิชัย เก่งมาก",
     subjects: { Grammar: 95, Vocabulary: 92, Speaking: 88, Listening: 90 },
-    status: "green"
+    status: "green",
   },
-  { 
-    id: "4", 
-    name: "นารี สวยงาม", 
+  {
+    id: "4",
+    name: "นารี สวยงาม",
     subjects: { Grammar: 55, Vocabulary: 60, Speaking: 50, Listening: 45 },
-    status: "orange"
+    status: "orange",
   },
-  { 
-    id: "5", 
-    name: "ประพันธ์ มั่นคง", 
+  {
+    id: "5",
+    name: "ประพันธ์ มั่นคง",
     subjects: { Grammar: 30, Vocabulary: 35, Speaking: 40, Listening: 38 },
-    status: "red"
+    status: "red",
   },
 ];
 
 const mockStudentAttendanceDetail = [
   { id: "1", studentName: "สมชาย ใจดี", date: "2024-01-15", time: "09:00", ep: "EP1", attended: true, remark: "" },
-  { id: "2", studentName: "สมชาย ใจดี", date: "2024-01-22", time: "09:00", ep: "EP2", attended: true, remark: "เข้าเรียนตรงเวลา" },
+  {
+    id: "2",
+    studentName: "สมชาย ใจดี",
+    date: "2024-01-22",
+    time: "09:00",
+    ep: "EP2",
+    attended: true,
+    remark: "เข้าเรียนตรงเวลา",
+  },
   { id: "3", studentName: "สมหญิง รักเรียน", date: "2024-01-15", time: "09:00", ep: "EP1", attended: true, remark: "" },
-  { id: "4", studentName: "สมหญิง รักเรียน", date: "2024-01-22", time: "09:15", ep: "EP2", attended: true, remark: "มาสาย 15 นาที" },
+  {
+    id: "4",
+    studentName: "สมหญิง รักเรียน",
+    date: "2024-01-22",
+    time: "09:15",
+    ep: "EP2",
+    attended: true,
+    remark: "มาสาย 15 นาที",
+  },
   { id: "5", studentName: "วิชัย เก่งมาก", date: "2024-01-15", time: "09:00", ep: "EP1", attended: true, remark: "" },
-  { id: "6", studentName: "วิชัย เก่งมาก", date: "2024-01-22", time: "09:00", ep: "EP2", attended: false, remark: "ลาป่วย" },
+  {
+    id: "6",
+    studentName: "วิชัย เก่งมาก",
+    date: "2024-01-22",
+    time: "09:00",
+    ep: "EP2",
+    attended: false,
+    remark: "ลาป่วย",
+  },
 ];
 
 const statusChartData = [
@@ -84,11 +119,16 @@ const epFilters = ["ทั้งหมด", "EP1-5", "EP6-10", "EP11-15"];
 
 function getStatusColor(status: string) {
   switch (status) {
-    case "green": return "bg-green-500";
-    case "yellow": return "bg-yellow-500";
-    case "orange": return "bg-orange-500";
-    case "red": return "bg-red-500";
-    default: return "bg-gray-500";
+    case "green":
+      return "bg-green-500";
+    case "yellow":
+      return "bg-yellow-500";
+    case "orange":
+      return "bg-orange-500";
+    case "red":
+      return "bg-red-500";
+    default:
+      return "bg-gray-500";
   }
 }
 
@@ -105,19 +145,15 @@ export default function StudentAttendancePage() {
   const [selectedEpFilter, setSelectedEpFilter] = useState<string>("ทั้งหมด");
   const [attendanceData, setAttendanceData] = useState(mockStudentAttendanceDetail);
   const [remarkDialogOpen, setRemarkDialogOpen] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<typeof mockStudentAttendanceDetail[0] | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<(typeof mockStudentAttendanceDetail)[0] | null>(null);
   const [remarkText, setRemarkText] = useState("");
 
-  const filteredSubjects = subjects.filter(s => s.courseId === selectedCourse);
+  const filteredSubjects = subjects.filter((s) => s.courseId === selectedCourse);
 
   const handleSaveRemark = () => {
     if (selectedRecord) {
-      setAttendanceData(prev => 
-        prev.map(record => 
-          record.id === selectedRecord.id 
-            ? { ...record, remark: remarkText }
-            : record
-        )
+      setAttendanceData((prev) =>
+        prev.map((record) => (record.id === selectedRecord.id ? { ...record, remark: remarkText } : record)),
       );
       toast.success("บันทึก Remark เรียบร้อยแล้ว");
       setRemarkDialogOpen(false);
@@ -126,7 +162,7 @@ export default function StudentAttendancePage() {
     }
   };
 
-  const openRemarkDialog = (record: typeof mockStudentAttendanceDetail[0]) => {
+  const openRemarkDialog = (record: (typeof mockStudentAttendanceDetail)[0]) => {
     setSelectedRecord(record);
     setRemarkText(record.remark);
     setRemarkDialogOpen(true);
@@ -148,7 +184,7 @@ export default function StudentAttendancePage() {
                     <SelectValue placeholder="เลือกคอร์สเรียน" />
                   </SelectTrigger>
                   <SelectContent>
-                    {courses.map(course => (
+                    {courses.map((course) => (
                       <SelectItem key={course.id} value={course.id}>
                         {course.name}
                       </SelectItem>
@@ -156,7 +192,7 @@ export default function StudentAttendancePage() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               {selectedCourse && (
                 <div className="w-full sm:w-64">
                   <Select value={selectedEpFilter} onValueChange={setSelectedEpFilter}>
@@ -164,7 +200,7 @@ export default function StudentAttendancePage() {
                       <SelectValue placeholder="Filter EP" />
                     </SelectTrigger>
                     <SelectContent>
-                      {epFilters.map(ep => (
+                      {epFilters.map((ep) => (
                         <SelectItem key={ep} value={ep}>
                           {ep}
                         </SelectItem>
@@ -194,7 +230,7 @@ export default function StudentAttendancePage() {
                       <TableRow>
                         <TableHead className="min-w-[150px]">ชื่อนักเรียน</TableHead>
                         <TableHead className="min-w-[40px]">สถานะ</TableHead>
-                        {["Grammar", "Vocabulary", "Speaking", "Listening"].map(subject => (
+                        {["Grammar", "Vocabulary", "Speaking", "Listening"].map((subject) => (
                           <TableHead key={subject} className="text-center min-w-[100px]">
                             {subject} (%)
                           </TableHead>
@@ -203,17 +239,22 @@ export default function StudentAttendancePage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {mockStudents.map(student => {
+                      {mockStudents.map((student) => {
                         const subjects = student.subjects as Record<string, number>;
-                        const avg = Math.round(Object.values(subjects).reduce((a, b) => a + b, 0) / Object.values(subjects).length);
+                        const avg = Math.round(
+                          Object.values(subjects).reduce((a, b) => a + b, 0) / Object.values(subjects).length,
+                        );
                         return (
                           <TableRow key={student.id}>
                             <TableCell className="font-medium">{student.name}</TableCell>
                             <TableCell>
                               <div className={`w-4 h-4 rounded-full ${getStatusColor(student.status)}`}></div>
                             </TableCell>
-                            {["Grammar", "Vocabulary", "Speaking", "Listening"].map(subject => (
-                              <TableCell key={subject} className={`text-center ${getAttendanceStatusColor(subjects[subject])}`}>
+                            {["Grammar", "Vocabulary", "Speaking", "Listening"].map((subject) => (
+                              <TableCell
+                                key={subject}
+                                className={`text-center ${getAttendanceStatusColor(subjects[subject])}`}
+                              >
                                 {subjects[subject]}%
                               </TableCell>
                             ))}
@@ -235,8 +276,7 @@ export default function StudentAttendancePage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <div className="w-2 h-2 rounded-full bg-primary"></div>
-                    % การเข้าเรียนตามสถานะ vs EP
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>% การเข้าเรียนตามสถานะ vs EP
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -262,8 +302,7 @@ export default function StudentAttendancePage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <div className="w-2 h-2 rounded-full bg-primary"></div>
-                    % การเข้าเรียนตามรายวิชา vs EP
+                    <div className="w-2 h-2 rounded-full bg-primary"></div>% การเข้าเรียนตามรายวิชา vs EP
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -298,7 +337,7 @@ export default function StudentAttendancePage() {
                       <SelectValue placeholder="เลือกรายวิชา" />
                     </SelectTrigger>
                     <SelectContent>
-                      {filteredSubjects.map(subject => (
+                      {filteredSubjects.map((subject) => (
                         <SelectItem key={subject.id} value={subject.id}>
                           {subject.name}
                         </SelectItem>
@@ -317,12 +356,10 @@ export default function StudentAttendancePage() {
                           <TableHead>เวลา</TableHead>
                           <TableHead>EP</TableHead>
                           <TableHead className="text-center">สถานะ</TableHead>
-                          <TableHead>Remark</TableHead>
-                          <TableHead className="text-center">จัดการ</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {attendanceData.map(record => (
+                        {attendanceData.map((record) => (
                           <TableRow key={record.id}>
                             <TableCell className="font-medium">{record.studentName}</TableCell>
                             <TableCell>{record.date}</TableCell>
@@ -337,19 +374,7 @@ export default function StudentAttendancePage() {
                                 <X className="h-5 w-5 text-red-500 mx-auto" />
                               )}
                             </TableCell>
-                            <TableCell className="max-w-[200px] truncate">
-                              {record.remark || "-"}
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => openRemarkDialog(record)}
-                              >
-                                <MessageSquare className="h-4 w-4 mr-1" />
-                                Remark
-                              </Button>
-                            </TableCell>
+                            <TableCell className="max-w-[200px] truncate">{record.remark || "-"}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -371,7 +396,9 @@ export default function StudentAttendancePage() {
               {selectedRecord && (
                 <div className="text-sm text-muted-foreground">
                   <p>นักเรียน: {selectedRecord.studentName}</p>
-                  <p>วันที่: {selectedRecord.date} | EP: {selectedRecord.ep}</p>
+                  <p>
+                    วันที่: {selectedRecord.date} | EP: {selectedRecord.ep}
+                  </p>
                 </div>
               )}
               <Textarea
@@ -384,9 +411,7 @@ export default function StudentAttendancePage() {
                 <Button variant="outline" onClick={() => setRemarkDialogOpen(false)}>
                   ยกเลิก
                 </Button>
-                <Button onClick={handleSaveRemark}>
-                  บันทึก
-                </Button>
+                <Button onClick={handleSaveRemark}>บันทึก</Button>
               </div>
             </div>
           </DialogContent>
